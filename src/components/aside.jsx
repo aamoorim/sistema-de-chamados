@@ -1,27 +1,36 @@
-
+import { ClipboardList } from 'lucide-react';
 
 
 export function Aside() {
     return (
         <div className="app-container">
             <aside className="aside">
-            <div className="logo">
+            <div className="logo">  
                 <img src="/logo_squad.svg" alt="logo da empresa squadBi" />
 
                 <div className="name_user">
                     <span className="aside_company">SquadBi</span>
                     <span className="aside_user">Admin</span>
                 </div>
-
+        
             </div>
 
             
 
             <nav>
                 <ul>
-                    <button>Chamados</button>
-                    <button>Técnico</button>
-                    <button>Clientes</button>
+                    <button className='nav-button'>
+                        <ClipboardList size={24} />
+                        <span>Chamados</span>   
+                    </button>
+                    <button className='nav-button'>
+                        <ClipboardList size={24} />
+                        <span>Relatórios</span>
+                    </button>
+                    <button className='nav-button'>
+                        <ClipboardList size={24} />
+                        <span>Configurações</span>
+                    </button>
                 </ul>
             </nav>
 
