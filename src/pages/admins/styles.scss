@@ -78,6 +78,7 @@
   overflow-x: auto;
 }
   flex: 1;
+  padding: 40px;
 /* Ajuste para responsividade */
 @media (max-width: 900px) {
   .calls-admin-main {
@@ -87,7 +88,6 @@
     max-width: 100vw;
   }
 }
-  padding: 40px;
 }
 
 /* Ajuste para o Aside se necessário */
