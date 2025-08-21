@@ -25,11 +25,11 @@ export function Aside() {
                     </button>
                     <button className='nav-button'>
                         <ClipboardList size={24} />
-                        <span>Relatórios</span>
+                        <span>Técnicos</span>
                     </button>
                     <button className='nav-button'>
                         <ClipboardList size={24} />
-                        <span>Configurações</span>
+                        <span>Clientes</span>
                     </button>
                 </ul>
             </nav>
