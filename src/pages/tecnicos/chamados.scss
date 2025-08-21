@@ -1,0 +1,535 @@
+// ========================================
+// VARIÁVEIS
+// ========================================
+
+// Colors
+$color-primary: #3b83f6;
+$color-primary-hover: #2563eb;
+$color-secondary: #64748b;  
+$color-success: #22c55e;
+$color-warning: #f59e0b;
+$color-danger: #ef4444;
+$color-icon:#355EC5 ;
+// Background Colors
+$bg-main: #ffffff;
+$bg-sidebar: #1e293b;
+$bg-card: #ffffff;
+$bg-app: #f1f5f9;
+$bg-hover: #f8fafc;
+
+// Text Colors
+$text-primary: #0f172a;
+$text-secondary: #64748b;
+$text-muted: #94a3b8;
+$text-white: #ffffff;
+
+// Border Colors
+$border-light: #e2e8f0;
+$border-dark: #334155;
+
+// Spacing
+$spacing-xs: 4px;
+$spacing-sm: 8px;
+$spacing-md: 12px;
+$spacing-lg: 16px;
+$spacing-xl: 20px;
+$spacing-2xl: 24px;
+$spacing-3xl: 32px;
+$spacing-4xl: 40px;
+
+// Border Radius
+$radius-sm: 6px;
+$radius-md: 8px;
+$radius-lg: 12px;
+$radius-xl: 16px;
+$radius-2xl: 20px;
+$radius-full: 50%;
+
+// Shadows
+$shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+$shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+$shadow-lg: 0 8px 25px rgba(0, 0, 0, 0.1);
+$shadow-primary: 0 2px 8px rgba(59, 130, 246, 0.3);
+
+// Font Weights
+$font-normal: 400;
+$font-medium: 500;
+$font-semibold: 600;
+$font-bold: 700;
+
+// Font Sizes
+$text-xs: 12px;
+$text-sm: 13px;
+$text-base: 14px;
+$text-lg: 16px;
+$text-xl: 18px;
+$text-2xl: 20px;
+$text-3xl: 28px;
+
+// Transitions
+$transition-fast: 0.15s ease;
+$transition-base: 0.2s ease;
+$transition-slow: 0.3s ease;
+
+// Breakpoints
+$breakpoint-xs: 480px;
+$breakpoint-sm: 576px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 992px;
+$breakpoint-xl: 1200px;
+
+// ========================================
+// MIXINS
+// ========================================
+
+@mixin flex($direction: row, $align: center, $justify: flex-start, $gap: 0) {
+  display: flex;
+  flex-direction: $direction;
+  align-items: $align;
+  justify-content: $justify;
+  gap: $gap;
+}
+
+@mixin card($padding: $spacing-2xl, $radius: $radius-xl, $shadow: $shadow-sm) {
+  background: $bg-card;
+  border: 1px solid $border-light;
+  border-radius: $radius;
+  padding: $padding;
+  box-shadow: $shadow;
+  transition: all $transition-base;
+}
+
+@mixin hover-lift() {
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: $shadow-lg;
+  }
+}
+
+@mixin button($bg: $color-primary, $color: $text-white, $padding: $spacing-sm $spacing-lg) {
+  background: $bg;
+  color: $color;
+  border: none;
+  padding: $padding;
+  border-radius: $radius-md;
+  font-weight: $font-medium;
+  cursor: pointer;
+  transition: all $transition-base;
+  
+  &:hover {
+    background: darken($bg, 10%);
+    transform: translateY(-1px);
+  }
+}
+
+@mixin avatar($size: 36px, $bg: $color-primary) {
+  width: $size;
+  height: $size;
+  border-radius: $radius-full;
+  background: $bg;
+  color: $text-white;
+  @include flex(row, center, center);
+  font-weight: $font-semibold;
+  font-size: calc(#{$size} * 0.36);
+}
+
+@mixin status-border($color: $color-warning, $width: 4px) {
+  border-left: $width solid $color;
+}
+
+@mixin responsive($breakpoint) {
+  @media (max-width: $breakpoint) {
+    @content;
+  }
+}
+
+// ========================================
+// RESET E BASE
+// ========================================
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  background: $bg-app;
+  overflow-x: hidden;
+}
+
+// ========================================
+// COMPONENTE PRINCIPAL
+// ========================================
+
+.app-container {
+  display: flex;    // Faz Aside e main ficarem lado a lado
+  min-height: 100vh;  // Ocupa a tela inteira
+  background: $bg-app;
+}
+
+.main-content {
+  flex: 1;  // Ocupa o espaço que sobra 
+  background:#f5f8fc; 
+  padding: 20px;
+
+
+  @include responsive($breakpoint-xl) {
+    padding: $spacing-2xl $spacing-3xl;
+  }
+
+  @include responsive($breakpoint-lg) {
+    border-radius: 0;   
+    padding: $spacing-2xl;
+  }
+
+  @include responsive($breakpoint-md) {
+    padding: $spacing-xl;
+  }
+
+  @include responsive($breakpoint-xs) {
+    padding: $spacing-lg;
+  }
+}
+
+// ========================================
+// MOBILE CONTROLS
+// ========================================
+
+.mobile-menu-btn {
+  position: fixed;
+  top: $spacing-xl;
+  right: $spacing-xl;
+  z-index: 1001;
+  background: $color-primary;
+  color: $text-white;
+  border: none;
+  padding: $spacing-md;
+  border-radius: $radius-lg;
+  cursor: pointer;
+  box-shadow: $shadow-lg;
+  transition: all $transition-base;
+  display: none;
+
+  &:hover {
+    background: $color-primary-hover;
+    transform: scale(1.05);
+  }
+
+  @include responsive($breakpoint-lg) {
+    display: block;
+  }
+}
+
+.mobile-close-btn {
+  position: absolute;
+  top: $spacing-xl;
+  right: $spacing-xl;
+  background: rgba(255, 255, 255, 0.1);
+  color: $text-white;
+  border: none;
+  padding: $spacing-sm;
+  border-radius: $radius-md;
+  cursor: pointer;
+  transition: all $transition-base;
+  display: none;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  @include responsive($breakpoint-lg) {
+    display: block;
+  }
+}
+
+.mobile-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  display: none;
+
+  @include responsive($breakpoint-lg) {
+    display: block;
+  }
+}
+
+// ========================================
+// HEADER
+// ========================================
+
+.header {
+  margin-bottom: $spacing-3xl;
+
+  h1 {
+    font-size: $text-3xl;
+    font-weight: $font-semibold;
+    color: $text-primary;
+    margin-bottom: $spacing-2xl;
+    letter-spacing: -0.025em;
+
+    @include responsive($breakpoint-md) {
+      font-size: $text-2xl;
+      margin-bottom: $spacing-xl;
+    }
+
+    @include responsive($breakpoint-xs) {
+      font-size: $text-xl;
+    }
+  }
+}
+
+.tabs-container {
+  @include flex(row, center, flex-start, $spacing-sm);
+  
+  @include responsive($breakpoint-xs) {
+    flex-wrap: wrap;
+  }
+}
+
+.tab {
+  @include flex(row, center, center, $spacing-sm);
+  padding: 10px $spacing-xl;
+  border-radius: 24px;
+  border: none;
+  font-size: $text-base;
+  font-weight: $font-medium;
+  cursor: pointer;
+  transition: all $transition-base;
+  background: $border-light;
+  color: $text-secondary;
+  white-space: nowrap;
+
+  &.active {
+    background: $color-primary;
+    color: $text-white;
+    box-shadow: $shadow-primary;
+  }
+
+  &:hover:not(.active) {
+    background: darken($border-light, 5%);
+  }
+
+  @include responsive($breakpoint-xs) {
+    padding: $spacing-sm $spacing-lg;
+    font-size: $text-sm;
+  }
+}
+
+.tab-icon {
+  width: 16px;
+  height: 16px;
+  display: flex;
+
+
+  @include responsive($breakpoint-xs) {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+// ========================================
+// LISTA DE CHAMADOS
+// ========================================
+
+.chamados-list {
+  @include flex(column, stretch, flex-start, $spacing-xl);
+  margin-top: $spacing-2xl;
+
+  @include responsive($breakpoint-md) {
+    gap: $spacing-lg;
+  }
+}
+
+.chamado-card {
+  @include card($spacing-2xl, $radius-xl, $shadow-sm);
+  position: relative;
+  @include hover-lift();
+
+  &.finalizado {
+    @include status-border($color-success);
+  }
+
+  &.andamento {
+    @include status-border($color-warning);
+  }
+
+  @include responsive($breakpoint-md) {
+    padding: $spacing-xl;
+  }
+
+  @include responsive($breakpoint-xs) {
+    padding: $spacing-lg;
+    border-radius: $radius-lg;
+  }
+}
+
+// ========================================
+// CARD HEADER
+// ========================================
+
+.card-header {
+  @include flex(row, flex-start, space-between);
+  margin-bottom: $spacing-xl;
+
+  @include responsive($breakpoint-sm) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: $spacing-lg;
+  }
+}
+
+.chamado-info {
+  flex: 1;
+
+  @include responsive($breakpoint-sm) {
+    order: 1;
+  }
+}
+
+.chamado-codigo {
+  font-size: $text-xs;
+  color: $text-secondary;
+  margin-bottom: 6px;
+  font-weight: $font-medium;
+}
+
+.chamado-titulo {
+  font-size: $text-lg;
+  font-weight: $font-semibold;
+  color: $text-primary;
+  margin-bottom: $spacing-xs;
+  line-height: 1.4;
+
+  @include responsive($breakpoint-xs) {
+    font-size: $text-base;
+  }
+}
+
+.chamado-descricao {
+  font-size: $text-base;
+  color: $text-secondary;
+  line-height: 1.5;
+
+  @include responsive($breakpoint-xs) {
+    font-size: $text-sm;
+  }
+}
+
+.card-actions {
+  @include flex(row, center, flex-end, $spacing-md);
+
+  @include responsive($breakpoint-sm) {
+    order: 2;
+    justify-content: flex-start;
+  }
+}
+
+.btn-enviar {
+  @include button(#1f2937, $text-white, $spacing-sm $spacing-lg);
+  font-size: $text-sm;
+
+  &:hover {
+    background: #374151;
+  }
+
+  @include responsive($breakpoint-xs) {
+    padding: $spacing-xs $spacing-md;
+    font-size: $text-xs;
+  }
+}
+
+.more-btn {
+  background: none;
+  border: none;
+  color: $text-muted;
+  cursor: pointer;
+  padding: $spacing-sm;
+  border-radius: $radius-sm;
+  transition: all $transition-base;
+
+  &:hover {
+    background: $bg-hover;
+    color: $text-secondary;
+  }
+}
+
+// ========================================
+// CARD FOOTER
+// ========================================
+
+.card-footer {
+  @include flex(row, center, space-between);
+  margin-top: $spacing-xl;
+
+  @include responsive($breakpoint-sm) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: $spacing-md;
+  }
+}
+
+.chamado-data {
+  font-size: $text-sm;
+  color: $text-secondary;
+  font-weight: $font-medium;
+
+  @include responsive($breakpoint-sm) {
+    order: 2;
+    text-align: center;
+  }
+}
+
+.user-info {
+  @include flex(row, center, flex-start, $spacing-md);
+
+  @include responsive($breakpoint-sm) {
+    order: 1;
+    justify-content: center;
+  }
+}
+
+.user-avatar {
+  @include avatar(36px, $color-primary);  
+  letter-spacing: 0.5px;
+
+  @include responsive($breakpoint-xs) {
+    @include avatar(32px, $color-primary);
+  }
+}
+
+.user-name {
+  font-size: $text-base;
+  color: $text-primary;
+  font-weight: $font-medium;
+
+  @include responsive($breakpoint-xs) {
+    font-size: $text-sm;
+  }
+}
+.tabs-container button{
+  color: $color-icon;
+
+}
+
+.status-icon {
+  width: 20px;
+  height: 20px;
+  margin-left: $spacing-sm;
+
+  &.finalizado {
+    color: $color-success;
+    background: lighten($color-success, 45%);
+    border-radius: $radius-full;
+    padding: 2px;
+  }
+}
+
+// ========================================
+// SIDEBAR
+// ========================================
