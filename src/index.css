@@ -13,7 +13,7 @@
 .aside {
   background: #181920;
   color: #fff;
-  width: 250px;   
+  width: 200px;   
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -57,10 +57,11 @@
       display: flex;    
       flex-direction: column;
       gap: 8px;
-      width: 100%;  
+      align-items: center;
 
 
       .nav-button {
+        align-self: stretch;
         width: 100%;
         max-width: 240px;
         background: transparent;
@@ -68,7 +69,6 @@
         color: #fff;
         text-align: left;
         padding: 12px 20px;
-        font-size: 1rem;
         border-radius: 6px;  
         cursor: pointer;
         transition: all 0.3s ease;
@@ -106,7 +106,7 @@
     margin-top: auto;
     display: flex;
     align-items: center;
-    padding: 16px 24px;
+    padding: 16px 2px;
     border-top: 1px solid #23243a;
     transition: background 0.2s ease;
 
@@ -142,12 +142,12 @@
   }
 }
 
-<<<<<<< HEAD
+
 .aside_footer:hover {
   background: rgba(255, 255, 255, 0.05);
   border-radius: 8px;
 }
-=======
+
 /* src/styles/SearchBar.css */
 .search-bar-container {
   display: flex;
@@ -161,6 +161,7 @@
 
 .search-input-wrapper {
   position: relative;
+  width: 400px;
   flex: 1;
 }
 
@@ -183,7 +184,7 @@
 
 .search-input::placeholder {
   color: #aaa;
-  font-weight: 60    0;
+  font-weight: 600;
 }
 
 .search-icon {
@@ -193,6 +194,8 @@
   transform: translateY(-50%);
   color: #aaa;
   pointer-events: none;
+  width: 18px;
+  height: 18px;
 }
 
 .filter-button {
@@ -215,4 +218,181 @@
   height: 20px;
   color: #555;
 }
->>>>>>> feature/search-bar
+
+/* Estilos existentes do search-bar mantidos, adicionando novos: */
+
+.filter-container {
+  position: relative;
+}
+
+.filter-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filter-button:hover {
+  background: #f5f5f5;
+}
+
+.filter-button.active {
+  background: #e3f2fd;
+  border-color: #2196f3;
+  color: #1976d2;
+}
+
+.filter-count {
+  background: #2196f3;
+  color: white;
+  font-size: 12px;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+}
+
+.chevron {
+  transition: transform 0.2s ease;
+}
+
+.chevron.open {
+  transform: rotate(180deg);
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
+  width: 320px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.dropdown-header {
+  display: flex;
+  justify-content: between;
+  align-items: center;
+  padding: 16px;
+  border-bottom: 1px solid #eee;
+}
+
+.dropdown-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.clear-all-btn {
+  background: none;
+  border: none;
+  color: #2196f3;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+.clear-all-btn:hover {
+  background: #f0f8ff;
+}
+
+.filter-section {
+  padding: 16px;
+  border-bottom: 1px solid #eee;
+}
+
+.filter-section:last-child {
+  border-bottom: none;
+}
+
+.filter-title {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #555;
+}
+
+.filter-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.filter-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+.filter-option:hover {
+  background: #f8f9fa;
+}
+
+.filter-option input[type="checkbox"] {
+  margin: 0;
+  accent-color: #2196f3;
+}
+
+.filter-option span {
+  font-size: 14px;
+  color: #666;
+}
+
+/* Tags dos filtros ativos */
+.active-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.filter-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #e3f2fd;
+  color: #1976d2;
+  padding: 6px 10px;
+  border-radius: 16px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.remove-filter-btn {
+  background: none;
+  border: none;
+  color: #1976d2;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  transition: background 0.2s ease;
+}
+
+.remove-filter-btn:hover {
+  background: rgba(25, 118, 210, 0.1);
+}
