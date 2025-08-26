@@ -1,90 +1,80 @@
-import { ClipboardList, LogOut } from 'lucide-react';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { LogOut, Users, UserCheck, Headphones, MessageSquare } from 'lucide-react';
 import { useAuth } from '../context/auth-context';
-import { getNavigationByRole } from '../config/navigation-config';
-import { Link, useLocation } from 'react-router-dom';
+import '../index.css';
 
-export function Aside() {
-  const { user, role, logout } = useAuth();
-  const location = useLocation();
-  
-  // Pega os itens de navegação baseado no role do usuário
-  const navigationItems = getNavigationByRole(role);
-  
-  // Função para verificar se a rota está ativa
-  const isActiveRoute = (path) => {
-    return location.pathname === path;
+export const Aside = () => {
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
   };
 
-  // Função para definir o nome do usuário baseado no role
-  const getUserDisplayInfo = () => {
-    const roleNames = {
-      admin: 'Administrador',
-      cliente: 'Cliente',
-      tecnico: 'Técnico'
-    };
-    
-    return {
-      roleName: roleNames[role] || 'Usuário',
-      userName: user?.nome || user?.name || 'Usuário',
-      userEmail: user?.email || `${role}@email.com`
-    };
+  const getMenuItems = () => {
+    switch (user?.role) {
+      case 'admin':
+        return [
+          { path: '/admin', icon: <MessageSquare size={20} />, label: 'Chamados', end: true },
+          { path: '/admin/clientes', icon: <Users size={20} />, label: 'Clientes' },
+          { path: '/admin/tecnicos', icon: <UserCheck size={20} />, label: 'Técnicos' }
+        ];
+      case 'cliente':
+        return [
+          { path: '/cliente', icon: <MessageSquare size={20} />, label: 'Chamados' }
+        ];
+      case 'tecnico':
+        return [
+          { path: '/tecnico', icon: <MessageSquare size={20} />, label: 'Chamados', end: true },
+          { path: '/tecnico/andamento', icon: <Headphones size={20} />, label: 'Em Andamento' }
+        ];
+      default:
+        return [];
+    }
   };
 
-  const userInfo = getUserDisplayInfo();
+  const menuItems = getMenuItems();
 
   return (
-    <div className="app-container">
-      <aside className="aside">
-        {/* Logo e informações do usuário */}
-        <div className="logo">
-          <img src="/logo_squad.svg" alt="logo da empresa squadBi" />
-          <div className="name_user">
-            <span className="aside_company">SquadBi</span>
-            <span className="aside_user">{userInfo.roleName}</span>
-          </div>
+    <aside className="aside">
+      <div className="logo">
+        <img src="/logo_squad.svg" alt="Squad BI Logo" />
+        <div className="name_user">
+          <span className="aside_company">SquadBi</span>
+          <span className="aside_user">{user?.role || 'Visitante'}</span>
         </div>
+      </div>
 
-        {/* Navegação dinâmica baseada no role */}
-        <nav>
-          <ul>
-            {navigationItems.map((item, index) => {
-              const IconComponent = item.icon;
-              const isActive = isActiveRoute(item.path);
-              
-              return (
-                <li key={index}>
-                  <Link 
-                    to={item.path}
-                    className={`nav-button ${isActive ? 'active' : ''}`}
-                  >
-                    <IconComponent size={24} />
-                    <span>{item.label}</span>
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        </nav>
+      <nav>
+        <ul>
+          {menuItems.map((item, index) => (
+            <li key={index}>
+              <NavLink
+                to={item.path}
+                end={item.end}
+                className={({ isActive }) =>
+                  `nav-button ${isActive ? 'active' : ''}`
+                }
+              >
+                <span>{item.icon}</span>
+                <span>{item.label}</span>
+              </NavLink>
+            </li>
+          ))}
+        </ul>
+      </nav>
 
-        {/* Footer com informações do usuário e logout */}
-        <div className="aside_footer_container">
-          <button className="aside_footer">
-            <div className="avatar">
-              {userInfo.userName.charAt(0).toUpperCase()}
-              {userInfo.roleName.charAt(0).toUpperCase()}
-            </div>
-            <div className="user_info">
-              <p>{userInfo.userName}</p>
-              <p>{userInfo.userEmail}</p>
-            </div>
-          </button>
-          
-          <button className="logout-button" onClick={logout}>
-            <LogOut size={20} />
-            <span>Sair</span>
-          </button>
+      <button className="aside_footer" onClick={handleLogout}>
+        <div className="avatar">
+          <span>{user?.name?.charAt(0)?.toUpperCase() || 'U'}</span>
         </div>
-      </aside>
-    </div>
+        <div className="user_info">
+          <p>{user?.name || 'Admin Teste'}</p>
+          <p>{user?.email || 'admin@email.com'}</p>
+        </div>
+        <LogOut size={16} style={{ marginLeft: 'auto' }} />
+      </button>
+    </aside>
   );
-}
+};

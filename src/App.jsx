@@ -1,14 +1,14 @@
-import { useState } from 'react'
-import './App.css'
-import { CallAdmin } from './pages/admins/ChamadosAdmin'
-import ListTable from './components/listTable'
+// src/App.jsx
+import { BrowserRouter as Router } from "react-router-dom";
+import AppRoutes from "./router/routes";
+import { AuthProvider } from "./context/auth-context";
 
-function App() {
+export default function App() {
   return (
-    <>
-
-      <CallAdmin />
-         
-    </>
-  )
+    <AuthProvider>
+      <Router>
+        <AppRoutes />
+      </Router>
+    </AuthProvider>
+  );
 }
