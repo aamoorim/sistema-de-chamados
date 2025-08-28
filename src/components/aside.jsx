@@ -1,7 +1,7 @@
 import { ClipboardList } from 'lucide-react';
 
 
-export function Aside() {
+export function aside() {
     return (
         <div className="app-container">
             <aside className="aside">

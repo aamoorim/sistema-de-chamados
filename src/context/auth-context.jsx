@@ -44,7 +44,7 @@ export function AuthProvider({ children }) {
       setUser, 
       currentUserId, 
       setCurrentUserId,
-      role, // ADICIONAR ROLE AQUI
+      role, 
       login,
       logout
     }}>

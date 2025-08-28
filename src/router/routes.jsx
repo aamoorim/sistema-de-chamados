@@ -16,7 +16,6 @@ import { SearchProvider } from "../context/search-context";
 import SearchBar from "../components/search-bar";
 import ListTable from "../components/listTable";
 import MeusChamados from "../pages/tecnicos/ChamadosTecnico";
-import { Aside } from "../components/aside";
 
 export default function AppRoutes() {
   return (
