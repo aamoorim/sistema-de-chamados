@@ -6,10 +6,11 @@
 $color-primary: #3b83f6;
 $color-primary-hover: #2563eb;
 $color-secondary: #64748b;  
-$color-success: #22c55e;
-$color-warning: #f59e0b;
+$color-success: #caecb1;
+$color-warning:#a5bbeb;
 $color-danger: #ef4444;
 $color-icon:#355EC5 ;
+
 // Background Colors
 $bg-main: #ffffff;
 $bg-sidebar: #1e293b;
@@ -133,7 +134,7 @@ $breakpoint-xl: 1200px;
   font-size: calc(#{$size} * 0.36);
 }
 
-@mixin status-border($color: $color-warning, $width: 4px) {
+@mixin status-border($color: $color-warning, $width: 3px) {
   border-left: $width solid $color;
 }
 
@@ -154,109 +155,29 @@ $breakpoint-xl: 1200px;
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
   background: $bg-app;
   overflow-x: hidden;
 }
 
 // ========================================
-// COMPONENTE PRINCIPAL
+// LAYOUT PRINCIPAL
 // ========================================
 
 .app-container {
-  display: flex;    // Faz Aside e main ficarem lado a lado
-  min-height: 100vh;  // Ocupa a tela inteira
+  display: flex;
+  min-height: 100vh;
   background: $bg-app;
 }
 
 .main-content {
-  flex: 1;  // Ocupa o espaço que sobra 
+  flex: 1;
   background:#f5f8fc; 
   padding: 20px;
 
-
-  @include responsive($breakpoint-xl) {
-    padding: $spacing-2xl $spacing-3xl;
-  }
-
-  @include responsive($breakpoint-lg) {
-    border-radius: 0;   
-    padding: $spacing-2xl;
-  }
-
-  @include responsive($breakpoint-md) {
-    padding: $spacing-xl;
-  }
-
-  @include responsive($breakpoint-xs) {
-    padding: $spacing-lg;
-  }
-}
-
-// ========================================
-// MOBILE CONTROLS
-// ========================================
-
-.mobile-menu-btn {
-  position: fixed;
-  top: $spacing-xl;
-  right: $spacing-xl;
-  z-index: 1001;
-  background: $color-primary;
-  color: $text-white;
-  border: none;
-  padding: $spacing-md;
-  border-radius: $radius-lg;
-  cursor: pointer;
-  box-shadow: $shadow-lg;
-  transition: all $transition-base;
-  display: none;
-
-  &:hover {
-    background: $color-primary-hover;
-    transform: scale(1.05);
-  }
-
-  @include responsive($breakpoint-lg) {
-    display: block;
-  }
-}
-
-.mobile-close-btn {
-  position: absolute;
-  top: $spacing-xl;
-  right: $spacing-xl;
-  background: rgba(255, 255, 255, 0.1);
-  color: $text-white;
-  border: none;
-  padding: $spacing-sm;
-  border-radius: $radius-md;
-  cursor: pointer;
-  transition: all $transition-base;
-  display: none;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.2);
-  }
-
-  @include responsive($breakpoint-lg) {
-    display: block;
-  }
-}
-
-.mobile-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 999;
-  display: none;
-
-  @include responsive($breakpoint-lg) {
-    display: block;
-  }
+  @include responsive($breakpoint-xl) { padding: $spacing-2xl $spacing-3xl; }
+  @include responsive($breakpoint-lg) { padding: $spacing-2xl; }
+  @include responsive($breakpoint-md) { padding: $spacing-xl; }
+  @include responsive($breakpoint-xs) { padding: $spacing-lg; }
 }
 
 // ========================================
@@ -264,72 +185,44 @@ body {
 // ========================================
 
 .header {
-  margin-bottom: $spacing-3xl;
+  margin-bottom: $spacing-3xl;  
 
   h1 {
     font-size: $text-3xl;
     font-weight: $font-semibold;
-    color: $text-primary;
+    color:#2E3DA3;
     margin-bottom: $spacing-2xl;
     letter-spacing: -0.025em;
-
-    @include responsive($breakpoint-md) {
-      font-size: $text-2xl;
-      margin-bottom: $spacing-xl;
-    }
-
-    @include responsive($breakpoint-xs) {
-      font-size: $text-xl;
-    }
   }
 }
 
-.tabs-container {
-  @include flex(row, center, flex-start, $spacing-sm);
-  
-  @include responsive($breakpoint-xs) {
-    flex-wrap: wrap;
-  }
+// ========================================
+// SEÇÕES (Em atendimento / Encerrados)
+// ========================================
+
+.section {
+  margin-bottom: $spacing-4xl;
 }
 
-.tab {
-  @include flex(row, center, center, $spacing-sm);
-  padding: 10px $spacing-xl;
-  border-radius: 24px;
-  border: none;
+.section-header {
   font-size: $text-base;
-  font-weight: $font-medium;
-  cursor: pointer;
-  transition: all $transition-base;
-  background: $border-light;
-  color: $text-secondary;
-  white-space: nowrap;
+  font-weight: $font-normal;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: $spacing-xl;
+  padding: 6px 14px;
+  border-radius: 24px;
+  color: $text-white;
 
-  &.active {
-    background: $color-primary;
-    color: $text-white;
-    box-shadow: $shadow-primary;
+  &.andamento {
+    background: $color-warning;
+    color: #0739b8;
   }
 
-  &:hover:not(.active) {
-    background: darken($border-light, 5%);
-  }
-
-  @include responsive($breakpoint-xs) {
-    padding: $spacing-sm $spacing-lg;
-    font-size: $text-sm;
-  }
-}
-
-.tab-icon {
-  width: 16px;
-  height: 16px;
-  display: flex;
-
-
-  @include responsive($breakpoint-xs) {
-    width: 14px;
-    height: 14px;
+  &.finalizado {
+    background: $color-success;
+    color: #508B26;
   }
 }
 
@@ -338,18 +231,27 @@ body {
 // ========================================
 
 .chamados-list {
-  @include flex(column, stretch, flex-start, $spacing-xl);
-  margin-top: $spacing-2xl;
-
-  @include responsive($breakpoint-md) {
-    gap: $spacing-lg;
-  }
+  @include flex(column, stretch, flex-start, $spacing-md);
 }
 
 .chamado-card {
-  @include card($spacing-2xl, $radius-xl, $shadow-sm);
+  @include card($spacing-lg, $radius-md, $shadow-sm);
   position: relative;
   @include hover-lift();
+  background: $bg-card;
+  border: 1px solid $border-light;
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 20px; // mantém alinhado à esquerda
+  box-shadow: $shadow-sm;
+  font-size: 14px;
+  line-height: 1.4;
+  transition: all $transition-base;
+
+  // 🔥 largura controlada
+  max-width: 350px; // diminui a largura total
+  height: 200px;
+  width: 100%;      // continua responsivo
 
   &.finalizado {
     @include status-border($color-success);
@@ -359,177 +261,190 @@ body {
     @include status-border($color-warning);
   }
 
-  @include responsive($breakpoint-md) {
-    padding: $spacing-xl;
-  }
-
-  @include responsive($breakpoint-xs) {
-    padding: $spacing-lg;
-    border-radius: $radius-lg;
-  }
+  @include responsive($breakpoint-md) { padding: $spacing-md; }
+  @include responsive($breakpoint-xs) { padding: $spacing-sm; border-radius: $radius-sm; }
 }
 
 // ========================================
-// CARD HEADER
+// CARD MAIN
 // ========================================
 
-.card-header {
+.card-main {
   @include flex(row, flex-start, space-between);
-  margin-bottom: $spacing-xl;
-
-  @include responsive($breakpoint-sm) {
-    flex-direction: column;
-    align-items: stretch;
-    gap: $spacing-lg;
-  }
+  margin-bottom: $spacing-md;
 }
 
 .chamado-info {
   flex: 1;
-
-  @include responsive($breakpoint-sm) {
-    order: 1;
-  }
-}
-
-.chamado-codigo {
-  font-size: $text-xs;
-  color: $text-secondary;
-  margin-bottom: 6px;
-  font-weight: $font-medium;
-}
-
-.chamado-titulo {
-  font-size: $text-lg;
-  font-weight: $font-semibold;
-  color: $text-primary;
-  margin-bottom: $spacing-xs;
-  line-height: 1.4;
-
-  @include responsive($breakpoint-xs) {
-    font-size: $text-base;
-  }
-}
-
-.chamado-descricao {
-  font-size: $text-base;
-  color: $text-secondary;
-  line-height: 1.5;
-
-  @include responsive($breakpoint-xs) {
-    font-size: $text-sm;
-  }
-}
-
-.card-actions {
-  @include flex(row, center, flex-end, $spacing-md);
-
-  @include responsive($breakpoint-sm) {
-    order: 2;
-    justify-content: flex-start;
-  }
-}
-
-.btn-enviar {
-  @include button(#1f2937, $text-white, $spacing-sm $spacing-lg);
-  font-size: $text-sm;
-
-  &:hover {
-    background: #374151;
-  }
-
-  @include responsive($breakpoint-xs) {
-    padding: $spacing-xs $spacing-md;
+  
+  .chamado-codigo {
     font-size: $text-xs;
-  }
-}
-
-.more-btn {
-  background: none;
-  border: none;
-  color: $text-muted;
-  cursor: pointer;
-  padding: $spacing-sm;
-  border-radius: $radius-sm;
-  transition: all $transition-base;
-
-  &:hover {
-    background: $bg-hover;
     color: $text-secondary;
+    margin-bottom: 2px;
+    font-weight: $font-medium;
+  }
+
+  .chamado-titulo {
+    font-size: $text-lg;
+    font-weight: $font-semibold;
+    color: $text-primary;
+    margin-bottom: 2px;
+    line-height: 1.3;
+  }
+
+  .chamado-descricao {
+    font-size: $text-sm;
+    color: $text-secondary;
+    line-height: 1.3;
+    margin-bottom: 15px;
+  }
+
+  .chamado-data {
+    font-size: $text-xs;
+    color: $text-muted;
+    font-weight: $font-semibold;
   }
 }
+
+.card-right {
+  @include flex(row, center, flex-end, $spacing-sm);
+}
+
+.btn-encerrar {
+@include button(#000, $text-white, 4px $spacing-md);
+  font-size: $text-xs;
+  font-weight: $font-medium;
+  border-radius: 4px;
+  width: 90px;
+  height: 28px;
+
+  @include flex(row, center, );
+
+  position: relative;
+  overflow: hidden;
+
+  &:hover { background: #1f2937; }
+}
+
+
+
 
 // ========================================
 // CARD FOOTER
 // ========================================
 
 .card-footer {
-  @include flex(row, center, space-between);
-  margin-top: $spacing-xl;
-
-  @include responsive($breakpoint-sm) {
-    flex-direction: column;
-    align-items: stretch;
-    gap: $spacing-md;
-  }
-}
-
-.chamado-data {
-  font-size: $text-sm;
-  color: $text-secondary;
-  font-weight: $font-medium;
-
-  @include responsive($breakpoint-sm) {
-    order: 2;
-    text-align: center;
-  }
+  border-top: 1px solid $border-light;
+  padding-top: 14px;   // aumenta o espaço interno
+  margin-top: 30px;    // empurra o rodapé para base do card
+  min-height: 50px;    // garante altura mínima
 }
 
 .user-info {
-  @include flex(row, center, flex-start, $spacing-md);
-
-  @include responsive($breakpoint-sm) {
-    order: 1;
-    justify-content: center;
-  }
+  @include flex(row, center, flex-start, $spacing-sm);
 }
 
 .user-avatar {
-  @include avatar(36px, $color-primary);  
-  letter-spacing: 0.5px;
-
-  @include responsive($breakpoint-xs) {
-    @include avatar(32px, $color-primary);
-  }
+  @include avatar(24px, $color-primary);
+  font-size: 10px;
+  font-weight: $font-bold;
 }
 
 .user-name {
-  font-size: $text-base;
+  font-size: $text-sm;
   color: $text-primary;
   font-weight: $font-medium;
-
-  @include responsive($breakpoint-xs) {
-    font-size: $text-sm;
-  }
-}
-.tabs-container button{
-  color: $color-icon;
-
+  flex: 1;
 }
 
-.status-icon {
+.check-icon {
+  @include flex(row, center, center);
   width: 20px;
   height: 20px;
-  margin-left: $spacing-sm;
+  background: lighten($color-success, 40%);
+  color: $color-success;
+  border-radius: $radius-full;
+  margin-left: auto;
+}
 
-  &.finalizado {
-    color: $color-success;
-    background: lighten($color-success, 45%);
-    border-radius: $radius-full;
-    padding: 2px;
+
+// ========================================
+// RESPONSIVE AJUSTES
+// ========================================
+
+@include responsive($breakpoint-md) {
+  .card-main {
+    flex-direction: column;
+    gap: $spacing-sm;
+  }
+  
+  .card-right {
+    justify-content: flex-start;
+  }
+}
+
+@include responsive($breakpoint-xs) {
+  .user-avatar {
+    @include avatar(20px, $color-primary);
+    font-size: 9px;
+  }
+  
+  .btn-encerrar {
+    padding: 3px $spacing-sm;
+    font-size: 10px;
   }
 }
 
 // ========================================
-// SIDEBAR
+// RIPPLE EFFECT - ADICIONAR AO FINAL DO ARQUIVO
 // ========================================
+
+// Variáveis específicas do ripple
+$ripple-duration: 0.8s;
+$ripple-size: 200px;
+$ripple-color: rgba(255, 255, 255, 0.4);
+$ripple-easing: cubic-bezier(0.4, 0, 0.2, 1);
+
+// Modifica o botão existente para suportar ripple
+.btn-encerrar {
+  position: relative;
+  overflow: hidden;
+  
+  // Melhora a interação visual
+  &:active {
+    transform: translateY(0px) scale(0.98);
+  }
+  
+  // Efeito ripple
+  .ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: $ripple-color;
+    pointer-events: none;
+    animation: rippleEffect $ripple-duration $ripple-easing forwards;
+    transform: translate(-50%, -50%);
+  }
+}
+
+// Animação da onda suave
+@keyframes rippleEffect {
+  0% {
+    width: 0;
+    height: 0;
+    opacity: 0.6;
+    transform: translate(-50%, -50%) scale(0);
+  }
+  
+  50% {
+    opacity: 0.4;
+  }
+  
+  100% {
+    width: $ripple-size;
+    height: $ripple-size;
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+
