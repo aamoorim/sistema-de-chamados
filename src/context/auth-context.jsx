@@ -10,7 +10,7 @@ export function AuthProvider({ children }) {
   });
 
   const [currentUserId, setCurrentUserId] = useState(() => {
-    const savedId = localStorage.getItem("currentuserId");
+    const savedId = localStorage.getItem("currentUserId");
     return savedId || (user ? user.id : null);
   });
 
