@@ -77,11 +77,11 @@ export const NAVIGATION_CONFIG = [
         ]
       },
       {
-        label: 'Em Andamento',
+        label: 'Em Espera',
         icon: BarChart3,
-        path: '/tecnico/andamento',
+        path: '/tecnico/espera',
         subItems: [
-          { label: 'Meus Atendimentos', path: '/tecnico/andamento' }
+          { label: 'Meus Atendimentos', path: '/tecnico/espera' }
         ]
       },
     ]

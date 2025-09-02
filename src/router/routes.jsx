@@ -11,10 +11,9 @@ import TecEmAndamento from "../pages/tecnicos/ChamadosTecnico";
 import CallAdmin from "../pages/admins/ChamadosAdmin";
 import ClientesAdmin from "../pages/admins/ClientesAdmin";
 import TecnicosAdmin from "../pages/admins/TecnicosAdmin";
-import { SearchProvider } from "../context/search-context";
-import SearchBar from "../components/search-bar";
-import ListTable from "../components/listTable";
-import MeusChamados from "../pages/tecnicos/ChamadosTecnico";
+import AdminLayout  from "../layouts/AdminLayout";
+import TecnicoLayout from "../layouts/TecnicoLayout";
+import ChamadosCliente from "../pages/clientes/ChamadosCliente";
 
 export default function AppRoutes() {
   return (
@@ -24,13 +23,8 @@ export default function AppRoutes() {
       
       {/* ADMIN */}
       <Route element={<RequireRole allowedRoles={["admin"]} />}>
-        <Route path="/admin" element={<CallAdmin />}>
-          <Route index element={
-            <SearchProvider>
-              <SearchBar />
-              <ListTable />
-            </SearchProvider>
-          } />
+          <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<CallAdmin />} />
           <Route path="clientes" element={<ClientesAdmin />} />
           <Route path="tecnicos" element={<TecnicosAdmin />} />
         </Route>
@@ -45,9 +39,9 @@ export default function AppRoutes() {
 
       {/* TÉCNICO - CORRIGIDO: allowedRoles em vez de allowed */}
       <Route element={<RequireRole allowedRoles={["tecnico"]} />}>
-        <Route path="/tecnico" element={<TecEmAndamento />}>
-          <Route index element={<MeusChamados />} />
-          <Route path="andamento" element={<TecEmEspera />} />
+          <Route path="/tecnico" element={<TecnicoLayout />}>
+          <Route index element={<TecEmAndamento />} />
+          <Route path="espera" element={<TecEmEspera />} />
         </Route>
       </Route>
 
