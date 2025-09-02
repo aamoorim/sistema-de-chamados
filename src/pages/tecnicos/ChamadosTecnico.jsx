@@ -97,7 +97,7 @@ const MeusChamados = () => {
                       className="btn-encerrar"
                       onClick={(e) => handleEncerrar(e, chamado.id)}
                     >
-                       <CircleCheckBig size={16}  style={{marginRight: '4px'}}/>Encerrar
+                       <CircleCheckBig size={15}  style={{marginRight: '4px'}}/>Encerrar
                     </button>
                   )}
                 </div>
