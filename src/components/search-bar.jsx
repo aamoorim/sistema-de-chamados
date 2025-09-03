@@ -11,9 +11,8 @@ const SearchBar = () => {
   // Opções de filtro baseadas nos seus dados
   const filterOptions = {
     status: ['Em espera', 'Em andamento', 'Finalizado'],
-    technician: ['Carlos Silva', 'Carlos Magno'], // Você pode tornar isso dinâmico
-    client: ['André Costa', 'André lima'], // Você pode tornar isso dinâmico
-    description: ['Instalação de Rede', 'Instalação de cpu', 'Manutenção'] // Exemplos
+    technician: ['Carlos Silva', 'Fernanda Rocha'], // Você pode tornar isso dinâmico
+    client: ['André Costa', 'Maria lima'], // Você pode tornar isso dinâmico
   };
 
   // Fechar dropdown quando clicar fora
@@ -119,7 +118,7 @@ const SearchBar = () => {
                     {filterType === 'status' ? 'Status' :
                      filterType === 'technician' ? 'Técnico' :
                      filterType === 'client' ? 'Cliente' :
-                     filterType === 'description' ? 'Tipo de Serviço' : filterType}
+                     filterType === 'description' ? "" : filterType}
                   </h4>
                   <div className="filter-options">
                     {options.map((option) => (

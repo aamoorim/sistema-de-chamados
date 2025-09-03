@@ -1,11 +1,13 @@
 import { Outlet } from "react-router";
-import ListTable from "../../components/listTable";
+import ClientTable from "../../components/ClientAdminTabe";
 
 export default function ClientesAdmin() {
     return (
         <>
-            <div>Clientes Admin</div>
-            <ListTable />
+                <h1>Clientes</h1>
+            <div className="calls-admin">
+                <ClientTable />
+            </div>
             <Outlet />
 
         </>

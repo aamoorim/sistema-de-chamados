@@ -5,5 +5,16 @@
 
 .calls-client-main {
     flex: 1;
-    padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 40px 0 0 40px;
+  min-width: 0;
+}
+
+h1 {
+    font-size: 30px;
+  font-weight: bold;
+  color: #2E3DA3;
+  margin-bottom: 24px;
 }
