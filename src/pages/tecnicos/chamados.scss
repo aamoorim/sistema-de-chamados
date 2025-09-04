@@ -241,17 +241,16 @@ body {
   background: $bg-card;
   border: 1px solid $border-light;
   border-radius: 12px;
-  padding: 16px 20px;
-  margin-bottom: 20px; // mantém alinhado à esquerda
+  padding: 24px 28px;
+  margin-bottom: 24px;
   box-shadow: $shadow-sm;
-  font-size: 14px;
+  font-size: 14px;  
   line-height: 1.4;
   transition: all $transition-base;
 
-  // 🔥 largura controlada
-  max-width: 350px; // diminui a largura total
-  height: 200px;
-  width: 100%;      // continua responsivo
+  // Aumentei largura
+  height: 220px;  
+  width: 346px;
 
   &.finalizado {
     @include status-border($color-success);
@@ -261,8 +260,18 @@ body {
     @include status-border($color-warning);
   }
 
-  @include responsive($breakpoint-md) { padding: $spacing-md; }
-  @include responsive($breakpoint-xs) { padding: $spacing-sm; border-radius: $radius-sm; }
+  @include responsive($breakpoint-lg) { 
+    max-width: 450px; 
+    padding: 18px 22px;
+  }
+  @include responsive($breakpoint-md) { 
+    max-width: 100%; 
+    padding: $spacing-md; 
+  }
+  @include responsive($breakpoint-xs) { 
+    padding: $spacing-sm; 
+    border-radius: $radius-sm; 
+  }
 }
 
 // ========================================
@@ -280,23 +289,23 @@ body {
   .chamado-codigo {
     font-size: $text-xs;
     color: $text-secondary;
-    margin-bottom: 2px;
+    margin-bottom: 4px;
     font-weight: $font-medium;
-  }
+  } 
 
   .chamado-titulo {
     font-size: $text-lg;
     font-weight: $font-semibold;
     color: $text-primary;
-    margin-bottom: 2px;
+    margin-bottom: 4px;
     line-height: 1.3;
   }
 
   .chamado-descricao {
     font-size: $text-sm;
     color: $text-secondary;
-    line-height: 1.3;
-    margin-bottom: 15px;
+    line-height: 1.4;
+    margin-bottom: 18px;
   }
 
   .chamado-data {
@@ -311,14 +320,14 @@ body {
 }
 
 .btn-encerrar {
-@include button(#000, $text-white, 4px $spacing-md);
+  @include button(#000, $text-white, 6px $spacing-lg);
   font-size: $text-xs;
   font-weight: $font-medium;
-  border-radius: 4px;
-  width: 90px;
-  height: 28px;
+  border-radius: 6px;
+  width: 96px; // aumentou de 90px para 100px
+  height: 31px; // aumentou de 28px para 32px
 
-  @include flex(row, center, );
+  @include flex(row, center, center);
 
   position: relative;
   overflow: hidden;
@@ -326,27 +335,33 @@ body {
   &:hover { background: #1f2937; }
 }
 
-
-
-
 // ========================================
 // CARD FOOTER
 // ========================================
 
 .card-footer {
   border-top: 1px solid $border-light;
-  padding-top: 14px;   // aumenta o espaço interno
-  margin-top: 30px;    // empurra o rodapé para base do card
-  min-height: 50px;    // garante altura mínima
+  padding-top: 16px;
+  margin-top: 32px;
+
+
+  // Alinha usuário à esquerda e ícone à direita
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .user-info {
-  @include flex(row, center, flex-start, $spacing-sm);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1
 }
 
+
 .user-avatar {
-  @include avatar(24px, $color-primary);
-  font-size: 10px;
+  @include avatar(26px, $color-primary); // aumentou de 24px para 26px
+  font-size: 11px; // aumentou de 10px para 11px
   font-weight: $font-bold;
 }
 
@@ -359,14 +374,13 @@ body {
 
 .check-icon {
   @include flex(row, center, center);
-  width: 20px;
-  height: 20px;
+  width: 22px; // aumentou de 20px para 22px
+  height: 22px;
   background: lighten($color-success, 40%);
   color: $color-success;
   border-radius: $radius-full;
   margin-left: auto;
 }
-
 
 // ========================================
 // RESPONSIVE AJUSTES
@@ -375,28 +389,49 @@ body {
 @include responsive($breakpoint-md) {
   .card-main {
     flex-direction: column;
-    gap: $spacing-sm;
+    gap: 16px; // aumentou o gap
   }
   
   .card-right {
     justify-content: flex-start;
   }
+
+  .chamado-info {
+    margin-right: 0; // remove margem no mobile
+  }
 }
 
 @include responsive($breakpoint-xs) {
   .user-avatar {
-    @include avatar(20px, $color-primary);
-    font-size: 9px;
+    @include avatar(28px, $color-primary); // aumentou de 22px para 28px
+    font-size: 12px; // aumentou de 10px para 12px
   }
   
   .btn-encerrar {
-    padding: 3px $spacing-sm;
-    font-size: 10px;
+    padding: 6px 16px; // aumentou o padding
+    font-size: 12px; // aumentou de 10px para 12px
+    width: 110px; // aumentou de 90px para 110px
+    height: 36px; // aumentou de 28px para 36px
+  }
+  
+  .check-icon {
+    width: 24px; // aumentou de 20px para 24px
+    height: 24px;
+  }
+
+  .chamado-info {
+    .chamado-titulo {
+      font-size: $text-lg; // mantém legível no mobile
+    }
+    
+    .chamado-descricao {
+      font-size: $text-sm; // mantém legível no mobile
+    }
   }
 }
 
 // ========================================
-// RIPPLE EFFECT - ADICIONAR AO FINAL DO ARQUIVO
+// RIPPLE EFFECT
 // ========================================
 
 // Variáveis específicas do ripple
@@ -447,4 +482,21 @@ $ripple-easing: cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
 
+.status-icon {
+  @include flex(row, center, center);
+  width: 26px;
+  height: 26px;
+  
+  
+  border-radius: $radius-full;
 
+  &.andamento {
+    background: lighten($color-warning, 10%);
+    color: $color-icon;
+  }
+
+  &.finalizado {
+    background: lighten($color-success, 10%);
+    color: #2E7D32;
+  }
+}

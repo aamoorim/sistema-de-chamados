@@ -31,10 +31,26 @@ export default function ChamadosTecnico() {
   const andamentoChamados = chamados.filter(c => c.status === 'andamento');
   const finalizadosChamados = chamados.filter(c => c.status === 'finalizado');
 
-  const handleEncerrar = (event, chamadoId) => {
-    console.log(`Encerrando chamado ${chamadoId}`);
-  };
+ const handleEncerrar = (event, chamadoId) => {
+  const button = event.currentTarget;
 
+  // cria o span ripple
+  const ripple = document.createElement("span");
+  ripple.classList.add("ripple");
+
+  // calcula posição do clique
+  const rect = button.getBoundingClientRect();
+  ripple.style.left = `${event.clientX - rect.left}px`;
+  ripple.style.top = `${event.clientY - rect.top}px`;
+
+  // adiciona ao botão
+  button.appendChild(ripple);
+
+  // remove depois da animação
+  setTimeout(() => {
+    ripple.remove();
+  }, 800); // igual à duração $ripple-duration
+};
   return (
     <div className="tecnico-chamados">
       <div className="header">
@@ -70,8 +86,11 @@ export default function ChamadosTecnico() {
                 <div className="user-info">
                   <div className="user-avatar">{chamado.avatar}</div>
                   <span className="user-name">{chamado.usuario}</span>
+                  <div className={`status-icon ${chamado.status}`}>
+                    {chamado.status === "andamento" ? <Clock2 size={16}/> : <Check size={16}/>}
+                  </div>
                 </div>
-              </div>
+              </div>  
             </div>
           ))}
         </div>
@@ -97,13 +116,15 @@ export default function ChamadosTecnico() {
                 <div className="user-info">
                   <div className="user-avatar">{chamado.avatar}</div>
                   <span className="user-name">{chamado.usuario}</span>
-                  <div className="check-icon"><Check size={14}/></div>
+                  <div className={`status-icon ${chamado.status}`}>
+                    {chamado.status === "andamento                                " ? <Clock2 size={16}/> : <Check size={16}/>}
+                  </div>
                 </div>
               </div>
             </div>
           ))}
         </div>
-      </div>
+      </div>  
     </div>
   );
 }
