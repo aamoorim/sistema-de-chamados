@@ -399,3 +399,26 @@
 .remove-filter-btn:hover {
   background: rgba(25, 118, 210, 0.1);
 }
+
+.header-admin {
+  display: flex;
+  align-items: center; /* Garante alinhamento vertical */
+  gap: 16px; /* Aumentei o gap para melhor espaçamento */
+  width: 100%;
+  margin-bottom: 24px; /* Adiciona espaçamento inferior consistente */
+  
+  /* Força o SearchBar a ocupar espaço disponível */
+  .search-bar-container {
+    flex: 1; /* Permite que cresça */
+    margin-bottom: 0 !important; /* Remove o margin-bottom problemático */
+    max-width: none !important; /* Remove limitação de largura */
+  }
+  
+  /* Padroniza altura do botão */
+  .MuiButton-root {
+    height: 44px; /* Mesma altura aproximada do input */
+    min-width: 44px;
+    padding: 8px 12px;
+    border-radius: 12px; /* Combina com o input */
+  }
+}

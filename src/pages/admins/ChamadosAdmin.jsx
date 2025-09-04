@@ -1,12 +1,12 @@
 import { Outlet } from "react-router-dom";
-import { Aside } from "../../components/aside";
 import './styles.scss';
+import ListTable from "../../components/listTable";
 
 function CallAdmin() {
   return (
     <div className="calls-admin">
-      <Aside />
-      <div className="calls-admin-main">  
+      <ListTable />
+      <div className="">
       <Outlet />  
       </div>
     </div>

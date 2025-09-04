@@ -1,57 +1,9 @@
-import { ClipboardList } from 'lucide-react';
-
-
-export function aside() {
-    return (
-        <div className="app-container">
-            <aside className="aside">
-            <div className="logo">  
-                <img src="/logo_squad.svg" alt="logo da empresa squadBi" />
-
-                <div className="name_user">
-                    <span className="aside_company">SquadBi</span>
-                    <span className="aside_user">Admin</span>
-                </div>
-        
-            </div>
-
-            
-
-            <nav>
-                <ul>
-                    <button className='nav-button'>
-                        <ClipboardList size={24} />
-                        <span>Chamados</span>   
-                    </button>
-                    <button className='nav-button'>
-                        <ClipboardList size={24} />
-                        <span>Técnicos</span>
-                    </button>
-                    <button className='nav-button'>
-                        <ClipboardList size={24} />
-                        <span>Clientes</span>
-                    </button>
-                </ul>
-            </nav>
-
-            <button className="aside_footer">
-                    <div className="avatar">UA</div>
-                    <div className="user_info">
-                        <p>Usuário Admin</p>
-                        <p>admin.test@email.com</p>
-                    </div>
-            </button>
-
-        </aside>
-        </div>
-    )
-}
 import { NavLink, useNavigate } from 'react-router-dom';
-import { LogOut, Users, UserCheck, Headphones, MessageSquare } from 'lucide-react';
+import { LogOut, Users, UserCheck, Headphones, MessageSquare, BriefcaseBusiness } from 'lucide-react';
 import { useAuth } from '../context/auth-context';
 import '../index.css';
 
-export const Aside = () => {
+const SideBar = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
 
@@ -65,8 +17,8 @@ export const Aside = () => {
       case 'admin':
         return [
           { path: '/admin', icon: <MessageSquare size={20} />, label: 'Chamados', end: true },
+          { path: '/admin/tecnicos', icon: <BriefcaseBusiness size={20} />, label: 'Técnicos' },
           { path: '/admin/clientes', icon: <Users size={20} />, label: 'Clientes' },
-          { path: '/admin/tecnicos', icon: <UserCheck size={20} />, label: 'Técnicos' }
         ];
       case 'cliente':
         return [
@@ -75,7 +27,7 @@ export const Aside = () => {
       case 'tecnico':
         return [
           { path: '/tecnico', icon: <MessageSquare size={20} />, label: 'Chamados', end: true },
-          { path: '/tecnico/andamento', icon: <Headphones size={20} />, label: 'Em Andamento' }
+          { path: '/tecnico/espera', icon: <Headphones size={20} />, label: 'Em Espera' }
         ];
       default:
         return [];
@@ -127,3 +79,4 @@ export const Aside = () => {
   );
 };
 
+export default SideBar;

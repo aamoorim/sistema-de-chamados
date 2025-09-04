@@ -1,5 +1,3 @@
-// ✅ VERSÃO CORRIGIDA do seu ListTable.js
-
 import { useSearch } from "../context/search-context";
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -8,6 +6,8 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
+import IconButton from '@mui/material/IconButton';
+import { Trash, Trash2 } from "lucide-react";
 
 const rows = [
   {
@@ -21,7 +21,7 @@ const rows = [
   },
   {
     createdAt: '13/04/25 20:56',
-    id: '00004', // Mudei o ID para ser único
+    id: '00004',
     title: 'Rede rapidamente lenta',
     description: 'Instalação de cpu',
     client: { initials: 'AL', name: 'André lima' },
@@ -52,6 +52,11 @@ function Avatar({ initials }) {
 
 export default function ListTable() {
   const { search, filters } = useSearch();
+
+  const handleDelete = (id) => {
+    console.log("Deletando chamado:", id);
+    // aqui você conecta com sua API para deletar
+  };
 
   const filteredRows = rows.filter(row => {
     const matchesSearch = search === '' || 
@@ -101,6 +106,7 @@ export default function ListTable() {
               <TableCell style={{ color: '#858B99', fontWeight: 600 }}>Cliente</TableCell>
               <TableCell style={{ color: '#858B99', fontWeight: 600 }}>Técnico</TableCell>
               <TableCell style={{ color: '#858B99', fontWeight: 600 }}>Status</TableCell>
+              <TableCell style={{ color: '#858B99', fontWeight: 600 }}>Ações</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -135,12 +141,21 @@ export default function ListTable() {
                       {row.status.label}
                     </span>
                   </TableCell>
+                  <TableCell>
+                    <IconButton 
+                      color="error" 
+                      size="small" 
+                      onClick={() => handleDelete(row.id)}
+                    >
+                      <Trash size={18} />
+                    </IconButton>
+                  </TableCell>
                 </TableRow>
               ))
             ) : (
               <TableRow>
                 <TableCell 
-                  colSpan={6} 
+                  colSpan={7} 
                   style={{ 
                     textAlign: 'center', 
                     padding: '40px', 
