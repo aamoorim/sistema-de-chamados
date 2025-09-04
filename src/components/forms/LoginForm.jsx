@@ -1,80 +1,88 @@
 import { useState } from "react";
-import { TextField, Button, Box, Typography, ThemeProvider, createTheme } from "@mui/material";
+import '../../styles/login.scss'
+import {
+  TextField,
+  Button,
+  Box,
+  Typography,
+  IconButton,
+  InputAdornment,
+  Container,
+  Paper,
+} from "@mui/material";
+import { Visibility, VisibilityOff, Lock} from "@mui/icons-material";
 
 export default function LoginForm({ onSubmit, loading, error }) {
   const [formData, setFormData] = useState({ email: "", senha: "" });
-  
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
-  
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleChange = (e) =>
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+
   const handleSubmit = (e) => {
     e.preventDefault();
     onSubmit(formData);
   };
-  
-  const theme = createTheme({
-    palette: {
-      background: {
-        primary: '#FFFFFF',
-      },
-      grayscale: {
-        "gray-100": '#151619',
-        "gray-200": '#1E2024',
-        "gray-300": '#535964',
-        "gray-400": '#858B99',
-        "main": '#E3E5E8',
-      },
-    },
-  });
-  
+
   return (
-    <ThemeProvider theme={theme}>
-      <Box sx={{ display: "flex", height: "100vh" }}>
-        {/* Lado esquerdo */}
-        <Box
-          sx={{
-            width: "50vw", // Determina que o lado esquerdo tome 50% da tela
-          }}
-        />
-        
-        {/* Lado direito */}
-        <Box
-          sx={{
-            width: "50vw",
-            display: "flex",
-            justifyContent: "center", // centraliza horizontal
-            alignItems: "center", // centraliza vertical
-            bgcolor: "grayscale.main",
-          }}
-        >
-          {/* Card do login */}
-          <Box
-            component="form"
-            onSubmit={handleSubmit}
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 2,
-              width: "30vw",
-              height: "60vh",
-              p: 4,
-              borderRadius: 5,
-              boxShadow: 3,
-              bgcolor: "background.primary",
-            }}
+    <Box
+      sx={{
+        display: "flex",
+        minHeight: "100vh",
+        flexDirection: { xs: "column", md: "row" },
+      }}
+    >
+      {/* Lado esquerdo (oculto no mobile) */}
+      <Box
+        sx={{
+          display: { xs: "none", md: "block" },
+          flex: 1,
+        }}
+      />
+
+      {/* Lado direito (formulário) */}
+      <Box
+        sx={{
+          flex: 1,
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          bgcolor: "#E3E5E8",
+          py: { xs: 4, md: 4 },
+          borderRadius: "15px 0 0 15px",
+          my: 1, 
+        }}
+      >
+        <Container maxWidth="sm">
+          <Paper
+              component="form"
+              onSubmit={handleSubmit}
+              elevation={6}
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center", // centraliza conteúdo verticalmente
+                gap: 3,
+                p: { xs: 3, sm: 4, md: 5 },
+                borderRadius: 5,
+                maxWidth: { xs: "100%", sm: 500, md: 600 },
+                minHeight: { xs: "auto", sm: 400, md: 500 },
+                mx: "auto",
+              }}
+
           >
-            <Typography variant="h5" textAlign="center" fontWeight="bold" gutterBottom>
+            <Typography
+              variant="h4"
+              textAlign="center"
+              fontWeight="bold"
+              color="#151619"
+            >
               Login
             </Typography>
-            
+
             <TextField
-              placeholder="exemplo@mail.com"
-              label="E-MAIL"
               variant="standard"
+              label="E-MAIL"
               name="email"
               type="email"
               value={formData.email}
@@ -82,31 +90,61 @@ export default function LoginForm({ onSubmit, loading, error }) {
               required
               fullWidth
             />
-            
+
             <TextField
-              placeholder="********"
-              label="SENHA"
               variant="standard"
+              label="SENHA"
               name="senha"
-              type="password"
+              type={showPassword ? "text" : "password"}
               value={formData.senha}
               onChange={handleChange}
               required
               fullWidth
+              slotProps={{
+                input: {
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={() => setShowPassword((prev) => !prev)}
+                        edge="end"
+                      >
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                },
+              }}
             />
-            
-            <Button type="submit" variant="contained" fullWidth disabled={loading}>
-              {loading ? "Entrando..." : "  Entrar"}
+
+            <Button
+              type="submit"
+              variant="contained"
+              fullWidth
+              disabled={loading}
+              sx={{
+                py: 1.5,
+                borderRadius: 2,
+                fontSize: "1rem",
+                fontWeight: "bold",
+                bgcolor: "#151619",
+                "&:hover": { bgcolor: "#1E2024" },
+              }}
+            >
+              {loading ? "Entrando..." : "Entrar"}
             </Button>
-            
+
             {error && (
-              <Typography color="error" textAlign="center">
+              <Typography
+                color="error"
+                textAlign="center"
+                sx={{ mt: 1, fontSize: "0.9rem" }}
+              >
                 {error}
               </Typography>
             )}
-          </Box>
-        </Box>
+          </Paper>
+        </Container>
       </Box>
-    </ThemeProvider>
+    </Box>
   );
 }
