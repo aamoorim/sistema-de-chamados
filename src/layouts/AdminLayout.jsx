@@ -4,9 +4,6 @@ import SearchBar from "../components/search-bar";
 import SideBar from "../components/SideBar";
 import Botao from "../components/Button";
 import "../pages/admins/styles.scss";
-import { useState } from "react";
-import { ModalCriarChamado } from "../components/Modals/CriarChamado";
-
 export default function AdminLayout() {
   const location = useLocation();
 
