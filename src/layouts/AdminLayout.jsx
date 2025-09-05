@@ -1,37 +1,39 @@
-// src/layout/AdminLayout.jsx - SOLUÇÃO 1: useLocation
 import { Outlet, useLocation } from "react-router-dom";
 import { SearchProvider } from "../context/search-context";
 import SearchBar from "../components/search-bar";
 import SideBar from "../components/SideBar";
 import Botao from "../components/Button";
 import "../pages/admins/styles.scss";
+import { useState } from "react";
+import { ModalCriarChamado } from "../components/Modals/CriarChamado";
 
 export default function AdminLayout() {
   const location = useLocation();
+
   
   // Configuração do botão para cada rota
   const getButtonConfig = () => {
     const path = location.pathname;
     
-    switch (path) {
-      case '/admin':
-        return {
-          text: 'Novo Chamado',
-        };
-      
+    switch (path) {      
       case '/admin/clientes':
         return {
           text: 'Novo Cliente',
+          modal: <div>Modal Cliente</div>, // provisório
         };
       
       case '/admin/tecnicos':
         return {
           text: 'Novo Técnico',
+          modal: <div>Modal Técnico</div>, // provisório
         };  
+      
+      default:
+        return null;
     }
   };
   
-  const buttonConfig = getButtonConfig();
+  const config = getButtonConfig();
 
   return (
     <div className="calls-admin">
@@ -39,10 +41,12 @@ export default function AdminLayout() {
         <SideBar />
         <main className="calls-admin-main">
           <div className="header-admin">
-              <SearchBar />
-            <Botao {...buttonConfig} />
-            <div className="search-bar-container">
-            </div>
+            <SearchBar />
+            {config && (
+              <Botao 
+                text={config.text} 
+              />
+            )}
           </div>
           <Outlet />
         </main>
