@@ -10,7 +10,7 @@ import {
   Container,
   Paper,
 } from "@mui/material";
-import { Visibility, VisibilityOff, Lock} from "@mui/icons-material";
+import { Visibility, VisibilityOff, Lock, AccountCircleOutlined} from "@mui/icons-material";
 
 export default function LoginForm({ onSubmit, loading, error }) {
   const [formData, setFormData] = useState({ email: "", senha: "" });
@@ -53,15 +53,17 @@ export default function LoginForm({ onSubmit, loading, error }) {
           my: 1, 
         }}
       >
+        
+        {/* Container de login */}
         <Container maxWidth="sm">
           <Paper
               component="form"
               onSubmit={handleSubmit}
-              elevation={6}
+              elevation={2}
               sx={{
                 display: "flex",
                 flexDirection: "column",
-                justifyContent: "center", // centraliza conteúdo verticalmente
+                justifyContent: "center", 
                 gap: 3,
                 p: { xs: 3, sm: 4, md: 5 },
                 borderRadius: 5,
@@ -71,16 +73,50 @@ export default function LoginForm({ onSubmit, loading, error }) {
               }}
 
           >
+
+           {/* Logo */}
+           <Box
+               sx={{
+                display: "flex",
+                justifyContent: "center",
+                mb: 2,
+                }}
+            >
+              <img
+                src="/logo_squad.png"
+                alt="Logo Squad"
+                style={{
+                 height: "auto", 
+                 width: "auto",
+                 maxWidth: "200px",
+                }}
+              />
+            </Box>
+
+            {/* Título do formulário */}
             <Typography
-              variant="h4"
-              textAlign="center"
+              variant="h5"
+              textAlign="start"
               fontWeight="bold"
               color="#151619"
             >
               Login
             </Typography>
 
+            {/* Inputs para login */}
             <TextField
+              sx={{
+                '& .MuiInputLabel-root': {
+                  fontWeight: 700,
+                },
+                // Remove o fundo amarelo do autofill e coloca branco
+                '& input:-webkit-autofill': {
+                  WebkitBoxShadow: '0 0 0 1000px white inset !important',
+                },
+                '& .MuiInputBase-input': {
+                  fontWeight: '500', 
+                }
+              }}
               variant="standard"
               label="E-MAIL"
               name="email"
@@ -89,9 +125,32 @@ export default function LoginForm({ onSubmit, loading, error }) {
               onChange={handleChange}
               required
               fullWidth
+              fontWeight="800"
+              slotProps={{
+                input: {
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <AccountCircleOutlined sx={{color: '#535964'}}/> 
+                    </InputAdornment>
+                  ),
+                },
+              }}
             />
 
             <TextField
+              sx={{
+                '& .MuiInputLabel-root': {
+                  fontWeight: 700,
+                },
+                // Remove o fundo amarelo do autofill e coloca branco
+                '& input:-webkit-autofill': {
+                  WebkitBoxShadow: '0 0 0 1000px white inset !important',
+                },
+                // Altera a fonte do texto digitado
+                '& .MuiInputBase-input': {
+                  fontWeight: '600', 
+                }
+              }}
               variant="standard"
               label="SENHA"
               name="senha"
@@ -100,22 +159,29 @@ export default function LoginForm({ onSubmit, loading, error }) {
               onChange={handleChange}
               required
               fullWidth
+              bgcolor="#fff"
               slotProps={{
                 input: {
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton
-                        onClick={() => setShowPassword((prev) => !prev)}
-                        edge="end"
-                      >
-                        {showPassword ? <VisibilityOff /> : <Visibility />}
-                      </IconButton>
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Lock sx={{color: '#535964'}}/> 
                     </InputAdornment>
                   ),
+                  endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() => setShowPassword((prev) => !prev)}
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
                 },
               }}
             />
 
+            {/* Botão de entrar */}
             <Button
               type="submit"
               variant="contained"
@@ -128,11 +194,15 @@ export default function LoginForm({ onSubmit, loading, error }) {
                 fontWeight: "bold",
                 bgcolor: "#151619",
                 "&:hover": { bgcolor: "#1E2024" },
+                my: 2,
+                fontSize: "1.15rem",
+                fontWeight: 700,
               }}
             >
               {loading ? "Entrando..." : "Entrar"}
             </Button>
 
+            {/* Mensagem de erro caso o login falhe */}
             {error && (
               <Typography
                 color="error"
@@ -142,6 +212,7 @@ export default function LoginForm({ onSubmit, loading, error }) {
                 {error}
               </Typography>
             )}
+
           </Paper>
         </Container>
       </Box>
