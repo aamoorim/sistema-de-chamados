@@ -4,26 +4,28 @@ import SearchBar from "../components/search-bar";
 import SideBar from "../components/SideBar";
 import Botao from "../components/Button";
 import "../pages/admins/styles.scss";
+import { ModalCriarTecnico } from "../components/Modals/CriarTecnico";
+import { useState } from "react";
+import { ModalCriarCiente } from "../components/Modals/CriarCliente";
 export default function AdminLayout() {
   const location = useLocation();
 
-  
+  const [open, setOpen] = useState(false);
   // Configuração do botão para cada rota
   const getButtonConfig = () => {
     const path = location.pathname;
     
     switch (path) {      
-      case '/admin/clientes':
-        return {
-          text: 'Novo Cliente',
-          modal: <div>Modal Cliente</div>, // provisório
-        };
-      
       case '/admin/tecnicos':
         return {
           text: 'Novo Técnico',
-          modal: <div>Modal Técnico</div>, // provisório
-        };  
+          modal: <ModalCriarTecnico  isOpen={open} onClose={() => setOpen(false)}/>, // provisório
+        }; 
+        case '/admin/clientes':
+        return {
+          text: 'Novo Cliente',
+          modal: <ModalCriarCiente isOpen={open} onClose={() => setOpen(false)}/>, // provisório
+        };
       
       default:
         return null;
@@ -41,11 +43,13 @@ export default function AdminLayout() {
             <SearchBar />
             {config && (
               <Botao 
-                text={config.text} 
+                text={config.text}
+                onClick={() => setOpen(true)}
               />
             )}
           </div>
           <Outlet />
+          {open && config?.modal}
         </main>
       </SearchProvider>
     </div>
