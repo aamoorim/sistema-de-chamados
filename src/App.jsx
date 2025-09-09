@@ -1,9 +1,8 @@
-// src/App.jsx
 import { BrowserRouter } from "react-router-dom";
 import AppRoutes from "./router/routes.jsx";
 import { AuthProvider } from "./context/auth-context";
-import { theme } from "./config/theme";
 import { ThemeProvider } from "@mui/material";
+import { theme } from "./config/theme";
 
 export default function App() {
   return (

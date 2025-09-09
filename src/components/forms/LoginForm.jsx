@@ -1,213 +1,215 @@
-import { useState } from "react";
-import '../../styles/login.scss'
+import React, { useState } from 'react';
 import {
+  Box,
   TextField,
   Button,
-  Box,
   Typography,
-  IconButton,
-  InputAdornment,
-  Container,
-  Paper,
-} from "@mui/material";
-import { Visibility, VisibilityOff, Lock, AccountCircleOutlined} from "@mui/icons-material";
+  Link,
+  ThemeProvider,
+  createTheme
+} from '@mui/material';
+import '../../styles/LoginForm.scss';
 
-export default function LoginForm({ onSubmit, loading, error }) {
-  const [formData, setFormData] = useState({ email: "", senha: "" });
-  const [showPassword, setShowPassword] = useState(false);
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: '#2E3DA3',
+    },
+    secondary: {
+      main: '#8996EB',
+    },
+  },
+  typography: {
+    fontFamily: '"Montserrat", sans-serif',
+  },
+});
 
-  const handleChange = (e) =>
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+const LoginForm = () => {
+  const [isSignUp, setIsSignUp] = useState(true);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    loginEmail: '',
+    loginPassword: ''
+  });
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onSubmit(formData);
+  const handleInputChange = (field) => (event) => {
+    setFormData({
+      ...formData,
+      [field]: event.target.value
+    });
+  };
+
+  const handleSubmit = (type) => (event) => {
+    event.preventDefault();
+    if (type === 'signup') {
+      console.log('Sign Up:', { 
+        name: formData.name, 
+        email: formData.email, 
+        password: formData.password 
+      });
+    } else {
+      console.log('Sign In:', { 
+        email: formData.loginEmail, 
+        password: formData.loginPassword 
+      });
+    }
+  };
+
+  const toggleMode = (signUpMode) => {
+    setIsSignUp(signUpMode);
   };
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        minHeight: "100vh",
-        flexDirection: { xs: "column", md: "row" },
-      }}
-    >
-      {/* Lado esquerdo (oculto no mobile) */}
-      <Box
-        sx={{
-          display: { xs: "none", md: "block" },
-          flex: 1,
-        }}
-      />
-
-      {/* Lado direito (formulário) */}
-      <Box
-        sx={{
-          flex: 1,
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          bgcolor: "#E3E5E8",
-          py: { xs: 4, md: 4 },
-          borderRadius: "15px 0 0 15px",
-          my: 1, 
-        }}
-      >
-        
-        {/* Container de login */}
-        <Container maxWidth="sm">
-          <Paper
-              component="form"
-              onSubmit={handleSubmit}
-              elevation={2}
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center", 
-                gap: 3,
-                p: { xs: 3, sm: 4, md: 5 },
-                borderRadius: 5,
-                maxWidth: { xs: "100%", sm: 500, md: 600 },
-                minHeight: { xs: "auto", sm: 400, md: 500 },
-                mx: "auto",
-              }}
+    <ThemeProvider theme={theme}>
+      <Box className="login-container">
+        {/* Container de cadastro */}
+        <Box className={`sign-up-container ${isSignUp ? 'active' : ''}`}>
+          <Box 
+            component="form" 
+            className="form" 
+            onSubmit={handleSubmit('signup')}
           >
-
-           {/* Logo */}
-           <Box
-               sx={{
-                display: "flex",
-                justifyContent: "center",
-                mb: 2,
-                }}
-            >
-              <img
-                src="/logo_squad.png"
-                alt="Logo Squad"
-                style={{
-                 height: "auto", 
-                 width: "auto",
-                 maxWidth: "200px",
-                }}
-              />
-            </Box>
-
-            {/* Título do formulário */}
-            <Typography
-              variant="h5"
-              textAlign="start"
-              fontWeight="bold"
-              color="#151619"
-            >
-              Login
+            <Typography variant="h4" component="h1" className="form-title">
+              Criar Conta
             </Typography>
-
-            {/* Inputs para login */}
+            
             <TextField
-              sx={{
-                '& .MuiInputLabel-root': {
-                  fontWeight: 700,
-                },
-                '& input:-webkit-autofill': {
-                  WebkitBoxShadow: '0 0 0 1000px white inset !important',
-                },
-                '& .MuiInputBase-input': {
-                  fontWeight: 500, 
-                }
-              }}
-              variant="standard"
-              label="E-MAIL"
-              name="email"
+              className="form-input"
+              type="text"
+              placeholder="Name"
+              value={formData.name}
+              onChange={handleInputChange('name')}
+              required
+              fullWidth
+              variant="outlined"
+            />
+            
+            <TextField
+              className="form-input"
               type="email"
+              placeholder="Email"
               value={formData.email}
-              onChange={handleChange}
+              onChange={handleInputChange('email')}
               required
               fullWidth
-              slotProps={{
-                input: {
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <AccountCircleOutlined sx={{color: '#535964'}}/> 
-                    </InputAdornment>
-                  ),
-                },
-              }}
+              variant="outlined"
             />
-
+            
             <TextField
-              sx={{
-                '& .MuiInputLabel-root': {
-                  fontWeight: 700,
-                },
-                '& input:-webkit-autofill': {
-                  WebkitBoxShadow: '0 0 0 1000px white inset !important',
-                },
-                '& .MuiInputBase-input': {
-                  fontWeight: 600, 
-                }
-              }}
-              variant="standard"
-              label="SENHA"
-              name="senha"
-              type={showPassword ? "text" : "password"}
-              value={formData.senha}
-              onChange={handleChange}
+              className="form-input"
+              type="password"
+              placeholder="Password"
+              value={formData.password}
+              onChange={handleInputChange('password')}
               required
               fullWidth
-              slotProps={{
-                input: {
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <Lock sx={{color: '#535964'}}/> 
-                    </InputAdornment>
-                  ),
-                  endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      onClick={() => setShowPassword((prev) => !prev)}
-                      edge="end"
-                    >
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-                },
-              }}
+              variant="outlined"
             />
-
-            {/* Botão de entrar */}
+            
             <Button
               type="submit"
               variant="contained"
-              fullWidth
-              disabled={loading}
-              sx={{
-                py: 1.5,
-                borderRadius: 2,
-                my: 2,
-                fontSize: "1.15rem",
-                fontWeight: 700,
-                bgcolor: "#151619",
-                "&:hover": { bgcolor: "#1E2024" },
-              }}
+              className="form-button"
             >
-              {loading ? "Entrando..." : "Entrar"}
+              Criar Conta
             </Button>
+          </Box>
+        </Box>
 
-            {/* Mensagem de erro caso o login falhe */}
-            {error && (
-              <Typography
-                color="error"
-                textAlign="center"
-                sx={{ mt: 1, fontSize: "0.9rem" }}
-              >
-                {error}
+        {/* Container de Login */}
+        <Box className={`sign-in-container ${isSignUp ? 'slide' : ''}`}>
+          <Box 
+            component="form" 
+            className="form" 
+            onSubmit={handleSubmit('signin')}
+          >
+            <Typography variant="h4" component="h1" className="form-title">
+              Login
+            </Typography>
+            
+            <TextField
+              className="form-input"
+              type="email"
+              placeholder="Email"
+              value={formData.loginEmail}
+              onChange={handleInputChange('loginEmail')}
+              required
+              fullWidth
+              variant="outlined"
+            />
+            
+            <TextField
+              className="form-input"
+              type="password"
+              placeholder="Password"
+              value={formData.loginPassword}
+              onChange={handleInputChange('loginPassword')}
+              required
+              fullWidth
+              variant="outlined"
+            />
+            
+            <Link 
+              href="#" 
+              className="form-link"
+              onClick={(e) => e.preventDefault()}
+            >
+              Esqueceu sua senha?
+            </Link>
+            
+            <Button
+              type="submit"
+              variant="contained"
+              className="form-button"
+            >
+              Login
+            </Button>
+          </Box>
+        </Box>
+
+        {/* Container de sobreposição */}
+        <Box className={`overlay-container ${isSignUp ? 'slide' : ''}`}>
+          <Box className={`overlay ${isSignUp ? 'slide' : ''}`}>
+            {/* Painel de sobreposição esquerdo */}
+            <Box className={`overlay-panel overlay-left ${isSignUp ? 'slide' : ''}`}>
+              <Typography variant="h4" component="h1" className="overlay-title">
+                Bem vindo de volta!
               </Typography>
-            )}
+              <Typography className="overlay-text">
+                Para se manter conectado conosco, faça seu login com suas informações pessoais!
+              </Typography>
+              <Button
+                variant="outlined"
+                className="form-button ghost-button"
+                onClick={() => toggleMode(false)}
+              >
+                Login
+              </Button>
+            </Box>
 
-          </Paper>
-        </Container>
+            {/*  Painel de sobreposição direito */}
+            <Box className={`overlay-panel overlay-right ${isSignUp ? 'slide' : ''}`}>
+              <Typography variant="h4" component="h1" className="overlay-title">
+                Olá, tudo bem?
+              </Typography>
+              <Typography className="overlay-text">
+                Se você não possui conta inscreva-se para se conectar conosco e iniciar a sua jornada!
+              </Typography>
+              <Button
+                variant="outlined"
+                className="form-button ghost-button"
+                onClick={() => toggleMode(true)}
+              >
+                Criar Conta
+              </Button>
+            </Box>
+          </Box>
+        </Box>
       </Box>
-    </Box>
+    </ThemeProvider>
   );
-}
+};
+
+export default LoginForm;
