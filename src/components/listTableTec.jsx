@@ -12,6 +12,9 @@ import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { ClipboardList } from 'lucide-react';
+import { useState } from "react";
+import { ModalAtenderChamado } from "./Modals/AtenderChamado";
+import Botao from "./Button";
 
 function createData(criado, id, titulo, descricao, cliente) {
   return { criado, id, titulo, descricao, cliente };
@@ -26,6 +29,7 @@ const rows = [
 ];
 
 export default function StyledTable() {
+  const [open, setOpen] = useState(false)
   return (
     <Box sx={{ p: 3 }}>
       {/* Título da seção */}
@@ -105,7 +109,7 @@ export default function StyledTable() {
                   </Box>
                 </TableCell>
                 <TableCell align="right">
-                  <IconButton
+                  <Botao
                     size="small"
                     sx={{
                       bgcolor: "#dcfce7",
@@ -114,10 +118,11 @@ export default function StyledTable() {
                         bgcolor: "#bbf7d0",
                       },
                     }}
-                    onClick={() => console.log("Visualizar:", row.id)}
+                    onClick={() => setOpen(true)}
                   >
+                    <ModalAtenderChamado isOpen={open} onClose={() => setOpen(false)}/>
                     <ClipboardList fontSize="small" />
-                  </IconButton>
+                  </Botao>
                 </TableCell>
               </TableRow>
             ))}
