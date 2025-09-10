@@ -1,10 +1,14 @@
 import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { LogOut, Users, UserCheck, Headphones, MessageSquare, BriefcaseBusiness, User, Settings, ChevronUp, ChevronDown } from 'lucide-react';
+import { LogOut, Users, Headphones, MessageSquare, BriefcaseBusiness, User, Settings, ChevronUp, ChevronDown } from 'lucide-react';
 import { useAuth } from '../context/auth-context';
 import '../index.css';
+import { ModalSairPerfil } from './Modals/Sair';
+
+
 
 const SideBar = () => {
+  const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
@@ -21,12 +25,6 @@ const SideBar = () => {
   const handleProfileClick = () => {
     // Navegar para página de perfil ou abrir modal de perfil
     navigate('/profile');
-    setIsUserMenuOpen(false);
-  };
-
-  const handleSettingsClick = () => {
-    // Navegar para página de configurações
-    navigate('/settings');
     setIsUserMenuOpen(false);
   };
 
@@ -98,10 +96,11 @@ const SideBar = () => {
               <span>Perfil</span>
             </button>
             <div className="dropdown_divider"></div>
-            <button className="dropdown_item logout_item" onClick={handleLogoutFromMenu}>
+            <button className="dropdown_item logout_item" onClick={() => setOpen(true)}>
               <LogOut size={16} />
               <span>Sair</span>
             </button>
+            <ModalSairPerfil isOpen={open} onClose={() => setOpen(false)} />
           </div>
         )}
 
