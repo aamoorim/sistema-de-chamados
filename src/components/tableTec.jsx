@@ -1,4 +1,3 @@
-import React from "react";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -6,12 +5,12 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
-import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
-import { ClipboardList } from "lucide-react";
-import { styled } from "@mui/material/styles";
-import "../pages/tecnicos/ChamadosAbertos.scss";
+import Tooltip from "@mui/material/Tooltip";
+import { ClipboardList } from 'lucide-react';
+import { useState } from "react";
+import ModalAtenderChamado from "./Modals/AtenderChamado";
 
 function createData(criado, id, titulo, descricao, cliente) {
   return { criado, id, titulo, descricao, cliente };
@@ -25,114 +24,94 @@ const rows = [
   createData("11/04/25 15:16", "00005", "Meu fone não conecta no computador", "Suporte de Software", "Ana Oliveira"),
 ];
 
-// Styled components
-const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
-  borderRadius: 8,
-  boxShadow: 'none',
-  border: '1px solid #e5e7eb',
-  '& .MuiTableHead-root': {
-    '& .MuiTableCell-head': {
-      fontWeight: 600,
-      color: '#6b7280',
-      fontSize: '14px',
-      backgroundColor: '#fff',
-      borderBottom: '1px solid #f1f5f9',
-    }
-  },
-  '& .MuiTableBody-root': {
-    '& .MuiTableCell-root': {
-      fontSize: '14px',
-      color: '#374151',
-      borderColor: '#f1f5f9',
-    },
-    '& .MuiTableRow-root:last-child': {
-      '& .MuiTableCell-root': {
-        border: 0,
-      }
-    }
-  }
-}));
+export default function StyledTable() {
+  const [open, setOpen] = useState(false);
+  const [selectedChamado, setSelectedChamado] = useState(null);
 
-const ClienteBox = styled(Box)(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  gap: '0.5rem',
-}));
+  const handleOpenModal = (chamado) => {
+    setSelectedChamado(chamado);
+    setOpen(true);
+  };
 
-const StyledAvatar = styled(Avatar)(({ theme }) => ({
-  backgroundColor: '#3b82f6',
-  width: 28,
-  height: 28,
-  fontSize: '0.75rem',
-}));
-
-const ActionButton = styled(IconButton)(({ theme }) => ({
-  backgroundColor: '#E3E5E8',
-  color: '#2BAF06 ',
-  width: 32,
-  height: 32,
-  borderRadius: 5,
-  '&:hover': {
-    backgroundColor: '#bbf7d0',
-  }
-}));
-
-const TituloCell = styled(TableCell)(({ theme }) => ({
-  fontWeight: '600 !important',
-}));
-
-export default function ListTableTec() {
-  const getInitials = (name) => {
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .join("");
+  const handleCloseModal = () => {
+    setOpen(false);
+    setSelectedChamado(null);
   };
 
   return (
-    <Box sx={{ p: 3, minHeight: '100vh' }}>
-      {/* Aqui você pode adicionar seu próprio título/chip separadamente */}
+    <Box sx={{ p: 3 }}>
+      {/* Modal que recebe dados do chamado selecionado */}
+      <ModalAtenderChamado 
+        isOpen={open} 
+        onClose={handleCloseModal}
+        chamado={selectedChamado}
+      />
       
-      <StyledTableContainer component={Paper}>
-        <Table aria-label="styled table">
+      <TableContainer 
+        component={Paper} 
+        sx={{ 
+          borderRadius: "12px", 
+          border: "1px solid #e5e7eb",
+          boxShadow: "0 1px 3px 0 rgb(0 0 0 / 0.1)"
+        }}
+      >
+        <Table>
           <TableHead>
-            <TableRow>
-              <TableCell>Criado em</TableCell>
-              <TableCell>Id</TableCell>
-              <TableCell>Título</TableCell>
-              <TableCell>Descrição</TableCell>
-              <TableCell>Cliente</TableCell>
-              <TableCell align="right"></TableCell>
+            <TableRow sx={{ bgcolor: "#f9fafb" }}>
+              <TableCell sx={{ fontWeight: 600 }}>Criado em</TableCell>
+              <TableCell sx={{ fontWeight: 600 }}>Id</TableCell>
+              <TableCell sx={{ fontWeight: 600 }}>Título</TableCell>
+              <TableCell sx={{ fontWeight: 600 }}>Descrição</TableCell>
+              <TableCell sx={{ fontWeight: 600 }}>Cliente</TableCell>
+              <TableCell sx={{ fontWeight: 600 }} align="center">Ações</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {rows.map((row) => (
-              <TableRow key={row.id}>
+              <TableRow 
+                key={row.id}
+                sx={{ 
+                  '&:hover': { 
+                    bgcolor: '#f9fafb' 
+                  },
+                  '&:last-child td, &:last-child th': { 
+                    border: 0 
+                  }
+                }}
+              >
                 <TableCell>{row.criado}</TableCell>
-                <TableCell>{row.id}</TableCell>
-                <TituloCell>{row.titulo}</TituloCell>
-                <TableCell>{row.descricao}</TableCell>
-                <TableCell>
-                  <ClienteBox>
-                    <StyledAvatar>
-                      {getInitials(row.cliente)}
-                    </StyledAvatar>
-                    {row.cliente}
-                  </ClienteBox>
+                <TableCell sx={{ fontWeight: 500, color: '#374151' }}>
+                  #{row.id}
                 </TableCell>
-                <TableCell align="right">
-                  <ActionButton
-                    size="small"
-                    onClick={() => console.log("Visualizar:", row.id)}
-                  >
-                    <ClipboardList size={18} />
-                  </ActionButton>
+                <TableCell sx={{ fontWeight: 500 }}>{row.titulo}</TableCell>
+                <TableCell>{row.descricao}</TableCell>
+                <TableCell>{row.cliente}</TableCell>
+                <TableCell align="center">
+                  <Tooltip title="Atender chamado" arrow placement="top">
+                    <IconButton
+                      size="small"
+                      sx={{
+                        bgcolor: "#dcfce7",
+                        color: "#15803d",
+                        border: "1px solid #bbf7d0",
+                        "&:hover": { 
+                          bgcolor: "#bbf7d0",
+                          transform: "scale(1.05)",
+                          boxShadow: "0 2px 8px rgba(21, 128, 61, 0.2)"
+                        },
+                        transition: "all 0.2s ease-in-out"
+                      }}
+                      onClick={() => handleOpenModal(row)}
+                    >
+                      <ClipboardList size={16} />
+                    </IconButton>
+                  </Tooltip>
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
-      </StyledTableContainer>
+      </TableContainer>
     </Box>
   );
 }
