@@ -1,3 +1,5 @@
+@use "sass:color";
+
 // ========================================
 // VARIÁVEIS
 // ========================================
@@ -7,7 +9,7 @@ $color-primary: #3b83f6;
 $color-primary-hover: #2563eb;
 $color-secondary: #64748b;  
 $color-success: #caecb1;
-$color-warning:#a5bbeb;
+$color-warning: #a5bbeb;
 $color-danger: #ef4444;
 $color-icon:#355EC5 ;
 
@@ -118,7 +120,7 @@ $breakpoint-xl: 1200px;
   transition: all $transition-base;
   
   &:hover {
-    background: darken($bg, 10%);
+    background: color.adjust($bg, $lightness: -10%);
     transform: translateY(-1px);
   }
 }
@@ -324,8 +326,8 @@ body {
   font-size: $text-xs;
   font-weight: $font-medium;
   border-radius: 6px;
-  width: 96px; // aumentou de 90px para 100px
-  height: 31px; // aumentou de 28px para 32px
+  width: 96px;
+  height: 31px;
 
   @include flex(row, center, center);
 
@@ -344,8 +346,6 @@ body {
   padding-top: 16px;
   margin-top: 32px;
 
-
-  // Alinha usuário à esquerda e ícone à direita
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -358,10 +358,9 @@ body {
   flex: 1
 }
 
-
 .user-avatar {
-  @include avatar(26px, $color-primary); // aumentou de 24px para 26px
-  font-size: 11px; // aumentou de 10px para 11px
+  @include avatar(26px, $color-primary);
+  font-size: 11px;
   font-weight: $font-bold;
 }
 
@@ -374,9 +373,9 @@ body {
 
 .check-icon {
   @include flex(row, center, center);
-  width: 22px; // aumentou de 20px para 22px
+  width: 22px;
   height: 22px;
-  background: lighten($color-success, 40%);
+  background: color.adjust($color-success, $lightness: 40%);
   color: $color-success;
   border-radius: $radius-full;
   margin-left: auto;
@@ -389,7 +388,7 @@ body {
 @include responsive($breakpoint-md) {
   .card-main {
     flex-direction: column;
-    gap: 16px; // aumentou o gap
+    gap: 16px;
   }
   
   .card-right {
@@ -397,35 +396,35 @@ body {
   }
 
   .chamado-info {
-    margin-right: 0; // remove margem no mobile
+    margin-right: 0;
   }
 }
 
 @include responsive($breakpoint-xs) {
   .user-avatar {
-    @include avatar(28px, $color-primary); // aumentou de 22px para 28px
-    font-size: 12px; // aumentou de 10px para 12px
+    @include avatar(28px, $color-primary);
+    font-size: 12px;
   }
   
   .btn-encerrar {
-    padding: 6px 16px; // aumentou o padding
-    font-size: 12px; // aumentou de 10px para 12px
-    width: 110px; // aumentou de 90px para 110px
-    height: 36px; // aumentou de 28px para 36px
+    padding: 6px 16px;
+    font-size: 12px;
+    width: 110px;
+    height: 36px;
   }
   
   .check-icon {
-    width: 24px; // aumentou de 20px para 24px
+    width: 24px;
     height: 24px;
   }
 
   .chamado-info {
     .chamado-titulo {
-      font-size: $text-lg; // mantém legível no mobile
+      font-size: $text-lg;
     }
     
     .chamado-descricao {
-      font-size: $text-sm; // mantém legível no mobile
+      font-size: $text-sm;
     }
   }
 }
@@ -434,23 +433,19 @@ body {
 // RIPPLE EFFECT
 // ========================================
 
-// Variáveis específicas do ripple
 $ripple-duration: 0.8s;
 $ripple-size: 200px;
 $ripple-color: rgba(255, 255, 255, 0.4);
 $ripple-easing: cubic-bezier(0.4, 0, 0.2, 1);
 
-// Modifica o botão existente para suportar ripple
 .btn-encerrar {
   position: relative;
   overflow: hidden;
   
-  // Melhora a interação visual
   &:active {
     transform: translateY(0px) scale(0.98);
   }
   
-  // Efeito ripple
   .ripple {
     position: absolute;
     border-radius: 50%;
@@ -461,7 +456,6 @@ $ripple-easing: cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
 
-// Animação da onda suave
 @keyframes rippleEffect {
   0% {
     width: 0;
@@ -486,17 +480,15 @@ $ripple-easing: cubic-bezier(0.4, 0, 0.2, 1);
   @include flex(row, center, center);
   width: 26px;
   height: 26px;
-  
-  
   border-radius: $radius-full;
 
   &.andamento {
-    background: lighten($color-warning, 10%);
+    background: color.adjust($color-warning, $lightness: 10%);
     color: $color-icon;
   }
 
   &.finalizado {
-    background: lighten($color-success, 10%);
+    background: color.adjust($color-success, $lightness: 10%);
     color: #2E7D32;
   }
 }

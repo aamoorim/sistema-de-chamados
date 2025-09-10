@@ -71,7 +71,6 @@ export default function LoginForm({ onSubmit, loading, error }) {
                 minHeight: { xs: "auto", sm: 400, md: 500 },
                 mx: "auto",
               }}
-
           >
 
            {/* Logo */}
@@ -109,12 +108,11 @@ export default function LoginForm({ onSubmit, loading, error }) {
                 '& .MuiInputLabel-root': {
                   fontWeight: 700,
                 },
-                // Remove o fundo amarelo do autofill e coloca branco
                 '& input:-webkit-autofill': {
                   WebkitBoxShadow: '0 0 0 1000px white inset !important',
                 },
                 '& .MuiInputBase-input': {
-                  fontWeight: '500', 
+                  fontWeight: 500, 
                 }
               }}
               variant="standard"
@@ -125,7 +123,6 @@ export default function LoginForm({ onSubmit, loading, error }) {
               onChange={handleChange}
               required
               fullWidth
-              fontWeight="800"
               slotProps={{
                 input: {
                   startAdornment: (
@@ -142,13 +139,11 @@ export default function LoginForm({ onSubmit, loading, error }) {
                 '& .MuiInputLabel-root': {
                   fontWeight: 700,
                 },
-                // Remove o fundo amarelo do autofill e coloca branco
                 '& input:-webkit-autofill': {
                   WebkitBoxShadow: '0 0 0 1000px white inset !important',
                 },
-                // Altera a fonte do texto digitado
                 '& .MuiInputBase-input': {
-                  fontWeight: '600', 
+                  fontWeight: 600, 
                 }
               }}
               variant="standard"
@@ -159,7 +154,6 @@ export default function LoginForm({ onSubmit, loading, error }) {
               onChange={handleChange}
               required
               fullWidth
-              bgcolor="#fff"
               slotProps={{
                 input: {
                   startAdornment: (
@@ -190,13 +184,11 @@ export default function LoginForm({ onSubmit, loading, error }) {
               sx={{
                 py: 1.5,
                 borderRadius: 2,
-                fontSize: "1rem",
-                fontWeight: "bold",
-                bgcolor: "#151619",
-                "&:hover": { bgcolor: "#1E2024" },
                 my: 2,
                 fontSize: "1.15rem",
                 fontWeight: 700,
+                bgcolor: "#151619",
+                "&:hover": { bgcolor: "#1E2024" },
               }}
             >
               {loading ? "Entrando..." : "Entrar"}

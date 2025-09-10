@@ -10,11 +10,6 @@ export default function Botao({
   size = "medium",
   ...props 
 }) {
-  // Se iconOnly for true, mostra apenas o ícone
-  // Se text for fornecido, usa o text
-  // Se children for fornecido, usa children
-  // Senão, usa apenas o ícone como fallback
-
   const renderContent = () => {
     if (iconOnly) {
       return <Plus size={20} />;
@@ -38,11 +33,9 @@ export default function Botao({
       );
     }
     
-    // Fallback: apenas ícone
     return <Plus size={20} />;
   };
 
-  // Estilos dinâmicos baseados no conteúdo
   const getDynamicStyles = () => {
     const baseStyles = {
       borderRadius: '12px',
@@ -62,8 +55,8 @@ export default function Botao({
       return {
         ...baseStyles,
         height: 44,
+        width: 44,
         minWidth: 44,
-        width: 44, // Força quadrado para ícone apenas
         padding: '8px',
       };
     }
@@ -73,7 +66,6 @@ export default function Botao({
       height: 44,
       minWidth: 44,
       padding: '8px 16px',
-      minWidth: 'auto', // Permite crescer com conteúdo
     };
   };
 
