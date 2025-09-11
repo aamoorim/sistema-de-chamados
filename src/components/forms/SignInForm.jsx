@@ -3,6 +3,7 @@ import { Box, Typography, TextField, Button, Link } from '@mui/material';
 
 const SignInForm = ({ formData, handleInputChange, handleSubmit }) => (
   <Box component="form" className="form" onSubmit={handleSubmit('signin')}>
+    <img src="/logo_squad.png" alt="Logo da empresa SquadBi" className='form-logo'/>
     <Typography variant="h4" component="h1" className="form-title">
       Login
     </Typography>

@@ -46,8 +46,10 @@ export default function Login() {
   };
 
   return (
-    <div className="login-container">
-      <LoginForm onSubmit={handleLogin} loading={loading} error={error} />
-    </div>
+    <>
+      <div className="login-container">
+        <LoginForm onSubmit={handleLogin} loading={loading} error={error} />
+      </div>
+    </>
   );
 }

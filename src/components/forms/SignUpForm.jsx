@@ -3,6 +3,7 @@ import { Box, Typography, TextField, Button } from '@mui/material';
 
 const SignUpForm = ({ formData, handleInputChange, handleSubmit }) => (
   <Box component="form" className="form" onSubmit={handleSubmit('signup')}>
+    <img src="/logo_squad.png" alt="Logo da empresa SquadBi" className='form-logo'/>
     <Typography variant="h4" component="h1" className="form-title">
       Criar Conta
     </Typography>
