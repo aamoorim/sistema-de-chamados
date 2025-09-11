@@ -8,7 +8,6 @@ import {
   Divider,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import LogoutIcon from "@mui/icons-material/Logout";
 import { useAuth } from "../../context/auth-context";
 import { useNavigate } from "react-router-dom";
 
