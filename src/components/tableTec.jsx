@@ -17,7 +17,7 @@ function createData(criado, id, titulo, descricao, cliente) {
 }
 
 const rows = [
-  createData("13/04/25 20:56", "00003", "Rede lenta", "Instalação de Rede", "Carlos Silva"),
+  createData("13/04/25 20:56", "00003", "Rede lenta", "minha rede estava funcionando de manhã mas quando voltei de tarde, não consegui acessar o sistema tem duas horas nisso tenho task para entregar hoje ainda!", "Carlos Silva"),
   createData("12/04/25 15:20", "00004", "Backup não está funcionando", "Recuperação de Dados", "Carlos Silva"),
   createData("12/04/25 09:01", "00001", "Computador não liga", "Manutenção de Hardware", "Carlos Silva"),
   createData("10/04/25 10:15", "00002", "Instalação de software de gestão", "Suporte de Software", "Ana Oliveira"),
@@ -84,7 +84,7 @@ export default function StyledTable() {
                   #{row.id}
                 </TableCell>
                 <TableCell sx={{ fontWeight: 500 }}>{row.titulo}</TableCell>
-                <TableCell>{row.descricao}</TableCell>
+                <TableCell sx={{ maxWidth: 200, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }} >{row.descricao}</TableCell>
                 <TableCell>{row.cliente}</TableCell>
                 <TableCell align="center">
                   <Tooltip title="Atender chamado" arrow placement="top">
