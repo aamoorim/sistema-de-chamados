@@ -186,7 +186,9 @@ body {
 // ========================================
 
 .header {
-  margin-bottom: $spacing-3xl;  
+  margin-top: 40px;
+  display: flex;
+  justify-content: space-between;
 
   h1 {
     font-size: $text-3xl;
@@ -198,6 +200,9 @@ body {
   }
 }
 
+.search-bar{
+  margin-top: -20px;
+}
 
 /* Container principal do conteúdo */
 .main-content-wrapper {

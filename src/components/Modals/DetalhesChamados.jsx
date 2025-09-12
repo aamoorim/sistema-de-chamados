@@ -18,6 +18,20 @@ export default function ModalChamadoDetalhes({ isOpen, onClose, chamado }) {
     outline: "none",
   };
 
+  // Função para decidir ícone, cor e label
+  const getStatusConfig = (status) => {
+    switch (status) {
+      case "andamento":
+        return { icon: <Clock2 size={16} />, label: "Em andamento", color: "primary" };
+      case "espera":
+        return { icon: <Clock2 size={16} />, label: "Em espera", color: "error" };
+      case "finalizado":
+        return { icon: <Check size={16} />, label: "Finalizado", color: "success" };
+    }
+  };
+
+  const statusConfig = getStatusConfig(chamado.status);
+
   return (
     <Modal open={isOpen} onClose={onClose}>
       <Box sx={style}>
@@ -39,15 +53,9 @@ export default function ModalChamadoDetalhes({ isOpen, onClose, chamado }) {
             {chamado.tipo}
           </Typography>
           <Chip
-            icon={
-              chamado.status === "andamento" ? (
-                <Clock2 size={16} />
-              ) : (
-                <Check size={16} />
-              )
-            }
-            label={chamado.status === "andamento" ? "Em andamento" : "Finalizado"}
-            color={chamado.status === "andamento" ? "primary" : "success"}
+            icon={statusConfig.icon}
+            label={statusConfig.label}
+            color={statusConfig.color}
             variant="outlined"
           />
         </Box>

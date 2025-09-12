@@ -1,7 +1,12 @@
 import React, { useState } from 'react';
-import { Check, Clock2, CircleCheckBig } from 'lucide-react';
+import { Check, Clock2, CircleCheckBig, Pointer, Pencil } from 'lucide-react';
 import SideBar from '../../components/SideBar';
 import '../clientes/clientes.scss';
+import Botao from "../../components/Button"
+import { ModalCriarChamado } from '../../components/Modals/CriarChamado';
+import ModalChamadoDetalhes from '../../components/Modals/DetalhesChamados';
+import { SearchProvider } from '../../context/search-context';
+import SearchBar from "../../components/search-bar"
 
 const ChamadosCliente = () => {
   const [chamados] = useState([
@@ -131,13 +136,29 @@ const ChamadosCliente = () => {
     }, 800);
   };
 
+const [openModalCalls, setOpenModalCalls] = useState(false);
+  const [chamadoSelecionado, setChamadoSelecionado] = useState(null);
+  const [openModalDetails, setOpenModalDetails] = useState(false)
+  const handleOpenModal = (chamado) => {
+    setChamadoSelecionado(chamado);
+    setOpenModalDetails(true);
+  }
+
   return (
     <div className="tecnico-chamados">
       {/* Conteúdo principal */}
       <div className="main-content-wrapper">
+          
         <div className="header">
           <h1>Meus chamados</h1>
+          <Botao onClick={() => setOpenModalCalls(true)}>Novo Chamado</Botao>
+          <ModalCriarChamado isOpen={openModalCalls} onClose={() => setOpenModalCalls(false)}/>
         </div>
+        <div className='search-bar'>
+            <SearchProvider>
+            <SearchBar  />
+          </SearchProvider>
+          </div>
         
         {/* Seção Em Espera */}
         <div className="section">
@@ -146,7 +167,7 @@ const ChamadosCliente = () => {
           </div>
           <div className="chamados-list">
             {esperaChamados.map(chamado => (
-              <div key={chamado.id} className="chamado-card espera">
+              <div key={chamado.id} className="chamado-card espera" onClick={() => handleOpenModal(chamado)} style={{ cursor: "pointer" }}>
                 <div className="card-main">
                   <div className="chamado-info">
                     <div className="chamado-codigo">{chamado.codigo}</div>
@@ -176,7 +197,7 @@ const ChamadosCliente = () => {
           </div>
           <div className="chamados-list">
             {andamentoChamados.map(chamado => (
-              <div key={chamado.id} className="chamado-card andamento">
+              <div key={chamado.id} className="chamado-card andamento" onClick={() => handleOpenModal(chamado)} style={{ cursor: "pointer" }}>
                 <div className="card-main">
                   <div className="chamado-info">
                     <div className="chamado-codigo">{chamado.codigo}</div>
@@ -187,10 +208,13 @@ const ChamadosCliente = () => {
                   {chamado.hasButton && (
                     <button 
                       className="btn-encerrar"
-                      onClick={(e) => handleEncerrar(e, chamado.id)}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleEncerrar(e, chamado.id)
+                      }}
                     >
-                      <CircleCheckBig size={15} style={{marginRight: '4px'}}/>
-                      Encerrar
+                      <Pencil size={13} style={{marginRight: '4px'}}/>
+                      Editar
                     </button>
                   )}
                 </div>
@@ -215,7 +239,7 @@ const ChamadosCliente = () => {
           </div>
           <div className="chamados-list">
             {finalizadosChamados.map(chamado => (
-              <div key={chamado.id} className="chamado-card finalizado">
+              <div key={chamado.id} className="chamado-card finalizado" onClick={() => handleOpenModal(chamado)} style={{cursor: "pointer"}}>
                 <div className="card-main">
                   <div className="chamado-info">
                     <div className="chamado-codigo">{chamado.codigo}</div>
@@ -243,6 +267,7 @@ const ChamadosCliente = () => {
       <div className="sidebar-container">
         <SideBar />
       </div>
+      <ModalChamadoDetalhes  isOpen={openModalDetails} onClose={() => setOpenModalDetails(false)} chamado={chamadoSelecionado}/>
     </div>
   );
 };

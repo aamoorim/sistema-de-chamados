@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { Check, Clock2, CircleCheckBig } from 'lucide-react';
 import './chamados.scss';
-import Botao from '../../components/Button'
-import { Button } from '@mui/material';
 import ModalChamadoDetalhes from '../../components/Modals/DetalhesChamados';
+import { ModalCriarChamado } from '../../components/Modals/CriarChamado';
 
 export default function ChamadosTecnico() {
   
@@ -69,7 +68,6 @@ const [openModal, setOpenModal] = useState(false);
       <div className="header">
         <h1>Meus chamados</h1>
       </div>
-
       {/* Seção Em Atendimento */}
       <div className="section">
         <div className="section-header andamento">
@@ -95,7 +93,7 @@ const [openModal, setOpenModal] = useState(false);
                     }}
                   >
                     <CircleCheckBig size={15} style={{marginRight: '4px'}}/>
-                    Encerrar
+                    Editar
                   </button>
                 )}
               </div>
