@@ -93,7 +93,7 @@ const [openModal, setOpenModal] = useState(false);
                     }}
                   >
                     <CircleCheckBig size={15} style={{marginRight: '4px'}}/>
-                    Editar
+                    Encerrar
                   </button>
                 )}
               </div>
