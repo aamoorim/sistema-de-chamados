@@ -2,11 +2,13 @@ import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { LogOut, Users, UserCheck, Headphones, MessageSquare, BriefcaseBusiness, User, Settings, ChevronUp, ChevronDown } from 'lucide-react';
 import { useAuth } from '../context/auth-context';
+import { useModal } from '../context/modal-context';
 import '../index.css';
 
 const SideBar = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const { openProfileModal } = useModal(); //hook para controlar o modal de perfil
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
   const handleLogout = () => {
@@ -20,7 +22,7 @@ const SideBar = () => {
 
   const handleProfileClick = () => {
     // Navegar para página de perfil ou abrir modal de perfil
-    navigate('/profile');
+    openProfileModal();
     setIsUserMenuOpen(false);
   };
 
@@ -89,7 +91,7 @@ const SideBar = () => {
       </nav>
 
       {/* Container do footer com dropdown */}
-      <div className="aside_footer" style={{ position: 'relative' }}>
+      <div className="aside_footer" style={{ position: 'relative'}}>
         {/* Menu dropdown */}
         {isUserMenuOpen && (
           <div className="user_dropdown_menu">
