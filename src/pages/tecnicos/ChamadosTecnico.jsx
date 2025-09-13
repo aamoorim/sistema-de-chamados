@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Check, Clock2, CircleCheckBig } from 'lucide-react';
 import './chamados.scss';
+import ModalChamadoDetalhes from '../../components/Modals/DetalhesChamados';
+import { ModalCriarChamado } from '../../components/Modals/CriarChamado';
 
 export default function ChamadosTecnico() {
+  
   const chamados = [
     {
       id: 1,
@@ -50,13 +53,21 @@ export default function ChamadosTecnico() {
   setTimeout(() => {
     ripple.remove();
   }, 800); // igual à duração $ripple-duration
+  
 };
+
+const [openModal, setOpenModal] = useState(false);
+  const [chamadoSelecionado, setChamadoSelecionado] = useState(null)
+  const handleOpenModal = (chamado) => {
+    setChamadoSelecionado(chamado);
+    setOpenModal(true);
+  }
+
   return (
     <div className="tecnico-chamados">
       <div className="header">
         <h1>Meus chamados</h1>
       </div>
-
       {/* Seção Em Atendimento */}
       <div className="section">
         <div className="section-header andamento">
@@ -64,18 +75,22 @@ export default function ChamadosTecnico() {
         </div>
         <div className="chamados-list">
           {andamentoChamados.map(chamado => (
-            <div key={chamado.id} className="chamado-card andamento">
+            
+              <div key={chamado.id} className="chamado-card andamento" onClick={() => handleOpenModal(chamado)} style={{ cursor: 'pointer' }}>
               <div className="card-main">
                 <div className="chamado-info">
                   <div className="chamado-codigo">{chamado.codigo}</div>
                   <div className="chamado-titulo">{chamado.tipo}</div>
                   <div className="chamado-descricao">{chamado.descricao}</div>
-                  <div className="chamado-data">{chamado.data}</div>
+                  <div className="chamado-data">{chamado.data}</div>                  
                 </div>
                 {chamado.hasButton && (
                   <button 
                     className="btn-encerrar"
-                    onClick={(e) => handleEncerrar(e, chamado.id)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleEncerrar(e, chamado.id)
+                    }}
                   >
                     <CircleCheckBig size={15} style={{marginRight: '4px'}}/>
                     Encerrar
@@ -101,9 +116,9 @@ export default function ChamadosTecnico() {
         <div className="section-header finalizado">
           <Check size={16}/> Encerrado
         </div>
-        <div className="chamados-list">
+        <div className="chamados-list" >
           {finalizadosChamados.map(chamado => (
-            <div key={chamado.id} className="chamado-card finalizado">
+            <div key={chamado.id} className="chamado-card finalizado" onClick={() => handleOpenModal(chamado)} style={{ cursor: 'pointer' }}>
               <div className="card-main">
                 <div className="chamado-info">
                   <div className="chamado-codigo">{chamado.codigo}</div>
@@ -124,7 +139,9 @@ export default function ChamadosTecnico() {
             </div>
           ))}
         </div>
-      </div>  
+      </div> 
+      <ModalChamadoDetalhes  isOpen={openModal} onClose={() => setOpenModal(false)} chamado={chamadoSelecionado}/>
     </div>
+    
   );
 }

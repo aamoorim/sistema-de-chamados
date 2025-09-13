@@ -3,14 +3,19 @@ import AppRoutes from "./router/routes.jsx";
 import { AuthProvider } from "./context/auth-context";
 import { ThemeProvider } from "@mui/material";
 import { theme } from "./config/theme";
+import { ModalProvider } from "./context/modal-context.jsx";
+import ProfileModal from './components/Modals/Perfil'; // ✅ SEM CHAVES
 
 export default function App() {
   return (
     <ThemeProvider theme={theme}>
       <AuthProvider>
-        <BrowserRouter>
-          <AppRoutes />
-        </BrowserRouter>
+        <ModalProvider>
+          <ProfileModal />
+          <BrowserRouter>
+            <AppRoutes />
+          </BrowserRouter>
+        </ModalProvider>
       </AuthProvider>
     </ThemeProvider>
   );

@@ -1,15 +1,38 @@
+import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { LogOut, Users, UserCheck, Headphones, MessageSquare, BriefcaseBusiness } from 'lucide-react';
+import { LogOut, Users, Headphones, MessageSquare, BriefcaseBusiness, User, Settings, ChevronUp, ChevronDown } from 'lucide-react';
 import { useAuth } from '../context/auth-context';
+import { useModal } from '../context/modal-context';
 import '../index.css';
+import { ModalSairPerfil } from './Modals/Sair';
+
+
 
 const SideBar = () => {
+  const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const { openProfileModal } = useModal(); //hook para controlar o modal de perfil
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
     navigate('/login');
+  };
+
+  const toggleUserMenu = () => {
+    setIsUserMenuOpen(!isUserMenuOpen);
+  };
+
+  const handleProfileClick = () => {
+    // Navegar para página de perfil ou abrir modal de perfil
+    openProfileModal();
+    setIsUserMenuOpen(false);
+  };
+
+  const handleLogoutFromMenu = () => {
+    setIsUserMenuOpen(false);
+    handleLogout();
   };
 
   const getMenuItems = () => {
@@ -45,7 +68,7 @@ const SideBar = () => {
           <span className="aside_user">{user?.role || 'Visitante'}</span>
         </div>
       </div>
-
+      
       <nav>
         <ul>
           {menuItems.map((item, index) => (
@@ -65,16 +88,35 @@ const SideBar = () => {
         </ul>
       </nav>
 
-      <button className="aside_footer" onClick={handleLogout}>
-        <div className="avatar">
-          <span>{user?.name?.charAt(0)?.toUpperCase() || 'U'}</span>
-        </div>
-        <div className="user_info">
-          <p>{user?.name || 'Admin Teste'}</p>
-          <p>{user?.email || 'admin@email.com'}</p>
-        </div>
-        <LogOut size={16} style={{ marginLeft: 'auto' }} />
-      </button>
+      {/* Container do footer com dropdown */}
+      <div className="aside_footer" style={{ position: 'relative'}}>
+        {/* Menu dropdown */}
+        {isUserMenuOpen && (
+          <div className="user_dropdown_menu">
+            <button className="dropdown_item" onClick={handleProfileClick}>
+              <User size={16} />
+              <span>Perfil</span>
+            </button>
+            <div className="dropdown_divider"></div>
+            <button className="dropdown_item logout_item" onClick={() => setOpen(true)}>
+              <LogOut size={16} />
+              <span>Sair</span>
+            </button>
+            <ModalSairPerfil isOpen={open} onClose={() => setOpen(false)} />
+          </div>
+        )}
+
+        {/* Botão do usuário - agora clicável para abrir dropdown */}
+        <button className="aside_footer" onClick={toggleUserMenu}>
+          <div className="avatar">
+            <span>{user?.name?.charAt(0)?.toUpperCase() || 'U'}</span>
+          </div>
+          <div className="user_info">
+            <p>{user?.name || 'Admin Teste'}</p>
+            <p>{user?.email || 'admin@email.com'}</p>
+          </div>
+        </button>
+      </div>
     </aside>
   );
 };
