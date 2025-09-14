@@ -1,9 +1,10 @@
 import React from 'react';
-import { Box, Typography, TextField, Button, Link } from '@mui/material';
+import { Box, Typography, TextField, Button, Alert } from '@mui/material';
 
-const SignInForm = ({ formData, handleInputChange, handleSubmit }) => (
+const SignInForm = ({ formData, handleInputChange, handleSubmit, loading, error }) => (
   <Box component="form" className="form" onSubmit={handleSubmit('signin')}>
     <img src="/logo_squad.png" alt="Logo da empresa SquadBi" className='form-logo'/>
+    
     <Typography variant="h4" component="h1" className="form-title">
       Login
     </Typography>
@@ -30,13 +31,26 @@ const SignInForm = ({ formData, handleInputChange, handleSubmit }) => (
       variant="outlined"
     />
 
-    <Link href="#" className="form-link" onClick={(e) => e.preventDefault()}>
-      Esqueceu sua senha?
-    </Link>
-
-    <Button type="submit" variant="contained" className="form-button">
-      Login
+    <Button 
+      type="submit" 
+      variant="contained" 
+      className="form-button"
+      disabled={loading}
+    >
+      {loading ? "Entrando..." : "Login"}
     </Button>
+
+    <Box 
+      sx={{ minHeight: 56, mt: 2, display: "flex", alignItems: "center" }}
+    >
+      {error && (
+        <Alert severity="error" sx={{ width: "100%" }}>
+          {error}
+        </Alert>
+      )}
+    </Box>
+
+
   </Box>
 );
 
