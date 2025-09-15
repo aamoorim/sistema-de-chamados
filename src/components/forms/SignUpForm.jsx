@@ -33,7 +33,7 @@ const SignUpForm = () => {
         sx={{
           width: "100%",
           maxWidth: "40rem",
-          height: "60vh", // altura fixa
+          height: "72vh", // altura fixa
           borderRadius: "1rem",
           boxShadow: 3,
           display: "flex",

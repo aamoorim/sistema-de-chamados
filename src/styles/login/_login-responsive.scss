@@ -31,6 +31,7 @@
     .login-container {
       width: 100%; 
       max-width: 100vw;
+      min-height: 100vh;
     }
   }
 
@@ -38,7 +39,7 @@
   @media (max-width: 768px) {
     .login-container {
       width: 100%;
-      min-height: 700px;
+      min-height: 100vh;
       flex-direction: column;
     }
 
@@ -106,7 +107,7 @@
     }
 
     .form {
-      padding: 12vh 20px 20px; 
+      padding: 12vh 20px 2vh; 
     }
 
     .form-input input {
@@ -130,6 +131,10 @@
       line-height: 20px !important;
       margin: 15px 0 20px !important;
     }
+
+    .card{
+      height: 60vh !important;
+    }
   }
 
   // Mobile
@@ -143,11 +148,15 @@
     }
     
     .form-login{
-      padding: 5rem 2rem 1.5rem;
+      padding: 5rem 2rem 2rem;
     }
 
     .form-signup{
-      padding: 1rem 1rem 1rem;
+      padding: 0rem 1rem 1rem;
+    }
+
+    .card{
+      height: 50vh !important;
     }
   }
 }
