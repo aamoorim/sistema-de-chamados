@@ -45,7 +45,7 @@ export default function StyledTable() {
         isOpen={open} 
         onClose={handleCloseModal}
         chamado={selectedChamado}
-      />
+      />  
       
       <TableContainer 
         component={Paper} 

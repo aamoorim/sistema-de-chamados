@@ -8,6 +8,8 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import IconButton from "@mui/material/IconButton";
 import { Pencil, Trash2 } from "lucide-react";
+import { DeletarPerfil } from "./Modals/DeletarPerfil";
+import { useState } from "react";
 
 const rows = [
   {
@@ -50,6 +52,25 @@ function Avatar({ initials }) {
 
 export default function ClientTable() {
   const { search } = useSearch();
+
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [selectedRow, setSelectedRow] = useState(null);
+
+  const handleOpenDelete = (row) => {
+    setSelectedRow(row);
+    setOpenDeleteModal(true);
+  };
+
+  const handleCloseDelete = () => {
+    setSelectedRow(null);
+    setOpenDeleteModal(false);
+  };
+
+  const handleDeleteConfirmed = () => {
+    console.log("Deletando chamado:", selectedRow.id);
+    // Aqui você conecta com sua API para deletar
+    handleCloseDelete();
+  };
 
   const filteredRows = rows.filter(
     (row) =>
@@ -110,7 +131,7 @@ export default function ClientTable() {
                       <Pencil size={18} />
                     </IconButton>
                     <IconButton color="error">
-                      <Trash2 size={18} />
+                      <Trash2 size={18} onClick={() => handleOpenDelete(row)}/>
                     </IconButton>
                   </TableCell>
                 </TableRow>
@@ -128,6 +149,12 @@ export default function ClientTable() {
           </TableBody>
         </Table>
       </TableContainer>
+      {/* Modal de deletar */}
+      <DeletarPerfil
+        isOpen={openDeleteModal}
+        onClose={handleCloseDelete}
+        onDelete={handleDeleteConfirmed}
+      />
     </div>
   );
 }

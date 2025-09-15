@@ -1,50 +1,54 @@
+import { useState } from "react";
 import { useSearch } from "../context/search-context";
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
-import IconButton from '@mui/material/IconButton';
-import { Trash, Trash2 } from "lucide-react";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Paper from "@mui/material/Paper";
+import IconButton from "@mui/material/IconButton";
+import { Trash2, Pencil } from "lucide-react";
+import { DeletarPerfil } from "./Modals/DeletarPerfil"; // ajuste o caminho
 
 const rows = [
   {
-    createdAt: '13/04/25 20:56',
-    id: '00003',
-    title: 'Rede lenta',
-    description: 'Instalação de Rede',
-    client: { initials: 'AC', name: 'André Costa' },
-    technician: { initials: 'CS', name: 'Carlos Silva' },
-    status: { label: 'Em espera', color: '#F8D7DA', text: '#D7263D' },
+    createdAt: "13/04/25 20:56",
+    id: "00003",
+    title: "Rede lenta",
+    description: "Instalação de Rede",
+    client: { initials: "AC", name: "André Costa" },
+    technician: { initials: "CS", name: "Carlos Silva" },
+    status: { label: "Em espera", color: "#F8D7DA", text: "#D7263D" },
   },
   {
-    createdAt: '13/04/25 20:56',
-    id: '00004',
-    title: 'Rede rapidamente lenta',
-    description: 'Instalação de cpu',
-    client: { initials: 'AL', name: 'André lima' },
-    technician: { initials: 'CM', name: 'Carlos Magno' },
-    status: { label: 'Em espera', color: '#F8D7DA', text: '#D7263D' },
+    createdAt: "13/04/25 20:56",
+    id: "00004",
+    title: "Rede rapidamente lenta",
+    description: "Instalação de cpu",
+    client: { initials: "AL", name: "André Lima" },
+    technician: { initials: "CM", name: "Carlos Magno" },
+    status: { label: "Em espera", color: "#F8D7DA", text: "#D7263D" },
   },
 ];
 
 function Avatar({ initials }) {
   return (
-    <span style={{
-      display: 'inline-flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      width: 28,
-      height: 28,
-      borderRadius: '50%',
-      background: '#2E3DA3',
-      color: '#fff',
-      fontWeight: 600,
-      fontSize: 14,
-      marginRight: 8,
-    }}>
+    <span
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+        width: 28,
+        height: 28,
+        borderRadius: "50%",
+        background: "#2E3DA3",
+        color: "#fff",
+        fontWeight: 600,
+        fontSize: 14,
+        marginRight: 8,
+      }}
+    >
       {initials}
     </span>
   );
@@ -53,13 +57,29 @@ function Avatar({ initials }) {
 export default function ListTable() {
   const { search, filters } = useSearch();
 
-  const handleDelete = (id) => {
-    console.log("Deletando chamado:", id);
-    // aqui você conecta com sua API para deletar
+  // Controle do modal
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [selectedRow, setSelectedRow] = useState(null);
+
+  const handleOpenDelete = (row) => {
+    setSelectedRow(row);
+    setOpenDeleteModal(true);
   };
 
-  const filteredRows = rows.filter(row => {
-    const matchesSearch = search === '' || 
+  const handleCloseDelete = () => {
+    setSelectedRow(null);
+    setOpenDeleteModal(false);
+  };
+
+  const handleDeleteConfirmed = () => {
+    console.log("Deletando chamado:", selectedRow.id);
+    // Aqui você conecta com sua API para deletar
+    handleCloseDelete();
+  };
+
+  const filteredRows = rows.filter((row) => {
+    const matchesSearch =
+      search === "" ||
       row.title.toLowerCase().includes(search.toLowerCase()) ||
       row.description.toLowerCase().includes(search.toLowerCase()) ||
       row.client.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -69,14 +89,14 @@ export default function ListTable() {
       if (values.length === 0) return true;
 
       switch (filterType) {
-        case 'status':
+        case "status":
           return values.includes(row.status.label);
-        case 'technician':
+        case "technician":
           return values.includes(row.technician.name);
-        case 'client':
+        case "client":
           return values.includes(row.client.name);
-        case 'description':
-          return values.some(value => 
+        case "description":
+          return values.some((value) =>
             row.description.toLowerCase().includes(value.toLowerCase())
           );
         default:
@@ -89,24 +109,24 @@ export default function ListTable() {
 
   return (
     <div>
-      <div style={{ marginBottom: 16, color: '#666', fontSize: 14 }}>
+      <div style={{ marginBottom: 16, color: "#666", fontSize: 14 }}>
         Mostrando {filteredRows.length} de {rows.length} chamados
       </div>
 
-      <TableContainer 
-        component={Paper} 
-        style={{ borderRadius: 14, boxShadow: '0 2px 8px rgba(44,62,80,0.04)' }}
+      <TableContainer
+        component={Paper}
+        style={{ borderRadius: 14, boxShadow: "0 2px 8px rgba(44,62,80,0.04)" }}
       >
         <Table sx={{ minWidth: 900 }} aria-label="tabela de chamados">
           <TableHead>
             <TableRow>
-              <TableCell style={{ color: '#858B99', fontWeight: 600 }}>Criado em</TableCell>
-              <TableCell style={{ color: '#858B99', fontWeight: 600 }}>Id</TableCell>
-              <TableCell style={{ color: '#858B99', fontWeight: 600 }}>Título e Descrição</TableCell>
-              <TableCell style={{ color: '#858B99', fontWeight: 600 }}>Cliente</TableCell>
-              <TableCell style={{ color: '#858B99', fontWeight: 600 }}>Técnico</TableCell>
-              <TableCell style={{ color: '#858B99', fontWeight: 600 }}>Status</TableCell>
-              <TableCell style={{ color: '#858B99', fontWeight: 600 }}>Ações</TableCell>
+              <TableCell style={{ color: "#858B99", fontWeight: 600 }}>Criado em</TableCell>
+              <TableCell style={{ color: "#858B99", fontWeight: 600 }}>Id</TableCell>
+              <TableCell style={{ color: "#858B99", fontWeight: 600 }}>Título e Descrição</TableCell>
+              <TableCell style={{ color: "#858B99", fontWeight: 600 }}>Cliente</TableCell>
+              <TableCell style={{ color: "#858B99", fontWeight: 600 }}>Técnico</TableCell>
+              <TableCell style={{ color: "#858B99", fontWeight: 600 }}>Status</TableCell>
+              <TableCell style={{ color: "#858B99", fontWeight: 600 }}>Ações</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -118,7 +138,7 @@ export default function ListTable() {
                   <TableCell>
                     <span style={{ fontWeight: 600 }}>{row.title}</span>
                     <br />
-                    <span style={{ color: '#888', fontSize: 13 }}>{row.description}</span>
+                    <span style={{ color: "#888", fontSize: 13 }}>{row.description}</span>
                   </TableCell>
                   <TableCell>
                     <Avatar initials={row.client.initials} />
@@ -129,38 +149,39 @@ export default function ListTable() {
                     {row.technician.name}
                   </TableCell>
                   <TableCell>
-                    <span style={{
-                      background: row.status.color,
-                      color: row.status.text,
-                      borderRadius: 16,
-                      padding: '4px 16px',
-                      fontWeight: 500,
-                      fontSize: 13,
-                      display: 'inline-block',
-                    }}>
+                    <span
+                      style={{
+                        background: row.status.color,
+                        color: row.status.text,
+                        borderRadius: 16,
+                        padding: "4px 16px",
+                        fontWeight: 500,
+                        fontSize: 13,
+                        display: "inline-block",
+                      }}
+                    >
                       {row.status.label}
                     </span>
                   </TableCell>
                   <TableCell>
-                    <IconButton 
-                      color="error" 
-                      size="small" 
-                      onClick={() => handleDelete(row.id)}
+                    <IconButton>
+                      <Pencil size={18} />
+                    </IconButton>
+                    <IconButton
+                      color="error"
+                      size="small"
+                      onClick={() => handleOpenDelete(row)}
                     >
-                      <Trash size={18} />
+                      <Trash2 size={18} />
                     </IconButton>
                   </TableCell>
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell 
-                  colSpan={7} 
-                  style={{ 
-                    textAlign: 'center', 
-                    padding: '40px', 
-                    color: '#999' 
-                  }}
+                <TableCell
+                  colSpan={7}
+                  style={{ textAlign: "center", padding: "40px", color: "#999" }}
                 >
                   Nenhum chamado encontrado com os filtros aplicados
                 </TableCell>
@@ -169,6 +190,13 @@ export default function ListTable() {
           </TableBody>
         </Table>
       </TableContainer>
+
+      {/* Modal de deletar */}
+      <DeletarPerfil
+        isOpen={openDeleteModal}
+        onClose={handleCloseDelete}
+        onDelete={handleDeleteConfirmed}
+      />
     </div>
   );
 }
