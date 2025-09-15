@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Box, ThemeProvider } from '@mui/material';
 import axios from 'axios';
-import '../../styles/LoginForm.scss'; // importa o SCSS com escopo .login-page
+import '../../styles/login/login.scss';
 import theme from './LoginTheme';
 import SignUpForm from './SignUpForm';
 import SignInForm from './SignInForm';
