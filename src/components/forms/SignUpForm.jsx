@@ -3,7 +3,7 @@ import {
   Box,
   Typography,
   Button,
-  Card,
+  Card, 
   CardContent,
   Accordion,
   AccordionSummary,
@@ -51,26 +51,43 @@ const SignUpForm = () => {
             WebkitOverflowScrolling: "touch",
           }}
         >
-          <Box component="img" className="form-logo-signup" src="/logo_squad.png" alt="Logo da empresa SquadBi"/>
+          <Box component="img" className="form-logo-signup" src="/logo_squad.png" alt="Logo da empresa SquadBi" />
           <SupportAgentIcon sx={{ fontSize: "3rem", color: "primary.main" }} />
 
-          <Typography
-            variant="h3"
-            component="h1"
-            className="form-title"
-            gutterBottom
-          >
-            Acesso Restrito
-          </Typography>
+         <Typography
+          variant="h3"
+          component="h1"
+          className="form-title"
+          gutterBottom
+          sx={{
+            fontSize: {
+              xs: "1.5rem",  // até 480px
+              sm: "1.8rem",  // até 768px
+              md: "2.2rem",  // até 1024px
+              lg: "3rem"   // acima de 1024px
+            }
+          }}
+        >
+          Acesso Restrito
+        </Typography>
 
-          <Typography
-            variant="body2"
-            color="text.secondary"
-            sx={{ mb: "1rem" }}
-          >
-            Usuários só podem ser cadastrados pelo administrador. Confira as
-            dúvidas frequentes abaixo:
-          </Typography>
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          sx={{
+            mb: "1rem",
+            fontSize: {
+              xs: "0.75rem",
+              sm: "0.85rem",
+              md: "0.95rem",
+              lg: "1.25rem"
+            }
+          }}
+        >
+          Usuários só podem ser cadastrados pelo administrador. Confira as
+          dúvidas frequentes abaixo:
+        </Typography>
+
 
           {/* Accordions */}
           <Accordion
@@ -83,14 +100,36 @@ const SignUpForm = () => {
             }}
           >
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-              <Typography variant="body2">
+              <Typography
+                variant="body2"
+                sx={{
+                  fontSize: {
+                    xs: "0.75rem",
+                    sm: "0.85rem",
+                    md: "0.95rem",
+                    lg: "1.2rem"
+                  }
+                }}
+              >
                 Quem pode acessar a plataforma?
               </Typography>
             </AccordionSummary>
             <AccordionDetails>
-              <Typography variant="body3" color="text.secondary">
-                Apenas clientes e técnicos cadastrados pelo administrador.
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{
+                  fontSize: {
+                    xs: "0.7rem",
+                    sm: "0.8rem",
+                    md: "0.9rem",
+                    lg: "1.15rem"
+                  }
+                }}
+              >
+                Apenas clientes oficiais e técnicos credenciados da SquadBI.
               </Typography>
+
             </AccordionDetails>
           </Accordion>
 
@@ -104,12 +143,34 @@ const SignUpForm = () => {
             }}
           >
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-              <Typography variant="body2">Como solicitar um acesso?</Typography>
+              <Typography
+                variant="body2"
+                sx={{
+                  fontSize: {
+                    xs: "0.75rem",
+                    sm: "0.85rem",
+                    md: "0.95rem",
+                    lg: "1.2rem"
+                  }
+                }}
+              >
+                Como solicitar um acesso?
+              </Typography>
             </AccordionSummary>
             <AccordionDetails>
-              <Typography variant="body3" color="text.secondary">
-                Entre em contato com o suporte informando seus dados para
-                avaliação do administrador.
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{
+                  fontSize: {
+                    xs: "0.7rem",
+                    sm: "0.8rem",
+                    md: "0.9rem",
+                    lg: "1.15rem"
+                  }
+                }}
+              >
+                Para acessar a plataforma você precisa ser cadastrado pelo administrador da plataforma, para isso entre em contato com o suporte.
               </Typography>
             </AccordionDetails>
           </Accordion>
@@ -119,13 +180,34 @@ const SignUpForm = () => {
             sx={{ textAlign: "left", width: "100%", borderRadius: 3 }}
           >
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-              <Typography variant="body2" >
-                Esqueci minha senha, e agora?
+              <Typography
+                variant="body2"
+                sx={{
+                  fontSize: {
+                    xs: "0.75rem",
+                    sm: "0.85rem",
+                    md: "0.95rem",
+                    lg: "1.2rem"
+                  }
+                }}
+              >
+                Esqueci minha senha, o que fazer?
               </Typography>
             </AccordionSummary>
             <AccordionDetails>
-              <Typography variant="body3" color="text.secondary">
-                Entre em contato com o suporte para redefinição da senha.
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{
+                  fontSize: {
+                    xs: "0.7rem",
+                    sm: "0.8rem",
+                    md: "0.9rem",
+                    lg: "1.15rem"
+                  }
+                }}
+              >
+                Entre em contato com o suporte para redefinir sua senha.
               </Typography>
             </AccordionDetails>
           </Accordion>
@@ -135,10 +217,32 @@ const SignUpForm = () => {
             color="primary"
             onClick={handleContactClick}
             className="form-button"
-            sx={{ mt: "1.5rem" }}
+            sx={{
+              mt: "1.5rem",
+              fontSize: {
+                xs: "0.75rem",     // até 480px
+                sm: "0.85rem",     // até 768px
+                md: "0.95rem",     // até 1024px
+                lg: "1rem"         // acima de 1024px
+              },
+              padding: {
+                xs: "10px 20px",
+                sm: "12px 24px",
+                md: "14px 28px",
+                lg: "16px 32px"
+              },
+              width: {
+                xs: "100%",
+                sm: "80%",
+                md: "60%",
+                lg: "auto"
+              },
+              alignSelf: "center",
+            }}
           >
             Falar com suporte
           </Button>
+
         </CardContent>
       </Card>
     </Box>
