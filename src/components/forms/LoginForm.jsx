@@ -7,7 +7,7 @@ import SignInForm from './SignInForm';
 import OverlayPanel from './OverlayPanel';
 import useIsMobile from '../../hooks/useIsMobile';
 import { useAuth } from '../../context/auth-context';
-import api from '../../services/api'; // importa o api.js já configurado
+import api from '../../services/api'; // usa api.js já configurado
 
 const LoginForm = () => {
   const { login } = useAuth();
