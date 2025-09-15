@@ -1,6 +1,5 @@
 import axios from "axios";
 
-// Base URL definida pelo .env do Vite
 const API_URL = "https://api-sdc.onrender.com";
 
 const api = axios.create({
