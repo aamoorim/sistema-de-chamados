@@ -1,0 +1,108 @@
+// Formulários e Elementos do Form
+.login-page {
+  .form-logo {
+    position: absolute;
+    top: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+    min-width: 10%;  
+    max-width: 30%;
+    z-index: 10;
+    
+    @media (max-width: 768px) {
+      min-width: 20vw;
+      max-width: 20vw;
+      top: 8%;
+    }
+    
+    @media (max-width: 480px) {
+      margin-top: 1rem !important;
+      min-width: 35vw;
+      max-width: 35vw;
+      top: 10px;
+    }
+  }
+
+  .form {
+    background-color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 60px 60px 0; 
+    height: 100%;
+    text-align: center;
+    position: relative;
+  }
+
+  .form-input {
+    margin: 10px 0 !important; 
+
+    .MuiOutlinedInput-root {
+      background-color: #eee;
+
+      & fieldset {
+        border: none;
+      }
+
+      &:hover {
+        background-color: #e0e0e0;
+      }
+
+      &.Mui-focused {
+        background-color: #e0e0e0;
+      }
+    }
+
+    input {
+      padding: 15px 18px; 
+      font-size: 16px; 
+    }
+  }
+
+  .form-button {
+    border-radius: 25px !important; 
+    font-size: 14px !important; 
+    font-weight: bold !important;
+    padding: 15px 50px !important; 
+    letter-spacing: 1px !important;
+    text-transform: uppercase !important;
+    margin-top: 18px !important; 
+
+    &:active {
+      transform: scale(0.95);
+    }
+  }
+
+  .ghost-button {
+    background-color: transparent !important;
+    border-color: #ffffff !important;
+    color: #ffffff !important;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.1) !important;
+      border-color: #ffffff !important;
+    }
+  }
+
+  .form-link {
+    color: #333;
+    font-size: 16px; 
+    margin: 18px 0; 
+    cursor: pointer;
+    transition: 0.5s;
+
+    &:hover {
+      color: #333;
+      scale: 1.02;
+      text-decoration: underline 1px black;
+    }
+  }
+
+  .form-title {
+    font-weight: bold !important;
+    margin-bottom: 25px !important; 
+    color: #333 !important;
+    font-size: 2rem !important;
+  }
+}
