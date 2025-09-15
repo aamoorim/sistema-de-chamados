@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Box, ThemeProvider } from '@mui/material';
-import axios from 'axios';
 import '../../styles/login/login.scss';
 import theme from './LoginTheme';
 import SignUpForm from './SignUpForm';
@@ -8,8 +7,7 @@ import SignInForm from './SignInForm';
 import OverlayPanel from './OverlayPanel';
 import useIsMobile from '../../hooks/useIsMobile';
 import { useAuth } from '../../context/auth-context';
-
-const API_URL = 'http://localhost/api-sdc';
+import api from '../../services/api'; // importa o api.js já configurado
 
 const LoginForm = () => {
   const { login } = useAuth();
@@ -42,7 +40,7 @@ const LoginForm = () => {
     }
 
     try {
-      const response = await axios.post(`${API_URL}/auth/login`, {
+      const response = await api.post("/api-sdc/auth/login", {
         email: formData.loginEmail,
         senha: formData.loginPassword
       });
