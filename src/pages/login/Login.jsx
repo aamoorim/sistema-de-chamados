@@ -1,8 +1,8 @@
 import { useAuth } from "../../context/auth-context";
 import { Navigate, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import axios from "axios";
-import  LoginForm  from "../../components/forms/LoginForm";
+import LoginForm from "../../components/forms/LoginForm";
+import authService from "../../services/authService";
 
 export default function Login() {
   const { user, login } = useAuth();
@@ -10,7 +10,7 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Se já está logado, redireciona
+  // Redireciona se já estiver logado
   if (user) {
     const roleRedirects = {
       admin: "/admin",
@@ -25,12 +25,7 @@ export default function Login() {
     setError("");
 
     try {
-      const res = await axios.post("http://localhost/api-sdc/auth/login", {
-        email,
-        senha,
-      });
-
-      const userData = res.data;
+      const userData = await authService.login(email, senha); // usa o service
       login(userData);
 
       // Redireciona conforme role
@@ -45,10 +40,8 @@ export default function Login() {
   };
 
   return (
-    <>
-      <div className="login-container">
-        <LoginForm onSubmit={handleLogin} loading={loading} error={error} />
-      </div>
-    </>
+    <div className="login-container">
+      <LoginForm onSubmit={handleLogin} loading={loading} error={error} />
+    </div>
   );
 }
