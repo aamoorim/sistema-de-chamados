@@ -1,0 +1,353 @@
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family:  'Lato', sans-serif; 
+}
+
+
+/* src/styles/SearchBar.css */
+.search-bar-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  max-width: 450px;
+  margin-bottom: 45px;
+  
+}
+
+.search-input-wrapper {
+  position: relative;
+  width: 400px;
+  flex: 1;
+}
+
+.search-input {
+  width: 100%;
+  padding: 10px 40px; /* espaço para o ícone */
+  border-radius: 12px;
+  border: 3px solid #e0e0e0;
+  background-color: #f5f5f5;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.search-input:focus {
+  border-color: #E3E5E8;
+  background-color: #fff;
+  box-shadow: 0 2px 8px rgba(46, 61, 163, 0.15);
+}
+
+.search-input::placeholder {
+  color: #aaa;
+  font-weight: 600;
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #aaa;
+  pointer-events: none;
+  width: 18px;
+  height: 18px;
+}
+
+.filter-button {
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.filter-button:hover {
+  background-color: #e0e0e0;
+}
+
+.filter-button svg {
+  width: 20px;
+  height: 20px;
+  color: #555;
+}
+
+/* Estilos existentes do search-bar mantidos, adicionando novos: */
+
+.filter-container {
+  position: relative;
+}
+
+.filter-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filter-button:hover {
+  background: #f5f5f5;
+}
+
+.filter-button.active {
+  background: #e3f2fd;
+  border-color: #2196f3;
+  color: #1976d2;
+}
+
+.filter-count {
+  background: #2196f3;
+  color: white;
+  font-size: 12px;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+}
+
+.chevron {
+  transition: transform 0.2s ease;
+}
+
+.chevron.open {
+  transform: rotate(180deg);
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
+  width: 320px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.dropdown-header {
+  display: flex;
+  justify-content: between;
+  align-items: center;
+  padding: 16px;
+  border-bottom: 1px solid #eee;
+}
+
+.dropdown-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.clear-all-btn {
+  background: none;
+  border: none;
+  color: #2196f3;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+.clear-all-btn:hover {
+  background: #f0f8ff;
+}
+
+.filter-section {
+  padding: 16px;
+  border-bottom: 1px solid #eee;
+}
+
+.filter-section:last-child {
+  border-bottom: none;
+}
+
+.filter-title {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #555;
+}
+
+.filter-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.filter-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+.filter-option:hover {
+  background: #f8f9fa;
+}
+
+.filter-option input[type="checkbox"] {
+  margin: 0;
+  accent-color: #2196f3;
+}
+
+.filter-option span {
+  font-size: 14px;
+  color: #666;
+}
+
+/* Tags dos filtros ativos */
+.active-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.filter-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #e3f2fd;
+  color: #1976d2;
+  padding: 6px 10px;
+  border-radius: 16px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.remove-filter-btn {
+  background: none;
+  border: none;
+  color: #1976d2;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  transition: background 0.2s ease;
+}
+
+.remove-filter-btn:hover {
+  background: rgba(25, 118, 210, 0.1);
+}
+
+.header-admin {
+  display: flex;
+  align-items: center; /* Garante alinhamento vertical */
+  gap: 16px; /* Aumentei o gap para melhor espaçamento */
+  width: 100%;
+  margin-bottom: 24px; /* Adiciona espaçamento inferior consistente */
+  
+  /* Força o SearchBar a ocupar espaço disponível */
+  .search-bar-container {
+    flex: 1; /* Permite que cresça */
+    margin-bottom: 0 !important; /* Remove o margin-bottom problemático */
+    max-width: none !important; /* Remove limitação de largura */
+  }
+  
+  /* Padroniza altura do botão */
+  .MuiButton-root {
+    height: 44px; /* Mesma altura aproximada do input */
+    min-width: 44px;
+    padding: 8px 12px;
+    border-radius: 12px; /* Combina com o input */
+  }
+}
+
+
+/* Container para o footer com dropdown */
+
+
+/* Menu dropdown */
+.user_dropdown_menu {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  right: 0;
+  margin-bottom: 8px;
+  background: #374151; /* ou a cor que combina com seu tema */
+  border: 1px solid #4b5563;
+  border-radius: 8px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  z-index: 50;
+  overflow: hidden;
+  animation: dropdownFadeIn 0.2s ease-out;
+}
+
+/* Animação do dropdown */
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Itens do dropdown */
+.dropdown_item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: none;
+  border: none;
+  color: #ffffff; /* ou a cor do seu texto */
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.dropdown_item:hover {
+  background-color: #4b5563; /* cor de hover */
+}
+
+/* Item de logout (vermelho) */
+.logout_item {
+  color: #ef4444 !important;
+}
+
+.logout_item:hover {
+  background-color: #4b5563;
+}
+
+/* Divider */
+.dropdown_divider {
+  height: 1px;
+  background-color: #4b5563;
+  margin: 4px 0;
+}
+
+/* Modificação no botão footer para ser clicável */
+
+
+
+

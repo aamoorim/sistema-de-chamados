@@ -8,6 +8,8 @@ import {
   TableRow,
   Paper,
   IconButton,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import { Trash2, Pencil } from "lucide-react";
 import DeletarChamado from "./Modals/DeletarChamado";
@@ -49,6 +51,9 @@ function AvatarInitials({ name }) {
 }
 
 export default function ListTable() {
+  const theme = useTheme();
+  const isMobile = useMediaQuery("(max-width:480px)");
+
   const { search, filters } = useSearch();
 
   const [rows, setRows] = useState([]);
@@ -110,12 +115,10 @@ export default function ListTable() {
     setOpenDetailsModal(false);
   };
 
-  // Função que aplica a busca e filtros dinamicamente
   const applySearchAndFilters = (data) => {
     const textToSearch = search.toLowerCase().trim();
 
     return data.filter((item) => {
-      // Se há texto na busca, verifica se algum campo contém o termo
       const matchesSearch =
         !textToSearch ||
         item.titulo.toLowerCase().includes(textToSearch) ||
@@ -125,19 +128,17 @@ export default function ListTable() {
 
       if (!matchesSearch) return false;
 
-      // Aplica filtros dinamicamente - se tiver filtros em um campo, o item deve estar neles
       for (const [filterType, filterValues] of Object.entries(filters)) {
         if (
           filterValues.length > 0 &&
           !filterValues.includes(
-            // Mapeia o nome do campo no objeto de acordo com o filtro
             filterType === "status"
               ? item.status
               : filterType === "technician"
               ? item.tecnico_nome
               : filterType === "client"
               ? item.cliente_nome
-              : "" // pode ser estendido para outros filtros
+              : ""
           )
         ) {
           return false;
@@ -158,7 +159,17 @@ export default function ListTable() {
     );
 
   return (
-    <div style={{ fontFamily: "Lato" }}>
+    <div
+      style={{
+        maxWidth: 480,
+        width: "100%",
+        margin: "0 auto",
+        padding: 12,
+        boxSizing: "border-box",
+        overflowX: "hidden", // SEM scroll horizontal
+        fontFamily: "Lato",
+      }}
+    >
       <div style={{ marginBottom: 16, color: "#666", fontSize: 14 }}>
         Mostrando {filteredRows.length} chamado
         {filteredRows.length !== 1 ? "s" : ""}
@@ -166,34 +177,70 @@ export default function ListTable() {
 
       <TableContainer
         component={Paper}
-        style={{ borderRadius: 14, boxShadow: "0 2px 8px rgba(44,62,80,0.04)" }}
+        style={{
+          borderRadius: 14,
+          boxShadow: "0 2px 8px rgba(44,62,80,0.04)",
+          // overflowX REMOVIDO para evitar scroll horizontal
+        }}
       >
-        <Table sx={{ minWidth: 900 }} aria-label="tabela de chamados">
+        <Table
+          sx={{ width: "100%" }}
+          aria-label="tabela de chamados"
+          size={isMobile ? "small" : "medium"}
+        >
           <TableHead>
             <TableRow>
-              <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
+              <TableCell
+                style={{ color: "#858B99", fontWeight: 600, whiteSpace: "nowrap" }}
+              >
                 Criado em
               </TableCell>
-              <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
-                ID
-              </TableCell>
-              <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
+
+              {!isMobile && (
+                <>
+                  <TableCell
+                    style={{ color: "#858B99", fontWeight: 600, whiteSpace: "nowrap" }}
+                  >
+                    ID
+                  </TableCell>
+                  <TableCell
+                    style={{ color: "#858B99", fontWeight: 600, whiteSpace: "nowrap" }}
+                  >
+                    Cliente
+                  </TableCell>
+                  <TableCell
+                    style={{ color: "#858B99", fontWeight: 600, whiteSpace: "nowrap" }}
+                  >
+                    Técnico
+                  </TableCell>
+                </>
+              )}
+
+              <TableCell
+                style={{
+                  color: "#858B99",
+                  fontWeight: 600,
+                  maxWidth: isMobile ? 150 : "auto",
+                  whiteSpace: "normal",
+                  wordWrap: "break-word",
+                }}
+              >
                 Título / Descrição
               </TableCell>
-              <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
-                Cliente
-              </TableCell>
-              <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
-                Técnico
-              </TableCell>
-              <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
+
+              <TableCell
+                style={{ color: "#858B99", fontWeight: 600, whiteSpace: "nowrap" }}
+              >
                 Status
               </TableCell>
-              <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
+              <TableCell
+                style={{ color: "#858B99", fontWeight: 600, whiteSpace: "nowrap" }}
+              >
                 Ações
               </TableCell>
             </TableRow>
           </TableHead>
+
           <TableBody>
             {filteredRows.length > 0 ? (
               filteredRows.map((row) => (
@@ -203,35 +250,52 @@ export default function ListTable() {
                   onClick={() => handleRowClick(row)}
                   style={{ cursor: "pointer" }}
                 >
-                  <TableCell>
+                  <TableCell style={{ whiteSpace: "nowrap" }}>
                     {new Date(row.data_criacao).toLocaleDateString("pt-BR")}
                   </TableCell>
-                  <TableCell>{row.id}</TableCell>
-                  <TableCell>
+
+                  {!isMobile && (
+                    <>
+                      <TableCell style={{ whiteSpace: "nowrap" }}>{row.id}</TableCell>
+                      <TableCell style={{ whiteSpace: "nowrap", display: "flex", alignItems: "center" }}>
+                        <AvatarInitials name={row.cliente_nome} />
+                        {row.cliente_nome || "Sem cliente"}
+                      </TableCell>
+                      <TableCell style={{ whiteSpace: "nowrap", display: "flex", alignItems: "center" }}>
+                        <AvatarInitials name={row.tecnico_nome} />
+                        {row.tecnico_nome || "Sem técnico"}
+                      </TableCell>
+                    </>
+                  )}
+
+                  <TableCell
+                    style={{
+                      maxWidth: isMobile ? 150 : "auto",
+                      whiteSpace: "normal",
+                      wordWrap: "break-word",
+                    }}
+                  >
                     <strong>{row.titulo}</strong>
                     <br />
                     <span style={{ color: "#888", fontSize: 13 }}>
                       {row.descricao}
                     </span>
                   </TableCell>
-                  <TableCell>
-                    <AvatarInitials name={row.cliente_nome} />
-                    {row.cliente_nome || "Sem cliente"}
-                  </TableCell>
-                  <TableCell>
-                    <AvatarInitials name={row.tecnico_nome} />
-                    {row.tecnico_nome || "Sem técnico"}
-                  </TableCell>
-                  <TableCell>
+
+                  <TableCell style={{ whiteSpace: "nowrap" }}>
                     <StatusChip label={row.status} />
                   </TableCell>
-                  <TableCell onClick={(e) => e.stopPropagation()}>
-                    <IconButton>
+
+                  <TableCell
+                    onClick={(e) => e.stopPropagation()}
+                    style={{ whiteSpace: "nowrap" }}
+                  >
+                    <IconButton size={isMobile ? "small" : "medium"}>
                       <Pencil size={18} />
                     </IconButton>
                     <IconButton
                       color="error"
-                      size="small"
+                      size={isMobile ? "small" : "medium"}
                       onClick={() => handleOpenDelete(row)}
                     >
                       <Trash2 size={18} />
@@ -242,7 +306,7 @@ export default function ListTable() {
             ) : (
               <TableRow>
                 <TableCell
-                  colSpan={7}
+                  colSpan={isMobile ? 5 : 7}
                   style={{ textAlign: "center", padding: "40px", color: "#999" }}
                 >
                   Nenhum chamado encontrado

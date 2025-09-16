@@ -1,7 +1,7 @@
 // src/layouts/TecnicoLayout.jsx
 import { Outlet } from "react-router-dom";
 import SideBar from "../components/SideBar";
-import "../index.css";
+import "../index.scss";
 
 export default function TecnicoLayout() {
   return (
