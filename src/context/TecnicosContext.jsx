@@ -4,21 +4,25 @@ import { useAuth } from "./auth-context"; // Ajuste conforme seu contexto de aut
 const TecnicosContext = createContext();
 
 export function TecnicosProvider({ children }) {
-  const { token } = useAuth(); // pega token do auth
+  const { token, user } = useAuth(); // pega token e dados do usuário (incluindo role)
   const [tecnicos, setTecnicos] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!token) return;
+    // Só busca técnicos se for admin e tiver token
+    if (!token || user?.role !== "admin") {
+      setTecnicos([]); // limpa lista se não for admin
+      return;
+    }
     fetchTecnicos();
-  }, [token]);
+  }, [token, user]);
 
   async function fetchTecnicos() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("https://api-sdc.onrender.com/tecnicos", {
+      const res = await fetch("https://api-sdc-teste.onrender.com/tecnicos", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -35,8 +39,9 @@ export function TecnicosProvider({ children }) {
   }
 
   async function addTecnico(tecnicoData) {
+    if (user?.role !== "admin") throw new Error("Sem permissão");
     try {
-      const res = await fetch("https://api-sdc.onrender.com/tecnicos", {
+      const res = await fetch("https://api-sdc-teste.onrender.com/tecnicos", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -52,9 +57,10 @@ export function TecnicosProvider({ children }) {
   }
 
   async function deleteTecnico(tecnicoId) {
+    if (user?.role !== "admin") throw new Error("Sem permissão");
     try {
       const res = await fetch(
-        `https://api-sdc.onrender.com/tecnicos/${tecnicoId}`,
+        `https://api-sdc-teste.onrender.com/tecnicos/${tecnicoId}`,
         {
           method: "DELETE",
           headers: {
