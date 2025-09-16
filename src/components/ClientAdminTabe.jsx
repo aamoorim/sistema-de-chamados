@@ -1,4 +1,8 @@
+// src/components/ClientAdminTabe.jsx
+
 import { useSearch } from "../context/search-context";
+import { useClientes } from "../context/ClientesContext"; 
+import { useAuth } from "../context/auth-context"; // para pegar o token
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -10,23 +14,6 @@ import IconButton from "@mui/material/IconButton";
 import { Pencil, Trash2 } from "lucide-react";
 import { DeletarPerfil } from "./Modals/DeletarPerfil";
 import { useState } from "react";
-
-const rows = [
-  {
-    id: "C001",
-    nome: "André Costa",
-    empresa: "Tech Solutions",
-    setor: "TI",
-    email: "andre.costa@tech.com",
-  },
-  {
-    id: "C002",
-    nome: "Maria Lima",
-    empresa: "Inova Ltda",
-    setor: "Financeiro",
-    email: "maria.lima@inova.com",
-  },
-];
 
 function Avatar({ initials }) {
   return (
@@ -52,6 +39,8 @@ function Avatar({ initials }) {
 
 export default function ClientTable() {
   const { search } = useSearch();
+  const { clientes, setClientes } = useClientes();
+  const { token } = useAuth();
 
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
@@ -66,25 +55,52 @@ export default function ClientTable() {
     setOpenDeleteModal(false);
   };
 
-  const handleDeleteConfirmed = () => {
-    console.log("Deletando chamado:", selectedRow.id);
-    // Aqui você conecta com sua API para deletar
-    handleCloseDelete();
+  const handleDeleteConfirmed = async () => {
+    if (!selectedRow) {
+      return;
+    }
+    try {
+      const res = await fetch(
+        `https://api-sdc.onrender.com/clientes/${selectedRow.id}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,  
+          },
+        }
+      );
+
+      if (!res.ok) {
+        throw new Error(`Erro ao deletar cliente: status ${res.status}`);
+      }
+
+      // Remove do contexto / estado local
+      setClientes((prev) => prev.filter((c) => c.id !== selectedRow.id));
+    } catch (error) {
+      console.error("Erro ao deletar cliente:", error);
+      alert("Não foi possível deletar cliente. Verifique permissão ou token.");
+    } finally {
+      handleCloseDelete();
+    }
   };
 
-  const filteredRows = rows.filter(
-    (row) =>
+  const filteredRows = clientes.filter((row) => {
+    if (!row) return false;
+    const term = search.toLowerCase();
+    return (
       search === "" ||
-      row.nome.toLowerCase().includes(search.toLowerCase()) ||
-      row.empresa.toLowerCase().includes(search.toLowerCase()) ||
-      row.setor.toLowerCase().includes(search.toLowerCase()) ||
-      row.email.toLowerCase().includes(search.toLowerCase())
-  );
+      (row.nome && row.nome.toLowerCase().includes(term)) ||
+      (row.empresa && row.empresa.toLowerCase().includes(term)) ||
+      (row.setor && row.setor.toLowerCase().includes(term)) ||
+      (row.email && row.email.toLowerCase().includes(term))
+    );
+  });
 
   return (
     <div>
       <div style={{ marginBottom: 16, color: "#666", fontSize: 14 }}>
-        Mostrando {filteredRows.length} de {rows.length} clientes
+        Mostrando {filteredRows.length} de {clientes.length} clientes
       </div>
 
       <TableContainer
@@ -117,25 +133,38 @@ export default function ClientTable() {
           </TableHead>
           <TableBody>
             {filteredRows.length > 0 ? (
-              filteredRows.map((row) => (
-                <TableRow key={row.id}>
-                  <TableCell>
-                    <Avatar initials={row.nome.split(" ").map((n) => n[0]).join("").slice(0, 2)} />
-                    {row.nome}
-                  </TableCell>
-                  <TableCell>{row.empresa}</TableCell>
-                  <TableCell>{row.setor}</TableCell>
-                  <TableCell>{row.email}</TableCell>
-                  <TableCell>
-                    <IconButton>
-                      <Pencil size={18} />
-                    </IconButton>
-                    <IconButton color="error">
-                      <Trash2 size={18} onClick={() => handleOpenDelete(row)}/>
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))
+              filteredRows.map((row) => {
+                const initials = row.nome
+                  ? row.nome
+                      .split(" ")
+                      .map((n) => (n && n.length > 0 ? n[0] : ""))
+                      .join("")
+                      .slice(0, 2)
+                  : "??";
+
+                return (
+                  <TableRow key={row.id}>
+                    <TableCell>
+                      <Avatar initials={initials} />
+                      {row.nome || "-"}
+                    </TableCell>
+                    <TableCell>{row.empresa || "-"}</TableCell>
+                    <TableCell>{row.setor || "-"}</TableCell>
+                    <TableCell>{row.email || "-"}</TableCell>
+                    <TableCell>
+                      <IconButton>
+                        <Pencil size={18} />
+                      </IconButton>
+                      <IconButton
+                        color="error"
+                        onClick={() => handleOpenDelete(row)}
+                      >
+                        <Trash2 size={18} />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                );
+              })
             ) : (
               <TableRow>
                 <TableCell
@@ -149,11 +178,12 @@ export default function ClientTable() {
           </TableBody>
         </Table>
       </TableContainer>
-      {/* Modal de deletar */}
+
       <DeletarPerfil
         isOpen={openDeleteModal}
         onClose={handleCloseDelete}
         onDelete={handleDeleteConfirmed}
+        usuario={selectedRow}
       />
     </div>
   );

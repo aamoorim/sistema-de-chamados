@@ -10,7 +10,7 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 
-export function DeletarPerfil({ isOpen, onClose, onDelete, usuario }) {
+export default function DeletarChamado({ isOpen, onClose, onDelete, chamado }) {
   const style = {
     position: "absolute",
     display: "flex",
@@ -37,7 +37,7 @@ export function DeletarPerfil({ isOpen, onClose, onDelete, usuario }) {
         {/* Header */}
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <Typography variant="subtitle1" fontWeight="bold">
-            Perfil
+            Deletar Chamado
           </Typography>
           <IconButton onClick={onClose} size="small">
             <CloseIcon />
@@ -46,20 +46,20 @@ export function DeletarPerfil({ isOpen, onClose, onDelete, usuario }) {
 
         <Divider sx={{ alignSelf: "stretch", m: 0 }} />
 
-        {/* Perfil */}
+        {/* Chamado Info */}
         <Box display="flex" alignItems="center" gap={1} mt={3} mb={2}>
           <Avatar>
-            {usuario?.nome ? getInitials(usuario.nome) : "??"}
+            {chamado?.titulo ? getInitials(chamado.titulo) : "??"}
           </Avatar>
           <Typography variant="body1" fontWeight="500" sx={{ margin: "2px" }}>
-            {usuario?.nome || "Usuário não identificado"}
+            {chamado?.titulo || "Chamado não identificado"}
           </Typography>
           <DeleteOutlineOutlinedIcon color="error" fontSize="small" />
         </Box>
 
         {/* Texto de confirmação */}
         <Typography variant="body2" sx={{ mb: 4 }}>
-          Você tem certeza que quer deletar o perfil?
+          Você tem certeza que quer deletar este chamado?
         </Typography>
 
         <Divider sx={{ alignSelf: "stretch", m: 0 }} />
@@ -72,7 +72,7 @@ export function DeletarPerfil({ isOpen, onClose, onDelete, usuario }) {
             onClick={onDelete}
             sx={{ margin: "-15px", textTransform: "none" }}
           >
-            Deletar Usuário
+            Deletar Chamado
           </Button>
         </Box>
       </Box>

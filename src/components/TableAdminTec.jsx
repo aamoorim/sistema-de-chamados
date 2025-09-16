@@ -1,4 +1,5 @@
-import { useSearch } from "../context/search-context";
+import React, { useState } from "react";
+import { useTecnicos } from "../context/TecnicosContext";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -8,23 +9,8 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import IconButton from "@mui/material/IconButton";
 import { Pencil, Trash2 } from "lucide-react";
-import { useState } from "react";
-import { DeletarPerfil } from "./Modals/DeletarPerfil"; 
-
-const rows = [
-  {
-    id: "T001",
-    nome: "Carlos Silva",
-    cargo: "Suporte Nível 1",
-    email: "carlos.silva@tech.com",
-  },
-  {
-    id: "T002",
-    nome: "Fernanda Rocha",
-    cargo: "Infraestrutura",
-    email: "fernanda.rocha@inova.com",
-  },
-];
+import { DeletarPerfil } from "./Modals/DeletarPerfil";
+import { useSearch } from "../context/search-context";
 
 function Avatar({ initials }) {
   return (
@@ -50,6 +36,7 @@ function Avatar({ initials }) {
 
 export default function TechnicianTable() {
   const { search } = useSearch();
+  const { tecnicos, deleteTecnico } = useTecnicos();
 
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
@@ -64,24 +51,32 @@ export default function TechnicianTable() {
     setOpenDeleteModal(false);
   };
 
-  const handleDeleteConfirmed = () => {
-    console.log("Deletando chamado:", selectedRow.id);
-    // Aqui você conecta com sua API para deletar
-    handleCloseDelete();
+  const handleDeleteConfirmed = async (id) => {
+    if (!id) {
+      alert("Usuário não identificado.");
+      return;
+    }
+
+    try {
+      await deleteTecnico(id);
+      handleCloseDelete();
+    } catch (error) {
+      alert("Erro ao deletar técnico: " + error.message);
+    }
   };
 
-  const filteredRows = rows.filter(
+  const filteredRows = tecnicos.filter(
     (row) =>
       search === "" ||
-      row.nome.toLowerCase().includes(search.toLowerCase()) ||
-      row.cargo.toLowerCase().includes(search.toLowerCase()) ||
-      row.email.toLowerCase().includes(search.toLowerCase())
+      (row.nome && row.nome.toLowerCase().includes(search.toLowerCase())) ||
+      (row.cargo && row.cargo.toLowerCase().includes(search.toLowerCase())) ||
+      (row.email && row.email.toLowerCase().includes(search.toLowerCase()))
   );
 
   return (
     <div>
       <div style={{ marginBottom: 16, color: "#666", fontSize: 14 }}>
-        Mostrando {filteredRows.length} de {rows.length} técnicos
+        Mostrando {filteredRows.length} de {tecnicos.length} técnicos
       </div>
 
       <TableContainer
@@ -114,17 +109,30 @@ export default function TechnicianTable() {
               filteredRows.map((row) => (
                 <TableRow key={row.id}>
                   <TableCell>
-                    <Avatar initials={row.nome.split(" ").map((n) => n[0]).join("").slice(0, 2)} />
-                    {row.nome}
+                    <Avatar
+                      initials={
+                        row.nome
+                          ? row.nome
+                              .split(" ")
+                              .map((n) => n[0])
+                              .join("")
+                              .slice(0, 2)
+                          : "??"
+                      }
+                    />
+                    {row.nome || "-"}
                   </TableCell>
-                  <TableCell>{row.cargo}</TableCell>
-                  <TableCell>{row.email}</TableCell>
+                  <TableCell>{row.cargo || "-"}</TableCell>
+                  <TableCell>{row.email || "-"}</TableCell>
                   <TableCell>
                     <IconButton>
                       <Pencil size={18} />
                     </IconButton>
-                    <IconButton color="error">
-                      <Trash2 size={18} onClick={() => handleOpenDelete(row)} />
+                    <IconButton
+                      color="error"
+                      onClick={() => handleOpenDelete(row)}
+                    >
+                      <Trash2 size={18} />
                     </IconButton>
                   </TableCell>
                 </TableRow>
@@ -143,12 +151,12 @@ export default function TechnicianTable() {
         </Table>
       </TableContainer>
 
-      {/* Modal de deletar */}
       <DeletarPerfil
-              isOpen={openDeleteModal}
-              onClose={handleCloseDelete}
-              onDelete={handleDeleteConfirmed}
-            />
+        isOpen={openDeleteModal}
+        onClose={handleCloseDelete}
+        onDelete={() => handleDeleteConfirmed(selectedRow?.id)}
+        usuario={selectedRow}
+      />
     </div>
   );
 }

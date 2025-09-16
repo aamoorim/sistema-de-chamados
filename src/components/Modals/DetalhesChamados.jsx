@@ -1,9 +1,57 @@
-import { Modal, Box, Typography, IconButton, Chip, Avatar, Divider } from "@mui/material";
+import { useState, useEffect } from "react";
+import { Modal, Box, Typography, IconButton, Avatar, Divider } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import { Clock2, Check } from "lucide-react";
+import StatusChip from "../StatusChip";
+import api from "../../services/api";
 
 export default function ModalChamadoDetalhes({ isOpen, onClose, chamado }) {
-  if (!chamado) return null; // se não tiver chamado selecionado, não renderiza
+  const [cliente, setCliente] = useState(null);
+  const [tecnico, setTecnico] = useState(null);
+  const [loadingCliente, setLoadingCliente] = useState(false);
+  const [loadingTecnico, setLoadingTecnico] = useState(false);
+
+  useEffect(() => {
+    if (!chamado) return;
+
+    async function fetchCliente() {
+      if (!chamado.cliente_id) {
+        setCliente(null);
+        return;
+      }
+      setLoadingCliente(true);
+      try {
+        const res = await api.get(`/clientes/${chamado.cliente_id}`);
+        setCliente(Array.isArray(res.data) ? res.data[0] : res.data);
+      } catch (error) {
+        console.error("Erro ao buscar cliente:", error);
+        setCliente(null);
+      } finally {
+        setLoadingCliente(false);
+      }
+    }
+
+    async function fetchTecnico() {
+      if (!chamado.tecnico_id) {
+        setTecnico(null);
+        return;
+      }
+      setLoadingTecnico(true);
+      try {
+        const res = await api.get(`/tecnicos/${chamado.tecnico_id}`);
+        setTecnico(Array.isArray(res.data) ? res.data[0] : res.data);
+      } catch (error) {
+        console.error("Erro ao buscar técnico:", error);
+        setTecnico(null);
+      } finally {
+        setLoadingTecnico(false);
+      }
+    }
+
+    fetchCliente();
+    fetchTecnico();
+  }, [chamado]);
+
+  if (!chamado) return null;
 
   const style = {
     position: "absolute",
@@ -16,53 +64,38 @@ export default function ModalChamadoDetalhes({ isOpen, onClose, chamado }) {
     borderRadius: 3,
     p: 3,
     outline: "none",
+    fontFamily: "Lato",
   };
 
-  // Função para decidir ícone, cor e label
-  const getStatusConfig = (status) => {
-    switch (status) {
-      case "andamento":
-        return { icon: <Clock2 size={16} />, label: "Em andamento", color: "primary" };
-      case "espera":
-        return { icon: <Clock2 size={16} />, label: "Em espera", color: "error" };
-      case "finalizado":
-        return { icon: <Check size={16} />, label: "Finalizado", color: "success" };
-    }
-  };
-
-  const statusConfig = getStatusConfig(chamado.status);
+  const getInitials = (name) =>
+    name
+      ? name
+          .split(" ")
+          .map((n) => n[0])
+          .join("")
+          .toUpperCase()
+      : "??";
 
   return (
     <Modal open={isOpen} onClose={onClose}>
       <Box sx={style}>
-        {/* Botão fechar */}
-        <IconButton
-          onClick={onClose}
-          sx={{ position: "absolute", top: 10, right: 10 }}
-        >
+        <IconButton onClick={onClose} sx={{ position: "absolute", top: 10, right: 10 }}>
           <CloseIcon />
         </IconButton>
 
-        {/* Cabeçalho */}
-        <Typography variant="body2" color="text.secondary">
-          {chamado.codigo}
+        <Typography variant="body2" color="text.secondary" mb={1}>
+          {chamado.codigo || `#${chamado.id}`}
         </Typography>
 
-        <Box display="flex" alignItems="center" justifyContent="space-between" mt={1}>
+        <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
           <Typography variant="h6" fontWeight="bold">
-            {chamado.tipo}
+            {chamado.titulo || chamado.tipo}
           </Typography>
-          <Chip
-            icon={statusConfig.icon}
-            label={statusConfig.label}
-            color={statusConfig.color}
-            variant="outlined"
-          />
+          <StatusChip label={chamado.status} />
         </Box>
 
-        {/* Descrição */}
-        <Box mt={2}>
-          <Typography variant="subtitle2" fontWeight="medium">
+        <Box mb={2}>
+          <Typography variant="subtitle2" fontWeight="medium" mb={0.5}>
             Descrição
           </Typography>
           <Typography variant="body2" color="text.secondary">
@@ -70,13 +103,18 @@ export default function ModalChamadoDetalhes({ isOpen, onClose, chamado }) {
           </Typography>
         </Box>
 
-        {/* Data */}
-        <Box mt={2}>
-          <Typography variant="subtitle2" fontWeight="medium">
+        <Box mb={2}>
+          <Typography variant="subtitle2" fontWeight="medium" mb={0.5}>
             Criado em
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            {chamado.data}
+            {new Date(chamado.data_criacao || chamado.data).toLocaleString("pt-BR", {
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
           </Typography>
         </Box>
 
@@ -84,34 +122,54 @@ export default function ModalChamadoDetalhes({ isOpen, onClose, chamado }) {
 
         {/* Cliente */}
         <Box>
-          <Typography variant="subtitle2" fontWeight="medium">
+          <Typography variant="subtitle2" fontWeight="medium" mb={1}>
             Cliente
           </Typography>
-          <Box display="flex" alignItems="center" gap={1} mt={1}>
-            <Avatar>{chamado.avatar}</Avatar>
-            <Box>
-              <Typography variant="body2">{chamado.usuario}</Typography>
-              <Typography variant="caption" color="text.secondary">
-                {chamado.emailCliente || "email@exemplo.com"}
-              </Typography>
+          {loadingCliente ? (
+            <Typography variant="body2" color="text.secondary">
+              Carregando cliente...
+            </Typography>
+          ) : cliente ? (
+            <Box display="flex" alignItems="center" gap={1}>
+              <Avatar sx={{ bgcolor: "#2E3DA3" }}>{getInitials(cliente.nome)}</Avatar>
+              <Box>
+                <Typography variant="body2">{cliente.nome}</Typography>
+                <Typography variant="caption" color="text.secondary">
+                  {cliente.email}
+                </Typography>
+              </Box>
             </Box>
-          </Box>
+          ) : (
+            <Typography variant="body2" color="text.secondary">
+              Sem cliente atribuído
+            </Typography>
+          )}
         </Box>
 
         {/* Técnico */}
         <Box mt={2}>
-          <Typography variant="subtitle2" fontWeight="medium">
+          <Typography variant="subtitle2" fontWeight="medium" mb={1}>
             Técnico responsável
           </Typography>
-          <Box display="flex" alignItems="center" gap={1} mt={1}>
-            <Avatar>CS</Avatar>
-            <Box>
-              <Typography variant="body2">Carlos Silva</Typography>
-              <Typography variant="caption" color="text.secondary">
-                carlos.silva@test.com
-              </Typography>
+          {loadingTecnico ? (
+            <Typography variant="body2" color="text.secondary">
+              Carregando técnico...
+            </Typography>
+          ) : tecnico ? (
+            <Box display="flex" alignItems="center" gap={1}>
+              <Avatar sx={{ bgcolor: "#2E3DA3" }}>{getInitials(tecnico.nome)}</Avatar>
+              <Box>
+                <Typography variant="body2">{tecnico.nome}</Typography>
+                <Typography variant="caption" color="text.secondary">
+                  {tecnico.email}
+                </Typography>
+              </Box>
             </Box>
-          </Box>
+          ) : (
+            <Typography variant="body2" color="text.secondary">
+              Sem técnico atribuído
+            </Typography>
+          )}
         </Box>
       </Box>
     </Modal>

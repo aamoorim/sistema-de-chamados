@@ -26,7 +26,7 @@ export function AuthProvider({ children }) {
     }
   }, [user]);
 
-  // NOVA FUNÇÃO: Função de login que define o role do usuário
+  // Função de login que define o role do usuário
   const login = (userData) => {
     setUser(userData);
   };
@@ -35,19 +35,25 @@ export function AuthProvider({ children }) {
     setUser(null);
   };
 
-  // NOVA FUNÇÃO: Pega o role atual do usuário
+  // Expõe o token para ser usado nas requisições
+  const token = user?.token || null;
+
+  // Pega o role atual do usuário
   const role = user?.role || user?.tipo || null;
 
   return (
-    <AuthContext.Provider value={{ 
-      user, 
-      setUser, 
-      currentUserId, 
-      setCurrentUserId,
-      role, 
-      login,
-      logout
-    }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        setUser,
+        currentUserId,
+        setCurrentUserId,
+        role,
+        login,
+        logout,
+        token, // <-- token aqui
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

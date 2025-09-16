@@ -7,31 +7,31 @@ import "../pages/admins/styles.scss";
 import { ModalCriarTecnico } from "../components/Modals/CriarTecnico";
 import { useState } from "react";
 import { ModalCriarCiente } from "../components/Modals/CriarCliente";
+
 export default function AdminLayout() {
   const location = useLocation();
 
   const [open, setOpen] = useState(false);
-  // Configuração do botão para cada rota
+
   const getButtonConfig = () => {
     const path = location.pathname;
-    
-    switch (path) {      
-      case '/admin/tecnicos':
+
+    switch (path) {
+      case "/admin/tecnicos":
         return {
-          text: 'Novo Técnico',
-          modal: <ModalCriarTecnico  isOpen={open} onClose={() => setOpen(false)}/>, // provisório
-        }; 
-        case '/admin/clientes':
-        return {
-          text: 'Novo Cliente',
-          modal: <ModalCriarCiente isOpen={open} onClose={() => setOpen(false)}/>, // provisório
+          text: "Novo Técnico",
+          modal: <ModalCriarTecnico isOpen={open} onClose={() => setOpen(false)} />,
         };
-      
+      case "/admin/clientes":
+        return {
+          text: "Novo Cliente",
+          modal: <ModalCriarCiente isOpen={open} onClose={() => setOpen(false)} />,
+        };
       default:
         return null;
     }
   };
-  
+
   const config = getButtonConfig();
 
   return (
@@ -41,12 +41,7 @@ export default function AdminLayout() {
         <main className="calls-admin-main">
           <div className="header-admin">
             <SearchBar />
-            {config && (
-              <Botao 
-                text={config.text}
-                onClick={() => setOpen(true)}
-              />
-            )}
+            {config && <Botao text={config.text} onClick={() => setOpen(true)} />}
           </div>
           <Outlet />
           {open && config?.modal}

@@ -1,38 +1,31 @@
-import { useState } from "react";
-import { useSearch } from "../context/search-context";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
-import IconButton from "@mui/material/IconButton";
+import React, { useState, useEffect } from "react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  IconButton,
+} from "@mui/material";
 import { Trash2, Pencil } from "lucide-react";
-import { DeletarPerfil } from "./Modals/DeletarPerfil"; // ajuste o caminho
+import DeletarChamado from "./Modals/DeletarChamado";
+import ModalChamadoDetalhes from "./Modals/DetalhesChamados";
+import api from "../services/api";
+import { useSearch } from "../context/search-context";
+import StatusChip from "./StatusChip";
 
-const rows = [
-  {
-    createdAt: "13/04/25 20:56",
-    id: "00003",
-    title: "Rede lenta",
-    description: "Instalação de Rede",
-    client: { initials: "AC", name: "André Costa" },
-    technician: { initials: "CS", name: "Carlos Silva" },
-    status: { label: "Em espera", color: "#F8D7DA", text: "#D7263D" },
-  },
-  {
-    createdAt: "13/04/25 20:56",
-    id: "00004",
-    title: "Rede rapidamente lenta",
-    description: "Instalação de cpu",
-    client: { initials: "AL", name: "André Lima" },
-    technician: { initials: "CM", name: "Carlos Magno" },
-    status: { label: "Em espera", color: "#F8D7DA", text: "#D7263D" },
-  },
-];
+// Avatar com iniciais
+function AvatarInitials({ name }) {
+  const initials = name
+    ? name
+        .split(" ")
+        .map((n) => n[0])
+        .join("")
+        .toUpperCase()
+    : "??";
 
-function Avatar({ initials }) {
   return (
     <span
       style={{
@@ -47,6 +40,7 @@ function Avatar({ initials }) {
         fontWeight: 600,
         fontSize: 14,
         marginRight: 8,
+        fontFamily: "Lato",
       }}
     >
       {initials}
@@ -57,60 +51,117 @@ function Avatar({ initials }) {
 export default function ListTable() {
   const { search, filters } = useSearch();
 
-  // Controle do modal
-  const [openDeleteModal, setOpenDeleteModal] = useState(false);
-  const [selectedRow, setSelectedRow] = useState(null);
+  const [rows, setRows] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const handleOpenDelete = (row) => {
-    setSelectedRow(row);
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [selectedChamado, setSelectedChamado] = useState(null);
+
+  const [openDetailsModal, setOpenDetailsModal] = useState(false);
+  const [selectedChamadoDetalhes, setSelectedChamadoDetalhes] = useState(null);
+
+  const fetchChamados = async () => {
+    try {
+      setLoading(true);
+      const response = await api.get("/chamados");
+      setRows(response.data);
+      setError(null);
+    } catch (err) {
+      console.error("Erro ao buscar chamados:", err);
+      setError("Erro ao carregar chamados");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchChamados();
+  }, []);
+
+  const handleOpenDelete = (chamado) => {
+    setSelectedChamado(chamado);
     setOpenDeleteModal(true);
   };
 
   const handleCloseDelete = () => {
-    setSelectedRow(null);
+    setSelectedChamado(null);
     setOpenDeleteModal(false);
   };
 
-  const handleDeleteConfirmed = () => {
-    console.log("Deletando chamado:", selectedRow.id);
-    // Aqui você conecta com sua API para deletar
+  const handleDeleteConfirmed = async () => {
+    try {
+      if (!selectedChamado) return;
+      await api.delete(`/chamados/${selectedChamado.id}`);
+      await fetchChamados();
+    } catch (err) {
+      console.error("Erro ao deletar chamado:", err);
+    }
     handleCloseDelete();
   };
 
-  const filteredRows = rows.filter((row) => {
-    const matchesSearch =
-      search === "" ||
-      row.title.toLowerCase().includes(search.toLowerCase()) ||
-      row.description.toLowerCase().includes(search.toLowerCase()) ||
-      row.client.name.toLowerCase().includes(search.toLowerCase()) ||
-      row.technician.name.toLowerCase().includes(search.toLowerCase());
+  const handleRowClick = (row) => {
+    setSelectedChamadoDetalhes(row);
+    setOpenDetailsModal(true);
+  };
 
-    const matchesFilters = Object.entries(filters).every(([filterType, values]) => {
-      if (values.length === 0) return true;
+  const handleCloseDetails = () => {
+    setSelectedChamadoDetalhes(null);
+    setOpenDetailsModal(false);
+  };
 
-      switch (filterType) {
-        case "status":
-          return values.includes(row.status.label);
-        case "technician":
-          return values.includes(row.technician.name);
-        case "client":
-          return values.includes(row.client.name);
-        case "description":
-          return values.some((value) =>
-            row.description.toLowerCase().includes(value.toLowerCase())
-          );
-        default:
-          return true;
+  // Função que aplica a busca e filtros dinamicamente
+  const applySearchAndFilters = (data) => {
+    const textToSearch = search.toLowerCase().trim();
+
+    return data.filter((item) => {
+      // Se há texto na busca, verifica se algum campo contém o termo
+      const matchesSearch =
+        !textToSearch ||
+        item.titulo.toLowerCase().includes(textToSearch) ||
+        (item.descricao && item.descricao.toLowerCase().includes(textToSearch)) ||
+        (item.cliente_nome && item.cliente_nome.toLowerCase().includes(textToSearch)) ||
+        (item.tecnico_nome && item.tecnico_nome.toLowerCase().includes(textToSearch));
+
+      if (!matchesSearch) return false;
+
+      // Aplica filtros dinamicamente - se tiver filtros em um campo, o item deve estar neles
+      for (const [filterType, filterValues] of Object.entries(filters)) {
+        if (
+          filterValues.length > 0 &&
+          !filterValues.includes(
+            // Mapeia o nome do campo no objeto de acordo com o filtro
+            filterType === "status"
+              ? item.status
+              : filterType === "technician"
+              ? item.tecnico_nome
+              : filterType === "client"
+              ? item.cliente_nome
+              : "" // pode ser estendido para outros filtros
+          )
+        ) {
+          return false;
+        }
       }
-    });
 
-    return matchesSearch && matchesFilters;
-  });
+      return true;
+    });
+  };
+
+  const filteredRows = applySearchAndFilters(rows);
+
+  if (loading)
+    return <div style={{ fontFamily: "Lato" }}>Carregando chamados...</div>;
+  if (error)
+    return (
+      <div style={{ color: "red", fontFamily: "Lato" }}>{error}</div>
+    );
 
   return (
-    <div>
+    <div style={{ fontFamily: "Lato" }}>
       <div style={{ marginBottom: 16, color: "#666", fontSize: 14 }}>
-        Mostrando {filteredRows.length} de {rows.length} chamados
+        Mostrando {filteredRows.length} chamado
+        {filteredRows.length !== 1 ? "s" : ""}
       </div>
 
       <TableContainer
@@ -120,50 +171,61 @@ export default function ListTable() {
         <Table sx={{ minWidth: 900 }} aria-label="tabela de chamados">
           <TableHead>
             <TableRow>
-              <TableCell style={{ color: "#858B99", fontWeight: 600 }}>Criado em</TableCell>
-              <TableCell style={{ color: "#858B99", fontWeight: 600 }}>Id</TableCell>
-              <TableCell style={{ color: "#858B99", fontWeight: 600 }}>Título e Descrição</TableCell>
-              <TableCell style={{ color: "#858B99", fontWeight: 600 }}>Cliente</TableCell>
-              <TableCell style={{ color: "#858B99", fontWeight: 600 }}>Técnico</TableCell>
-              <TableCell style={{ color: "#858B99", fontWeight: 600 }}>Status</TableCell>
-              <TableCell style={{ color: "#858B99", fontWeight: 600 }}>Ações</TableCell>
+              <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
+                Criado em
+              </TableCell>
+              <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
+                ID
+              </TableCell>
+              <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
+                Título / Descrição
+              </TableCell>
+              <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
+                Cliente
+              </TableCell>
+              <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
+                Técnico
+              </TableCell>
+              <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
+                Status
+              </TableCell>
+              <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
+                Ações
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {filteredRows.length > 0 ? (
               filteredRows.map((row) => (
-                <TableRow key={row.id}>
-                  <TableCell>{row.createdAt}</TableCell>
+                <TableRow
+                  key={row.id}
+                  hover
+                  onClick={() => handleRowClick(row)}
+                  style={{ cursor: "pointer" }}
+                >
+                  <TableCell>
+                    {new Date(row.data_criacao).toLocaleDateString("pt-BR")}
+                  </TableCell>
                   <TableCell>{row.id}</TableCell>
                   <TableCell>
-                    <span style={{ fontWeight: 600 }}>{row.title}</span>
+                    <strong>{row.titulo}</strong>
                     <br />
-                    <span style={{ color: "#888", fontSize: 13 }}>{row.description}</span>
-                  </TableCell>
-                  <TableCell>
-                    <Avatar initials={row.client.initials} />
-                    {row.client.name}
-                  </TableCell>
-                  <TableCell>
-                    <Avatar initials={row.technician.initials} />
-                    {row.technician.name}
-                  </TableCell>
-                  <TableCell>
-                    <span
-                      style={{
-                        background: row.status.color,
-                        color: row.status.text,
-                        borderRadius: 16,
-                        padding: "4px 16px",
-                        fontWeight: 500,
-                        fontSize: 13,
-                        display: "inline-block",
-                      }}
-                    >
-                      {row.status.label}
+                    <span style={{ color: "#888", fontSize: 13 }}>
+                      {row.descricao}
                     </span>
                   </TableCell>
                   <TableCell>
+                    <AvatarInitials name={row.cliente_nome} />
+                    {row.cliente_nome || "Sem cliente"}
+                  </TableCell>
+                  <TableCell>
+                    <AvatarInitials name={row.tecnico_nome} />
+                    {row.tecnico_nome || "Sem técnico"}
+                  </TableCell>
+                  <TableCell>
+                    <StatusChip label={row.status} />
+                  </TableCell>
+                  <TableCell onClick={(e) => e.stopPropagation()}>
                     <IconButton>
                       <Pencil size={18} />
                     </IconButton>
@@ -183,7 +245,7 @@ export default function ListTable() {
                   colSpan={7}
                   style={{ textAlign: "center", padding: "40px", color: "#999" }}
                 >
-                  Nenhum chamado encontrado com os filtros aplicados
+                  Nenhum chamado encontrado
                 </TableCell>
               </TableRow>
             )}
@@ -191,11 +253,17 @@ export default function ListTable() {
         </Table>
       </TableContainer>
 
-      {/* Modal de deletar */}
-      <DeletarPerfil
+      <DeletarChamado
         isOpen={openDeleteModal}
         onClose={handleCloseDelete}
         onDelete={handleDeleteConfirmed}
+        chamado={selectedChamado}
+      />
+
+      <ModalChamadoDetalhes
+        isOpen={openDetailsModal}
+        onClose={handleCloseDetails}
+        chamado={selectedChamadoDetalhes}
       />
     </div>
   );
