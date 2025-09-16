@@ -15,6 +15,7 @@ import ModalChamadoDetalhes from "./Modals/DetalhesChamados";
 import api from "../services/api";
 import { useSearch } from "../context/search-context";
 import StatusChip from "./StatusChip";
+import EditTicketModal from "./Modals/EditarChamado";
 
 // Avatar com iniciais
 function AvatarInitials({ name }) {
@@ -60,6 +61,9 @@ export default function ListTable() {
 
   const [openDetailsModal, setOpenDetailsModal] = useState(false);
   const [selectedChamadoDetalhes, setSelectedChamadoDetalhes] = useState(null);
+
+  const [openEditModal, setOpenEditModal] = useState(false);
+  const [selectedTicket, setSelectedTicket] = useState(null); // opcional: passar dados para o modal
 
   const fetchChamados = async () => {
     try {
@@ -108,6 +112,16 @@ export default function ListTable() {
   const handleCloseDetails = () => {
     setSelectedChamadoDetalhes(null);
     setOpenDetailsModal(false);
+  };
+
+  const handleOpenEdit = (row) => {
+    setSelectedTicket(row); // opcional: enviar dados do ticket
+    setOpenEditModal(true);
+  };
+
+  const handleCloseEdit = () => {
+    setSelectedTicket(null);
+    setOpenEditModal(false);
   };
 
   // Função que aplica a busca e filtros dinamicamente
@@ -226,7 +240,7 @@ export default function ListTable() {
                     <StatusChip label={row.status} />
                   </TableCell>
                   <TableCell onClick={(e) => e.stopPropagation()}>
-                    <IconButton>
+                    <IconButton onClick={() => handleOpenEdit(row)}>
                       <Pencil size={18} />
                     </IconButton>
                     <IconButton
@@ -265,6 +279,15 @@ export default function ListTable() {
         onClose={handleCloseDetails}
         chamado={selectedChamadoDetalhes}
       />
+
+      {/* Modal de editar chamado */}
+      {openEditModal && (
+        <EditTicketModal
+          open={openEditModal}
+          onClose={handleCloseEdit}
+          ticket={selectedTicket} // opcional, caso queira passar os dados do ticket
+        />
+      )}
     </div>
   );
 }

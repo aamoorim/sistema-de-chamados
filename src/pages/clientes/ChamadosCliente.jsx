@@ -7,6 +7,7 @@ import { ModalCriarChamado } from '../../components/Modals/CriarChamado';
 import ModalChamadoDetalhes from '../../components/Modals/DetalhesChamados';
 import { SearchProvider } from '../../context/search-context';
 import SearchBar from "../../components/search-bar"
+import EditTicketModal from '../../components/Modals/EditarChamado';
 
 const ChamadosCliente = () => {
   const [chamados] = useState([
@@ -111,6 +112,9 @@ const ChamadosCliente = () => {
     }
   ]);
 
+  const [openEditModal, setOpenEditModal] = useState(false);
+  const [selectedTicket, setSelectedTicket] = useState(null); // opcional: passar dados para o modal
+
   const esperaChamados = chamados.filter(c => c.status === 'espera');
   const andamentoChamados = chamados.filter(c => c.status === 'andamento');
   const finalizadosChamados = chamados.filter(c => c.status === 'finalizado');
@@ -134,6 +138,16 @@ const ChamadosCliente = () => {
     setTimeout(() => {
       ripple.remove();
     }, 800);
+  };
+
+  const handleOpenEdit = (row) => {
+    setSelectedTicket(row); // opcional: enviar dados do ticket
+    setOpenEditModal(true);
+  };
+
+  const handleCloseEdit = () => {
+    setSelectedTicket(null);
+    setOpenEditModal(false);
   };
 
 const [openModalCalls, setOpenModalCalls] = useState(false);
@@ -213,7 +227,7 @@ const [openModalCalls, setOpenModalCalls] = useState(false);
                         handleEncerrar(e, chamado.id)
                       }}
                     >
-                      <Pencil size={13} style={{marginRight: '4px'}}/>
+                      <Pencil size={13} style={{marginRight: '4px'}} onClick={() => handleOpenEdit(row)}/>
                       Editar
                     </button>
                   )}
@@ -268,6 +282,16 @@ const [openModalCalls, setOpenModalCalls] = useState(false);
         <SideBar />
       </div>
       <ModalChamadoDetalhes  isOpen={openModalDetails} onClose={() => setOpenModalDetails(false)} chamado={chamadoSelecionado}/>
+
+
+        {/* Modal de editar chamado */}
+              {openEditModal && (
+                <EditTicketModal
+                  open={openEditModal}
+                  onClose={handleCloseEdit}
+                  ticket={selectedTicket} // opcional, caso queira passar os dados do ticket
+                />
+              )}
     </div>
   );
 };
