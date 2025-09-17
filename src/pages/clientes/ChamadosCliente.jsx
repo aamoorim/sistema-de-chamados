@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Check, Clock2, Pencil } from 'lucide-react';
+import { Check, Clock2 } from 'lucide-react';
 import SideBar from '../../components/SideBar';
 import '../clientes/clientes.scss';
 import Botao from "../../components/Button";
@@ -8,14 +8,13 @@ import ModalChamadoDetalhes from '../../components/Modals/DetalhesChamados';
 import { SearchProvider } from '../../context/search-context';
 import SearchBar from "../../components/search-bar";
 import { useAuth } from '../../context/auth-context';
-import api from '../../services/api';
+import chamadosService from '../../services/chamadosService';
 
 const ChamadosCliente = () => {
   const { user } = useAuth();
 
   const [chamados, setChamados] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
 
   const [openModalCalls, setOpenModalCalls] = useState(false);
   const [chamadoSelecionado, setChamadoSelecionado] = useState(null);
@@ -29,12 +28,11 @@ const ChamadosCliente = () => {
 
     const fetchChamados = async () => {
       setLoading(true);
-      setError(null);
       try {
-        const response = await api.get(`/chamados?clienteId=${user.id}`);
-        setChamados(response.data);
-      } catch (err) {
-        setError(err.response?.data?.erro || err.message || 'Erro ao buscar chamados');
+        const data = await chamadosService.getChamadosDoCliente();
+        setChamados(data);
+      } catch {
+        setChamados([]); // Se erro, deixar vazio (sem mostrar erro)
       } finally {
         setLoading(false);
       }
@@ -43,35 +41,28 @@ const ChamadosCliente = () => {
     fetchChamados();
   }, [user]);
 
-  const criarChamado = async (dadosChamado) => {
+  const criarChamadoHandler = async (dadosChamado) => {
+    if (!dadosChamado.titulo || !dadosChamado.descricao) {
+      alert("Título e descrição são obrigatórios.");
+      return;
+    }
+
     try {
-      const payload = {
-        titulo: dadosChamado.titulo,
-        descricao: dadosChamado.descricao,
-        cliente_id: user.id,
-      };
-      const response = await api.post('/chamados', payload);
-      setChamados(prev => [...prev, response.data]);
-      setOpenModalCalls(false);
+      const novoChamado = await chamadosService.criarChamado(dadosChamado);
+      if (novoChamado && novoChamado.id) {
+        setChamados(prev => [novoChamado, ...prev]);
+        setOpenModalCalls(false);
+      } else {
+        alert("Não foi possível criar o chamado. Tente novamente.");
+      }
     } catch (err) {
       alert(err.response?.data?.erro || 'Erro ao criar chamado');
     }
   };
 
-  const esperaChamados = chamados.filter(c => c.status === 'espera');
-  const andamentoChamados = chamados.filter(c => c.status === 'andamento');
-  const finalizadosChamados = chamados.filter(c => c.status === 'finalizado');
-
-  const handleEncerrar = (event, chamadoId) => {
-    const button = event.currentTarget;
-    const ripple = document.createElement("span");
-    ripple.classList.add("ripple");
-    const rect = button.getBoundingClientRect();
-    ripple.style.left = `${event.clientX - rect.left}px`;
-    ripple.style.top = `${event.clientY - rect.top}px`;
-    button.appendChild(ripple);
-    setTimeout(() => ripple.remove(), 800);
-  };
+  const esperaChamados = chamados.filter(c => c.status?.toLowerCase() === 'aberto');
+  const andamentoChamados = chamados.filter(c => c.status?.toLowerCase() === 'em_andamento');
+  const finalizadosChamados = chamados.filter(c => c.status?.toLowerCase() === 'encerrado');
 
   const handleOpenModal = (chamado) => {
     setChamadoSelecionado(chamado);
@@ -91,6 +82,29 @@ const ChamadosCliente = () => {
     );
   }
 
+  // Spinner simples e estilizado para loading
+  const LoadingSpinner = () => (
+    <div style={{
+      display: 'flex', justifyContent: 'center', alignItems: 'center',
+      height: '20vw', width: '100%'
+    }}>
+      <div style={{
+        border: '6px solid #f3f3f3',
+        borderTop: '6px solid #604FEB',
+        borderRadius: '50%',
+        width: '40px',
+        height: '40px',
+        animation: 'spin 1s linear infinite'
+      }} />
+      <style>{`
+        @keyframes spin {
+          0% { transform: rotate(0deg);}
+          100% { transform: rotate(360deg);}
+        }
+      `}</style>
+    </div>
+  );
+
   return (
     <div className="tecnico-chamados">
       <div className="main-content-wrapper">
@@ -100,7 +114,7 @@ const ChamadosCliente = () => {
           <ModalCriarChamado
             isOpen={openModalCalls}
             onClose={() => setOpenModalCalls(false)}
-            onSalvar={criarChamado}
+            onSalvar={criarChamadoHandler}
           />
         </div>
 
@@ -110,126 +124,55 @@ const ChamadosCliente = () => {
           </SearchProvider>
         </div>
 
-        {loading && <p>Carregando chamados...</p>}
-        {error && <p style={{ color: 'red' }}>{error}</p>}
-        {!loading && chamados.length === 0 && <p>Você não tem chamados cadastrados.</p>}
-
-        {/* Em Espera */}
-        <div className="section">
-          <div className="section-header espera">
-            <Clock2 size={16} /> Em espera
-          </div>
-          <div className="chamados-list">
-            {esperaChamados.map(chamado => (
-              <div
-                key={chamado.id}
-                className="chamado-card espera"
-                onClick={() => handleOpenModal(chamado)}
-                style={{ cursor: "pointer" }}
-              >
-                <div className="card-main">
-                  <div className="chamado-info">
-                    <div className="chamado-codigo">{chamado.codigo}</div>
-                    <div className="chamado-titulo">{chamado.tipo}</div>
-                    <div className="chamado-descricao">{chamado.descricao}</div>
-                    <div className="chamado-data">{chamado.data || chamado.data_criacao}</div>
-                  </div>
+        {loading ? (
+          <LoadingSpinner />
+        ) : (
+          <>
+            {[
+              { titulo: 'Em Espera', icone: <Clock2 size={16} />, classe: 'espera', lista: esperaChamados },
+              { titulo: 'Em Atendimento', icone: <Clock2 size={16} />, classe: 'andamento', lista: andamentoChamados },
+              { titulo: 'Encerrado', icone: <Check size={16} />, classe: 'finalizado', lista: finalizadosChamados }
+            ].map((secao, idx) => (
+              <div className="section" key={idx}>
+                <div className={`section-header ${secao.classe}`}>
+                  {secao.icone} {secao.titulo}
                 </div>
-                <div className="card-footer">
-                  <div className="user-info">
-                    <div className="user-avatar">{chamado.avatar || user.nome[0]}</div>
-                    <span className="user-name">{chamado.usuario || user.nome}</span>
-                    <div className={`status-icon ${chamado.status}`}>
-                      <Clock2 size={16} />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Em Atendimento */}
-        <div className="section">
-          <div className="section-header andamento">
-            <Clock2 size={16} /> Em atendimento
-          </div>
-          <div className="chamados-list">
-            {andamentoChamados.map(chamado => (
-              <div
-                key={chamado.id}
-                className="chamado-card andamento"
-                onClick={() => handleOpenModal(chamado)}
-                style={{ cursor: "pointer" }}
-              >
-                <div className="card-main">
-                  <div className="chamado-info">
-                    <div className="chamado-codigo">{chamado.codigo}</div>
-                    <div className="chamado-titulo">{chamado.tipo}</div>
-                    <div className="chamado-descricao">{chamado.descricao}</div>
-                    <div className="chamado-data">{chamado.data || chamado.data_criacao}</div>
-                  </div>
-                  {chamado.hasButton && (
-                    <button
-                      className="btn-encerrar"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleEncerrar(e, chamado.id);
-                      }}
-                    >
-                      <Pencil size={13} style={{ marginRight: '4px' }} />
-                      Editar
-                    </button>
+                <div className="chamados-list">
+                  {secao.lista.length > 0 ? (
+                    secao.lista.map(chamado => (
+                      <div
+                        key={chamado.id}
+                        className={`chamado-card ${secao.classe}`}
+                        onClick={() => handleOpenModal(chamado)}
+                        style={{ cursor: 'pointer' }}
+                      >
+                        <div className="card-main">
+                          <div className="chamado-info">
+                            <div className="chamado-codigo">#{chamado.id}</div>
+                            <div className="chamado-titulo">{chamado.titulo}</div>
+                            <div className="chamado-descricao">{chamado.descricao}</div>
+                            <div className="chamado-data">{new Date(chamado.data_criacao).toLocaleDateString()}</div>
+                          </div>
+                        </div>
+                        <div className="card-footer">
+                          <div className="user-info">
+                            <div className="user-avatar">{user?.nome?.[0] || 'U'}</div>
+                            <span className="user-name">{user?.nome || 'Usuário'}</span>
+                            <div className={`status-icon ${secao.classe}`}>
+                              {secao.icone}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p style={{ color: '#64748b', paddingLeft: '8px' }}>Nenhum chamado nesta seção.</p>
                   )}
                 </div>
-                <div className="card-footer">
-                  <div className="user-info">
-                    <div className="user-avatar">{chamado.avatar || user.nome[0]}</div>
-                    <span className="user-name">{chamado.usuario || user.nome}</span>
-                    <div className={`status-icon ${chamado.status}`}>
-                      <Clock2 size={16} />
-                    </div>
-                  </div>
-                </div>
               </div>
             ))}
-          </div>
-        </div>
-
-        {/* Finalizados */}
-        <div className="section">
-          <div className="section-header finalizado">
-            <Check size={16} /> Encerrado
-          </div>
-          <div className="chamados-list">
-            {finalizadosChamados.map(chamado => (
-              <div
-                key={chamado.id}
-                className="chamado-card finalizado"
-                onClick={() => handleOpenModal(chamado)}
-                style={{ cursor: "pointer" }}
-              >
-                <div className="card-main">
-                  <div className="chamado-info">
-                    <div className="chamado-codigo">{chamado.codigo}</div>
-                    <div className="chamado-titulo">{chamado.tipo}</div>
-                    <div className="chamado-descricao">{chamado.descricao}</div>
-                    <div className="chamado-data">{chamado.data || chamado.data_criacao}</div>
-                  </div>
-                </div>
-                <div className="card-footer">
-                  <div className="user-info">
-                    <div className="user-avatar">{chamado.avatar || user.nome[0]}</div>
-                    <span className="user-name">{chamado.usuario || user.nome}</span>
-                    <div className={`status-icon ${chamado.status}`}>
-                      <Check size={16} />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+          </>
+        )}
       </div>
 
       <div className="sidebar-container">

@@ -18,11 +18,16 @@ export function ModalCriarChamado({ isOpen, onClose, onSalvar }) {
       alert("Preencha título e descrição");
       return;
     }
-    if (typeof onSalvar !== 'function') {
+
+    if (typeof onSalvar !== "function") {
       console.error("onSalvar não é uma função!", onSalvar);
       return;
     }
-    onSalvar({ titulo: titulo.trim(), descricao: descricao.trim() });
+
+    onSalvar({
+      titulo: titulo.trim(),
+      descricao: descricao.trim(),
+    });
   };
 
   const style = {

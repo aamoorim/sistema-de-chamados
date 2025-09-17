@@ -1,19 +1,16 @@
 import api from "./api";
 
-// Buscar chamados do cliente pelo ID do cliente
-const getChamadosDoCliente = async (clienteId) => {
-  const res = await api.get(`/chamados?clienteId=${clienteId}`);
-  return res.data;
-};
-
-// Outros serviços existentes
-const getAllChamados = async () => {
+const getChamadosDoCliente = async () => {
   const res = await api.get("/chamados");
   return res.data;
 };
 
 const criarChamado = async (dados) => {
-  const res = await api.post("/chamados", dados);
+  const res = await api.post("/chamados", {
+    titulo: dados.titulo,
+    descricao: dados.descricao,
+    // sem status aqui, backend vai forçar 'aberto'
+  });
   return res.data;
 };
 
@@ -29,7 +26,6 @@ const excluirChamado = async (id) => {
 
 export default {
   getChamadosDoCliente,
-  getAllChamados,
   criarChamado,
   atualizarChamado,
   excluirChamado,

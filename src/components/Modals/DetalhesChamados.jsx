@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Modal, Box, Typography, IconButton, Avatar, Divider } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import StatusChip from "../StatusChip";
@@ -10,46 +10,45 @@ export default function ModalChamadoDetalhes({ isOpen, onClose, chamado }) {
   const [loadingCliente, setLoadingCliente] = useState(false);
   const [loadingTecnico, setLoadingTecnico] = useState(false);
 
+  const fetchCliente = useCallback(async () => {
+    if (!chamado?.cliente_id) {
+      setCliente(null);
+      return;
+    }
+    setLoadingCliente(true);
+    try {
+      const res = await api.get(`/clientes/${chamado.cliente_id}`);
+      setCliente(Array.isArray(res.data) ? res.data[0] : res.data);
+    } catch (error) {
+      console.error("Erro ao buscar cliente:", error);
+      setCliente(null);
+    } finally {
+      setLoadingCliente(false);
+    }
+  }, [chamado]);
+
+  const fetchTecnico = useCallback(async () => {
+    if (!chamado?.tecnico_id) {
+      setTecnico(null);
+      return;
+    }
+    setLoadingTecnico(true);
+    try {
+      const res = await api.get(`/tecnicos/${chamado.tecnico_id}`);
+      setTecnico(Array.isArray(res.data) ? res.data[0] : res.data);
+    } catch (error) {
+      console.error("Erro ao buscar técnico:", error);
+      setTecnico(null);
+    } finally {
+      setLoadingTecnico(false);
+    }
+  }, [chamado]);
+
   useEffect(() => {
     if (!chamado) return;
-
-    async function fetchCliente() {
-      if (!chamado.cliente_id) {
-        setCliente(null);
-        return;
-      }
-      setLoadingCliente(true);
-      try {
-        const res = await api.get(`/clientes/${chamado.cliente_id}`);
-        setCliente(Array.isArray(res.data) ? res.data[0] : res.data);
-      } catch (error) {
-        console.error("Erro ao buscar cliente:", error);
-        setCliente(null);
-      } finally {
-        setLoadingCliente(false);
-      }
-    }
-
-    async function fetchTecnico() {
-      if (!chamado.tecnico_id) {
-        setTecnico(null);
-        return;
-      }
-      setLoadingTecnico(true);
-      try {
-        const res = await api.get(`/tecnicos/${chamado.tecnico_id}`);
-        setTecnico(Array.isArray(res.data) ? res.data[0] : res.data);
-      } catch (error) {
-        console.error("Erro ao buscar técnico:", error);
-        setTecnico(null);
-      } finally {
-        setLoadingTecnico(false);
-      }
-    }
-
     fetchCliente();
     fetchTecnico();
-  }, [chamado]);
+  }, [chamado, fetchCliente, fetchTecnico]);
 
   if (!chamado) return null;
 
@@ -67,14 +66,14 @@ export default function ModalChamadoDetalhes({ isOpen, onClose, chamado }) {
     fontFamily: "Lato",
   };
 
-  const getInitials = (name) =>
-    name
-      ? name
-          .split(" ")
-          .map((n) => n[0])
-          .join("")
-          .toUpperCase()
-      : "??";
+  const getInitials = (name) => {
+    if (!name) return "??";
+    const parts = name.trim().split(" ");
+    if (parts.length === 1) {
+      return parts[0][0].toUpperCase();
+    }
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  };
 
   return (
     <Modal open={isOpen} onClose={onClose}>
@@ -99,7 +98,7 @@ export default function ModalChamadoDetalhes({ isOpen, onClose, chamado }) {
             Descrição
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            {chamado.descricao}
+            {chamado.descricao || "—"}
           </Typography>
         </Box>
 
