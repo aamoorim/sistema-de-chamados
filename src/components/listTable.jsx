@@ -114,8 +114,8 @@ export default function ListTable() {
     setOpenDetailsModal(false);
   };
 
-  const handleOpenEdit = (row) => {
-    setSelectedTicket(row); // opcional: enviar dados do ticket
+  const handleOpenEdit = (chamado) => {
+    setSelectedTicket(chamado); // opcional: enviar dados do ticket
     setOpenEditModal(true);
   };
 
@@ -133,9 +133,12 @@ export default function ListTable() {
       const matchesSearch =
         !textToSearch ||
         item.titulo.toLowerCase().includes(textToSearch) ||
-        (item.descricao && item.descricao.toLowerCase().includes(textToSearch)) ||
-        (item.cliente_nome && item.cliente_nome.toLowerCase().includes(textToSearch)) ||
-        (item.tecnico_nome && item.tecnico_nome.toLowerCase().includes(textToSearch));
+        (item.descricao &&
+          item.descricao.toLowerCase().includes(textToSearch)) ||
+        (item.cliente_nome &&
+          item.cliente_nome.toLowerCase().includes(textToSearch)) ||
+        (item.tecnico_nome &&
+          item.tecnico_nome.toLowerCase().includes(textToSearch));
 
       if (!matchesSearch) return false;
 
@@ -167,9 +170,7 @@ export default function ListTable() {
   if (loading)
     return <div style={{ fontFamily: "Lato" }}>Carregando chamados...</div>;
   if (error)
-    return (
-      <div style={{ color: "red", fontFamily: "Lato" }}>{error}</div>
-    );
+    return <div style={{ color: "red", fontFamily: "Lato" }}>{error}</div>;
 
   return (
     <div style={{ fontFamily: "Lato" }}>
@@ -257,7 +258,11 @@ export default function ListTable() {
               <TableRow>
                 <TableCell
                   colSpan={7}
-                  style={{ textAlign: "center", padding: "40px", color: "#999" }}
+                  style={{
+                    textAlign: "center",
+                    padding: "40px",
+                    color: "#999",
+                  }}
                 >
                   Nenhum chamado encontrado
                 </TableCell>
