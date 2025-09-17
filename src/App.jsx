@@ -8,7 +8,7 @@ import ProfileModal from './components/Modals/Perfil';
 import { ClientesProvider } from "./context/ClientesContext";
 import { TecnicosProvider } from "./context/TecnicosContext";
 import { SearchProvider } from "./context/search-context";
-import { ChamadosAbertosTecnicosProvider } from "./context/ChamadosAbertosTecnicosContext"; // Importa o provider
+import { ChamadosAbertosTecnicosProvider } from "./context/ChamadosAbertosTecnicosContext"; 
 
 export default function App() {
   return (
@@ -17,7 +17,7 @@ export default function App() {
         <ClientesProvider>
           <TecnicosProvider>
             <SearchProvider>
-              <ChamadosAbertosTecnicosProvider> {/* Aqui */}
+              <ChamadosAbertosTecnicosProvider> 
                 <ModalProvider>
                   <ProfileModal />
                   <BrowserRouter>

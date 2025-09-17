@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://api-sdc-teste.onrender.com",
+  baseURL: "https://api-sdc.onrender.com",
 });
 
 api.interceptors.request.use((config) => {

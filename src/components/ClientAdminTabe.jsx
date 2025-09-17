@@ -66,7 +66,7 @@ export default function ClientTable() {
     }
     try {
       const res = await fetch(
-        `https://api-sdc-teste.onrender.com/clientes/${selectedRow.id}`,
+        `https://api-sdc.onrender.com/clientes/${selectedRow.id}`,
         {
           method: "DELETE",
           headers: {

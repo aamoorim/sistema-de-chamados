@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useAuth } from "./auth-context";
-import tecnicoService from "../services/tecnicoService"; // ✅ import default
+import tecnicoService from "../services/tecnicoService"; 
 
 const TecnicosContext = createContext();
 

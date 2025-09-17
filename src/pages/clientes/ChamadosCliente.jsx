@@ -5,7 +5,7 @@ import "../clientes/clientes.scss";
 import Botao from "../../components/Button";
 import { ModalCriarChamado } from "../../components/Modals/CriarChamado";
 import ModalChamadoDetalhes from "../../components/Modals/DetalhesChamados";
-import EditTicketModal from "../../components/Modals/EditarChamado"; // Importa o modal edit
+import EditTicketModal from "../../components/Modals/EditarChamado"; 
 import { SearchProvider } from "../../context/search-context";
 import SearchBar from "../../components/search-bar";
 import { useAuth } from "../../context/auth-context";

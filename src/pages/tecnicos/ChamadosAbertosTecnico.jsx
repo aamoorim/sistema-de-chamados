@@ -17,7 +17,7 @@ export default function TecEmAndamento() {
     const fetchChamados = async () => {
       setLoading(true);
       try {
-        // Busca chamados abertos do técnico (você pode ajustar o endpoint se necessário)
+        // Busca chamados abertos do técnico 
         const data = await chamadosService.getChamadosAbertosDisponiveis();
         setChamados(data);
       } catch (error) {

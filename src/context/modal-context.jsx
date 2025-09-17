@@ -14,12 +14,10 @@ export const ModalProvider = ({ children }) => {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
   const openProfileModal = () => {
-  console.log('🚀 Abrindo modal - setando true!'); // Adicione esta linha
   setIsProfileModalOpen(true);
 };
 
 const closeProfileModal = () => {
-  console.log('🚀 Fechando modal - setando false!'); // Adicione esta linha
   setIsProfileModalOpen(false);
 };
 

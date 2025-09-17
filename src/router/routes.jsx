@@ -30,14 +30,14 @@ export default function AppRoutes() {
         </Route>
       </Route>
 
-      {/* CLIENTE - CORRIGIDO: allowedRoles em vez de allowed */}
+      {/* CLIENTE */}
       <Route element={<RequireRole allowedRoles={["cliente"]} />}>
         <Route path="/cliente" element={<ClienteMeusChamados />}>
           <Route index element={<ClienteMeusChamados />} />
         </Route>
       </Route>
 
-      {/* TÉCNICO - CORRIGIDO: allowedRoles em vez de allowed */}
+      {/* TÉCNICO */}
       <Route element={<RequireRole allowedRoles={["tecnico"]} />}>
           <Route path="/tecnico" element={<TecnicoLayout />}>
           <Route index element={<TecEmAndamento />} />
