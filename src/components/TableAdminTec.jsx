@@ -74,32 +74,38 @@ export default function TechnicianTable() {
   );
 
   return (
-    <div>
+    <div style={{ fontFamily: "Lato" }}>
       <div style={{ marginBottom: 16, color: "#666", fontSize: 14 }}>
         Mostrando {filteredRows.length} de {tecnicos.length} técnicos
       </div>
 
       <TableContainer
         component={Paper}
-        style={{
-          borderRadius: 14,
+        sx={{
+          borderRadius: 2,
           boxShadow: "0 2px 8px rgba(44,62,80,0.04)",
-          marginBottom: 32,
+          marginBottom: 4,
+          overflowX: "auto", // 🔑 habilita scroll horizontal em telas pequenas
+          "@media (max-width: 768px)": {
+            "& table": {
+              minWidth: "600px", // largura mínima para rolagem em mobile
+            },
+          },
         }}
       >
-        <Table sx={{ minWidth: 900 }} aria-label="tabela de técnicos">
+        <Table aria-label="tabela de técnicos">
           <TableHead>
             <TableRow>
-              <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
+              <TableCell sx={{ color: "#858B99", fontWeight: 600 }}>
                 Nome
               </TableCell>
-              <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
+              <TableCell sx={{ color: "#858B99", fontWeight: 600 }}>
                 Cargo
               </TableCell>
-              <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
+              <TableCell sx={{ color: "#858B99", fontWeight: 600 }}>
                 E-mail
               </TableCell>
-              <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
+              <TableCell sx={{ color: "#858B99", fontWeight: 600 }}>
                 Ações
               </TableCell>
             </TableRow>
@@ -107,7 +113,7 @@ export default function TechnicianTable() {
           <TableBody>
             {filteredRows.length > 0 ? (
               filteredRows.map((row) => (
-                <TableRow key={row.id}>
+                <TableRow key={row.id} hover>
                   <TableCell>
                     <Avatar
                       initials={
@@ -141,7 +147,11 @@ export default function TechnicianTable() {
               <TableRow>
                 <TableCell
                   colSpan={4}
-                  style={{ textAlign: "center", padding: "40px", color: "#999" }}
+                  style={{
+                    textAlign: "center",
+                    padding: "40px",
+                    color: "#999",
+                  }}
                 >
                   Nenhum técnico encontrado com os filtros aplicados
                 </TableCell>

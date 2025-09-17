@@ -51,10 +51,9 @@ function AvatarInitials({ name }) {
 }
 
 export default function ListTable() {
-  const theme = useTheme();
-  const isMobile = useMediaQuery("(max-width:480px)");
-
   const { search, filters } = useSearch();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm")); // detecta mobile
 
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -65,6 +64,9 @@ export default function ListTable() {
 
   const [openDetailsModal, setOpenDetailsModal] = useState(false);
   const [selectedChamadoDetalhes, setSelectedChamadoDetalhes] = useState(null);
+
+  const [openEditModal, setOpenEditModal] = useState(false);
+  const [selectedTicket, setSelectedTicket] = useState(null);
 
   const fetchChamados = async () => {
     try {
@@ -115,6 +117,16 @@ export default function ListTable() {
     setOpenDetailsModal(false);
   };
 
+  const handleOpenEdit = (chamado) => {
+    setSelectedTicket(chamado);
+    setOpenEditModal(true);
+  };
+
+  const handleCloseEdit = () => {
+    setSelectedTicket(null);
+    setOpenEditModal(false);
+  };
+
   const applySearchAndFilters = (data) => {
     const textToSearch = search.toLowerCase().trim();
 
@@ -122,9 +134,12 @@ export default function ListTable() {
       const matchesSearch =
         !textToSearch ||
         item.titulo.toLowerCase().includes(textToSearch) ||
-        (item.descricao && item.descricao.toLowerCase().includes(textToSearch)) ||
-        (item.cliente_nome && item.cliente_nome.toLowerCase().includes(textToSearch)) ||
-        (item.tecnico_nome && item.tecnico_nome.toLowerCase().includes(textToSearch));
+        (item.descricao &&
+          item.descricao.toLowerCase().includes(textToSearch)) ||
+        (item.cliente_nome &&
+          item.cliente_nome.toLowerCase().includes(textToSearch)) ||
+        (item.tecnico_nome &&
+          item.tecnico_nome.toLowerCase().includes(textToSearch));
 
       if (!matchesSearch) return false;
 
@@ -154,22 +169,10 @@ export default function ListTable() {
   if (loading)
     return <div style={{ fontFamily: "Lato" }}>Carregando chamados...</div>;
   if (error)
-    return (
-      <div style={{ color: "red", fontFamily: "Lato" }}>{error}</div>
-    );
+    return <div style={{ color: "red", fontFamily: "Lato" }}>{error}</div>;
 
   return (
-    <div
-      style={{
-        maxWidth: 480,
-        width: "100%",
-        margin: "0 auto",
-        padding: 12,
-        boxSizing: "border-box",
-        overflowX: "hidden", // SEM scroll horizontal
-        fontFamily: "Lato",
-      }}
-    >
+    <div style={{ fontFamily: "Lato" }}>
       <div style={{ marginBottom: 16, color: "#666", fontSize: 14 }}>
         Mostrando {filteredRows.length} chamado
         {filteredRows.length !== 1 ? "s" : ""}
@@ -180,67 +183,43 @@ export default function ListTable() {
         style={{
           borderRadius: 14,
           boxShadow: "0 2px 8px rgba(44,62,80,0.04)",
-          // overflowX REMOVIDO para evitar scroll horizontal
+          overflowX: "auto", // permite scroll no mobile
         }}
       >
         <Table
-          sx={{ width: "100%" }}
+          sx={{ minWidth: isMobile ? 500 : 900 }} // menor largura no mobile
           aria-label="tabela de chamados"
           size={isMobile ? "small" : "medium"}
         >
           <TableHead>
             <TableRow>
-              <TableCell
-                style={{ color: "#858B99", fontWeight: 600, whiteSpace: "nowrap" }}
-              >
+              <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
                 Criado em
               </TableCell>
-
+              <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
+                ID
+              </TableCell>
               {!isMobile && (
                 <>
-                  <TableCell
-                    style={{ color: "#858B99", fontWeight: 600, whiteSpace: "nowrap" }}
-                  >
-                    ID
-                  </TableCell>
-                  <TableCell
-                    style={{ color: "#858B99", fontWeight: 600, whiteSpace: "nowrap" }}
-                  >
+                  <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
                     Cliente
                   </TableCell>
-                  <TableCell
-                    style={{ color: "#858B99", fontWeight: 600, whiteSpace: "nowrap" }}
-                  >
+                  <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
                     Técnico
                   </TableCell>
                 </>
               )}
-
-              <TableCell
-                style={{
-                  color: "#858B99",
-                  fontWeight: 600,
-                  maxWidth: isMobile ? 150 : "auto",
-                  whiteSpace: "normal",
-                  wordWrap: "break-word",
-                }}
-              >
+              <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
                 Título / Descrição
               </TableCell>
-
-              <TableCell
-                style={{ color: "#858B99", fontWeight: 600, whiteSpace: "nowrap" }}
-              >
+              <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
                 Status
               </TableCell>
-              <TableCell
-                style={{ color: "#858B99", fontWeight: 600, whiteSpace: "nowrap" }}
-              >
+              <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
                 Ações
               </TableCell>
             </TableRow>
           </TableHead>
-
           <TableBody>
             {filteredRows.length > 0 ? (
               filteredRows.map((row) => (
@@ -250,52 +229,39 @@ export default function ListTable() {
                   onClick={() => handleRowClick(row)}
                   style={{ cursor: "pointer" }}
                 >
-                  <TableCell style={{ whiteSpace: "nowrap" }}>
+                  <TableCell>
                     {new Date(row.data_criacao).toLocaleDateString("pt-BR")}
                   </TableCell>
-
+                  <TableCell>{row.id}</TableCell>
                   {!isMobile && (
                     <>
-                      <TableCell style={{ whiteSpace: "nowrap" }}>{row.id}</TableCell>
-                      <TableCell style={{ whiteSpace: "nowrap", display: "flex", alignItems: "center" }}>
+                      <TableCell>
                         <AvatarInitials name={row.cliente_nome} />
                         {row.cliente_nome || "Sem cliente"}
                       </TableCell>
-                      <TableCell style={{ whiteSpace: "nowrap", display: "flex", alignItems: "center" }}>
+                      <TableCell>
                         <AvatarInitials name={row.tecnico_nome} />
                         {row.tecnico_nome || "Sem técnico"}
                       </TableCell>
                     </>
                   )}
-
-                  <TableCell
-                    style={{
-                      maxWidth: isMobile ? 150 : "auto",
-                      whiteSpace: "normal",
-                      wordWrap: "break-word",
-                    }}
-                  >
+                  <TableCell>
                     <strong>{row.titulo}</strong>
                     <br />
                     <span style={{ color: "#888", fontSize: 13 }}>
                       {row.descricao}
                     </span>
                   </TableCell>
-
-                  <TableCell style={{ whiteSpace: "nowrap" }}>
+                  <TableCell>
                     <StatusChip label={row.status} />
                   </TableCell>
-
-                  <TableCell
-                    onClick={(e) => e.stopPropagation()}
-                    style={{ whiteSpace: "nowrap" }}
-                  >
-                    <IconButton size={isMobile ? "small" : "medium"}>
+                  <TableCell onClick={(e) => e.stopPropagation()}>
+                    <IconButton onClick={() => handleOpenEdit(row)}>
                       <Pencil size={18} />
                     </IconButton>
                     <IconButton
                       color="error"
-                      size={isMobile ? "small" : "medium"}
+                      size="small"
                       onClick={() => handleOpenDelete(row)}
                     >
                       <Trash2 size={18} />
@@ -307,7 +273,11 @@ export default function ListTable() {
               <TableRow>
                 <TableCell
                   colSpan={isMobile ? 5 : 7}
-                  style={{ textAlign: "center", padding: "40px", color: "#999" }}
+                  style={{
+                    textAlign: "center",
+                    padding: "40px",
+                    color: "#999",
+                  }}
                 >
                   Nenhum chamado encontrado
                 </TableCell>
