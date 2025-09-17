@@ -8,6 +8,7 @@ import {
   TableRow,
   Paper,
   IconButton,
+  Typography,
 } from "@mui/material";
 import { Trash2, Pencil } from "lucide-react";
 import DeletarChamado from "./Modals/DeletarChamado";
@@ -48,6 +49,41 @@ function AvatarInitials({ name }) {
   );
 }
 
+// Spinner
+const LoadingSpinner = () => (
+  <div
+    style={{
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      height: "100vh",
+      width: "100vw",
+      position: "fixed",
+      top: 0,
+      left: 0,
+      backgroundColor: "rgba(255, 255, 255, 0.7)",
+      zIndex: 9999,
+    }}
+  >
+    <div
+      style={{
+        border: "6px solid #f3f3f3",
+        borderTop: "6px solid #604FEB",
+        borderRadius: "50%",
+        width: "40px",
+        height: "40px",
+        animation: "spin 1s linear infinite",
+      }}
+    />
+    <style>{`
+      @keyframes spin {
+        0% { transform: rotate(0deg);}
+        100% { transform: rotate(360deg);}
+      }
+    `}</style>
+  </div>
+);
+
 export default function ListTable() {
   const { search, filters } = useSearch();
 
@@ -65,6 +101,7 @@ export default function ListTable() {
     try {
       setLoading(true);
       const response = await api.get("/chamados");
+      // PARA ADMIN: pega TODOS os chamados, sem filtro por status
       setRows(response.data);
       setError(null);
     } catch (err) {
@@ -115,7 +152,6 @@ export default function ListTable() {
     const textToSearch = search.toLowerCase().trim();
 
     return data.filter((item) => {
-      // Se há texto na busca, verifica se algum campo contém o termo
       const matchesSearch =
         !textToSearch ||
         item.titulo.toLowerCase().includes(textToSearch) ||
@@ -125,19 +161,17 @@ export default function ListTable() {
 
       if (!matchesSearch) return false;
 
-      // Aplica filtros dinamicamente - se tiver filtros em um campo, o item deve estar neles
       for (const [filterType, filterValues] of Object.entries(filters)) {
         if (
           filterValues.length > 0 &&
           !filterValues.includes(
-            // Mapeia o nome do campo no objeto de acordo com o filtro
             filterType === "status"
               ? item.status
               : filterType === "technician"
               ? item.tecnico_nome
               : filterType === "client"
               ? item.cliente_nome
-              : "" // pode ser estendido para outros filtros
+              : ""
           )
         ) {
           return false;
@@ -150,12 +184,10 @@ export default function ListTable() {
 
   const filteredRows = applySearchAndFilters(rows);
 
-  if (loading)
-    return <div style={{ fontFamily: "Lato" }}>Carregando chamados...</div>;
+  if (loading) return <LoadingSpinner />;
+
   if (error)
-    return (
-      <div style={{ color: "red", fontFamily: "Lato" }}>{error}</div>
-    );
+    return <div style={{ color: "red", fontFamily: "Lato" }}>{error}</div>;
 
   return (
     <div style={{ fontFamily: "Lato" }}>
@@ -208,11 +240,21 @@ export default function ListTable() {
                   </TableCell>
                   <TableCell>{row.id}</TableCell>
                   <TableCell>
-                    <strong>{row.titulo}</strong>
-                    <br />
-                    <span style={{ color: "#888", fontSize: 13 }}>
+                    <Typography
+                      variant="subtitle1"
+                      component="div"
+                      fontWeight="bold"
+                    >
+                      {row.titulo}
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      component="div"
+                      color="text.secondary"
+                      noWrap
+                    >
                       {row.descricao}
-                    </span>
+                    </Typography>
                   </TableCell>
                   <TableCell>
                     <AvatarInitials name={row.cliente_nome} />

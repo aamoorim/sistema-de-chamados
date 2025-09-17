@@ -1,19 +1,30 @@
 import axios from "axios";
 
-const API_URL = "https://api-sdc-teste.onrender.com";
-
 const api = axios.create({
-  baseURL: API_URL,
+  baseURL: "https://api-sdc-teste.onrender.com",
 });
 
 api.interceptors.request.use((config) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  if (user?.token) {
-    config.headers.Authorization = `Bearer ${user.token}`;
+  const user = localStorage.getItem("user");
+  let token = null;
+
+  if (user) {
+    try {
+      const parsedUser = JSON.parse(user);
+      token = parsedUser.token;
+    } catch (err) {
+      token = null;
+    }
   }
+
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+    console.log("api.js - token enviado no header Authorization:", token);
+  } else {
+    console.log("api.js - Nenhum token encontrado para enviar");
+  }
+
   return config;
-}, (error) => {
-  return Promise.reject(error);
 });
 
 export default api;

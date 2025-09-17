@@ -9,7 +9,6 @@ const criarChamado = async (dados) => {
   const res = await api.post("/chamados", {
     titulo: dados.titulo,
     descricao: dados.descricao,
-    // sem status aqui, backend vai forçar 'aberto'
   });
   return res.data;
 };
@@ -19,8 +18,18 @@ const atualizarChamado = async (id, dados) => {
   return res.data;
 };
 
+const atribuirChamado = async (id, dados) => {
+  const res = await api.put(`/chamados/${id}/atribuir`, dados);
+  return res.data;
+};
+
 const excluirChamado = async (id) => {
   const res = await api.delete(`/chamados/${id}`);
+  return res.data;
+};
+
+const getChamadosAbertosDisponiveis = async () => {
+  const res = await api.get("/chamados/abertos");
   return res.data;
 };
 
@@ -28,5 +37,7 @@ export default {
   getChamadosDoCliente,
   criarChamado,
   atualizarChamado,
+  atribuirChamado,
   excluirChamado,
+  getChamadosAbertosDisponiveis,
 };

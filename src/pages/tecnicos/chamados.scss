@@ -250,7 +250,6 @@ body {
   line-height: 1.4;
   transition: all $transition-base;
 
-  // Aumentei largura
   height: 220px;  
   width: 346px;
 
@@ -338,30 +337,30 @@ body {
 }
 
 // ========================================
-// CARD FOOTER
+// CARD FOOTER (CORRIGIDO)
 // ========================================
 
 .card-footer {
   border-top: 1px solid $border-light;
-  padding-top: 16px;
-  margin-top: 32px;
+  padding-top: $spacing-md;
+  margin-top: auto;  // fixa o footer no fundo do card
 
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  @include flex(row, center, space-between, $spacing-sm);
+  flex: 1;
+  width: 100%;
 }
 
 .user-info {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex: 1
+  @include flex(row, center, flex-start, $spacing-sm);
+  flex: 1;
+  min-width: 0; // Para evitar overflow com texto longo
 }
 
 .user-avatar {
   @include avatar(26px, $color-primary);
   font-size: 11px;
   font-weight: $font-bold;
+  flex-shrink: 0;
 }
 
 .user-name {
@@ -369,6 +368,10 @@ body {
   color: $text-primary;
   font-weight: $font-medium;
   flex: 1;
+  min-width: 0; // Permite o truncamento
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .check-icon {
@@ -379,6 +382,7 @@ body {
   color: $color-success;
   border-radius: $radius-full;
   margin-left: auto;
+  flex-shrink: 0;
 }
 
 // ========================================
@@ -486,9 +490,5 @@ $ripple-easing: cubic-bezier(0.4, 0, 0.2, 1);
     background: color.adjust($color-warning, $lightness: 10%);
     color: $color-icon;
   }
-
-  &.finalizado {
-    background: color.adjust($color-success, $lightness: 10%);
-    color: #2E7D32;
-  }
 }
+ 
