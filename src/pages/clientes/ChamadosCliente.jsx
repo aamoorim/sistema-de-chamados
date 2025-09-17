@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Check, Clock2 } from 'lucide-react';
+import { Check, Clock2, Pencil } from 'lucide-react';
 import SideBar from '../../components/SideBar';
 import '../clientes/clientes.scss';
 import Botao from "../../components/Button";
 import { ModalCriarChamado } from '../../components/Modals/CriarChamado';
 import ModalChamadoDetalhes from '../../components/Modals/DetalhesChamados';
 import { SearchProvider } from '../../context/search-context';
-import SearchBar from "../../components/search-bar";
 import { useAuth } from '../../context/auth-context';
 import chamadosService from '../../services/chamadosService';
+import SearchBar from "../../components/search-bar";
+import EditTicketModal from '../../components/Modals/EditarChamado';
 
 const ChamadosCliente = () => {
   const { user } = useAuth();
@@ -19,6 +20,9 @@ const ChamadosCliente = () => {
   const [openModalCalls, setOpenModalCalls] = useState(false);
   const [chamadoSelecionado, setChamadoSelecionado] = useState(null);
   const [openModalDetails, setOpenModalDetails] = useState(false);
+
+  const [openEditModal, setOpenEditModal] = useState(false);
+  const [selectedTicket, setSelectedTicket] = useState(null);
 
   useEffect(() => {
     if (!user || !user.id) {
@@ -32,7 +36,7 @@ const ChamadosCliente = () => {
         const data = await chamadosService.getChamadosDoCliente();
         setChamados(data);
       } catch {
-        setChamados([]); // Se erro, deixar vazio (sem mostrar erro)
+        setChamados([]);
       } finally {
         setLoading(false);
       }
@@ -40,6 +44,10 @@ const ChamadosCliente = () => {
 
     fetchChamados();
   }, [user]);
+
+  const esperaChamados = chamados.filter(c => c.status?.toLowerCase() === 'aberto');
+  const andamentoChamados = chamados.filter(c => c.status?.toLowerCase() === 'em_andamento');
+  const finalizadosChamados = chamados.filter(c => c.status?.toLowerCase() === 'encerrado');
 
   const criarChamadoHandler = async (dadosChamado) => {
     if (!dadosChamado.titulo || !dadosChamado.descricao) {
@@ -60,34 +68,23 @@ const ChamadosCliente = () => {
     }
   };
 
-  const esperaChamados = chamados.filter(c => c.status?.toLowerCase() === 'aberto');
-  const andamentoChamados = chamados.filter(c => c.status?.toLowerCase() === 'em_andamento');
-  const finalizadosChamados = chamados.filter(c => c.status?.toLowerCase() === 'encerrado');
-
   const handleOpenModal = (chamado) => {
     setChamadoSelecionado(chamado);
     setOpenModalDetails(true);
   };
 
-  if (!user) {
-    return (
-      <div className="tecnico-chamados">
-        <div className="main-content-wrapper">
-          <p>Você precisa estar logado para ver seus chamados.</p>
-        </div>
-        <div className="sidebar-container">
-          <SideBar />
-        </div>
-      </div>
-    );
-  }
+  const handleOpenEdit = (ticket) => {
+    setSelectedTicket(ticket);
+    setOpenEditModal(true);
+  };
 
-  // Spinner simples e estilizado para loading
+  const handleCloseEdit = () => {
+    setSelectedTicket(null);
+    setOpenEditModal(false);
+  };
+
   const LoadingSpinner = () => (
-    <div style={{
-      display: 'flex', justifyContent: 'center', alignItems: 'center',
-      height: '20vw', width: '100%'
-    }}>
+    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '20vw', width: '100%' }}>
       <div style={{
         border: '6px solid #f3f3f3',
         borderTop: '6px solid #604FEB',
@@ -104,6 +101,19 @@ const ChamadosCliente = () => {
       `}</style>
     </div>
   );
+
+  if (!user) {
+    return (
+      <div className="tecnico-chamados">
+        <div className="main-content-wrapper">
+          <p>Você precisa estar logado para ver seus chamados.</p>
+        </div>
+        <div className="sidebar-container">
+          <SideBar />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="tecnico-chamados">
@@ -153,7 +163,22 @@ const ChamadosCliente = () => {
                             <div className="chamado-descricao">{chamado.descricao}</div>
                             <div className="chamado-data">{new Date(chamado.data_criacao).toLocaleDateString()}</div>
                           </div>
+
+                          {/* Botão editar opcional, só se quiser mostrar na seção de andamento */}
+                          {secao.classe === 'andamento' && (
+                            <button
+                              className="btn-editar"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleOpenEdit(chamado);
+                              }}
+                            >
+                              <Pencil size={13} style={{ marginRight: '4px' }} />
+                              Editar
+                            </button>
+                          )}
                         </div>
+
                         <div className="card-footer">
                           <div className="user-info">
                             <div className="user-avatar">{user?.nome?.[0] || 'U'}</div>
@@ -184,6 +209,14 @@ const ChamadosCliente = () => {
         onClose={() => setOpenModalDetails(false)}
         chamado={chamadoSelecionado}
       />
+
+      {openEditModal && (
+        <EditTicketModal
+          open={openEditModal}
+          onClose={handleCloseEdit}
+          ticket={selectedTicket}
+        />
+      )}
     </div>
   );
 };
