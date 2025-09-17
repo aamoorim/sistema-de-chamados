@@ -11,8 +11,7 @@ import IconButton from "@mui/material/IconButton";
 import { Pencil, Trash2 } from "lucide-react";
 import { DeletarPerfil } from "./Modals/DeletarPerfil";
 import { useSearch } from "../context/search-context";
-import EditTicketModal from "./Modals/EditarChamado";
-
+import { ModalEditarTecnico } from "./Modals/EditarTecnico";
 
 function Avatar({ initials }) {
   return (
@@ -43,9 +42,9 @@ export default function TechnicianTable() {
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
 
-   // Novo estado para abrir modal de edição
+  // Estados para modal de edição
   const [openEditModal, setOpenEditModal] = useState(false);
-  const [selectedTicket, setSelectedTicket] = useState(null); // opcional: passar dados para o modal
+  const [selectedTecnicoEdit, setSelectedTecnicoEdit] = useState(null);
 
   const handleOpenDelete = (row) => {
     setSelectedRow(row);
@@ -71,17 +70,16 @@ export default function TechnicianTable() {
     }
   };
 
-  const handleOpenEdit = (row) => {
-    setSelectedTicket(row); // opcional: enviar dados do ticket
+  // Abrir modal de editar técnico
+  const handleOpenEdit = (tecnico) => {
+    setSelectedTecnicoEdit(tecnico);
     setOpenEditModal(true);
   };
 
   const handleCloseEdit = () => {
-    setSelectedTicket(null);
+    setSelectedTecnicoEdit(null);
     setOpenEditModal(false);
   };
-
-
 
   const filteredRows = tecnicos.filter(
     (row) =>
@@ -176,14 +174,12 @@ export default function TechnicianTable() {
         usuario={selectedRow}
       />
 
-      {/* Modal de editar chamado */}
-      {openEditModal && (
-        <EditTicketModal
-          open={openEditModal}
-          onClose={handleCloseEdit}
-          ticket={selectedTicket} // opcional, caso queira passar os dados do ticket
-        />
-      )}
+      {/* Modal de edição */}
+      <ModalEditarTecnico
+        isOpen={openEditModal}
+        onClose={handleCloseEdit}
+        tecnico={selectedTecnicoEdit}
+      />
     </div>
   );
 }

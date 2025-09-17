@@ -3,7 +3,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  // Estado inicial depois lê do localStorage
+  // Lê o usuário salvo no localStorage no carregamento inicial
   const [user, setUser] = useState(() => {
     const saved = localStorage.getItem("user");
     return saved ? JSON.parse(saved) : null;
@@ -14,6 +14,7 @@ export function AuthProvider({ children }) {
     return savedId || (user ? user.id : null);
   });
 
+  // Sincroniza localStorage ao alterar user
   useEffect(() => {
     if (user) {
       localStorage.setItem("user", JSON.stringify(user));
@@ -26,7 +27,7 @@ export function AuthProvider({ children }) {
     }
   }, [user]);
 
-  // Função de login que define o role do usuário
+  // Função de login, deve receber objeto user com token e role
   const login = (userData) => {
     setUser(userData);
   };
@@ -35,10 +36,10 @@ export function AuthProvider({ children }) {
     setUser(null);
   };
 
-  // Expõe o token para ser usado nas requisições
+  // Extrai token do usuário para facilitar acesso
   const token = user?.token || null;
 
-  // Pega o role atual do usuário
+  // Extrai role/tipo do usuário para facilitar acesso
   const role = user?.role || user?.tipo || null;
 
   return (
@@ -51,7 +52,7 @@ export function AuthProvider({ children }) {
         role,
         login,
         logout,
-        token, // <-- token aqui
+        token,
       }}
     >
       {children}
@@ -59,4 +60,5 @@ export function AuthProvider({ children }) {
   );
 }
 
+// Hook para consumir o contexto Auth
 export const useAuth = () => useContext(AuthContext);

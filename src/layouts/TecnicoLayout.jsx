@@ -1,4 +1,4 @@
-// src/layouts/TecnicoLayout.jsx
+
 import { Outlet } from "react-router-dom";
 import SideBar from "../components/SideBar";
 import "../index.css";
@@ -10,7 +10,7 @@ export default function TecnicoLayout() {
         <SideBar />
         <main className="calls-admin-main">
           
-          <Outlet /> {/* aqui aparece ChamadosTecnico */}
+          <Outlet /> 
         </main>
       
     </div>

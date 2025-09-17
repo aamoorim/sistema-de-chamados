@@ -1,30 +1,28 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { useAuth } from "./auth-context"; // Ajuste conforme seu contexto de auth
+import { useAuth } from "./auth-context";
+import tecnicoService from "../services/tecnicoService"; // ✅ import default
 
 const TecnicosContext = createContext();
 
 export function TecnicosProvider({ children }) {
-  const { token } = useAuth(); // pega token do auth
+  const { token, user } = useAuth();
   const [tecnicos, setTecnicos] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!token) return;
+    if (!token || user?.role !== "admin") {
+      setTecnicos([]);
+      return;
+    }
     fetchTecnicos();
-  }, [token]);
+  }, [token, user]);
 
   async function fetchTecnicos() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("https://api-sdc.onrender.com/tecnicos", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (!res.ok) throw new Error("Erro ao buscar técnicos");
-      const data = await res.json();
+      const data = await tecnicoService.getAllTecnicos();
       setTecnicos(data);
     } catch (err) {
       setError(err.message);
@@ -35,34 +33,31 @@ export function TecnicosProvider({ children }) {
   }
 
   async function addTecnico(tecnicoData) {
+    if (user?.role !== "admin") throw new Error("Sem permissão");
     try {
-      const res = await fetch("https://api-sdc.onrender.com/tecnicos", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(tecnicoData),
-      });
-      if (!res.ok) throw new Error("Erro ao criar técnico");
+      await tecnicoService.criarTecnico(tecnicoData);
       await fetchTecnicos();
     } catch (err) {
       throw err;
     }
   }
 
-  async function deleteTecnico(tecnicoId) {
+  async function updateTecnico(tecnicoId, tecnicoData) {
+    if (user?.role !== "admin") throw new Error("Sem permissão");
     try {
-      const res = await fetch(
-        `https://api-sdc.onrender.com/tecnicos/${tecnicoId}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+      const updated = await tecnicoService.atualizarTecnico(tecnicoId, tecnicoData);
+      setTecnicos((prev) =>
+        prev.map((t) => (t.id === tecnicoId ? updated : t))
       );
-      if (!res.ok) throw new Error("Erro ao deletar técnico");
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async function deleteTecnico(tecnicoId) {
+    if (user?.role !== "admin") throw new Error("Sem permissão");
+    try {
+      await tecnicoService.excluirTecnico(tecnicoId);
       await fetchTecnicos();
     } catch (err) {
       throw err;
@@ -71,7 +66,16 @@ export function TecnicosProvider({ children }) {
 
   return (
     <TecnicosContext.Provider
-      value={{ tecnicos, loading, error, addTecnico, deleteTecnico, fetchTecnicos }}
+      value={{
+        tecnicos,
+        loading,
+        error,
+        addTecnico,
+        updateTecnico,
+        deleteTecnico,
+        fetchTecnicos,
+        setTecnicos,
+      }}
     >
       {children}
     </TecnicosContext.Provider>
@@ -80,7 +84,8 @@ export function TecnicosProvider({ children }) {
 
 export function useTecnicos() {
   const context = useContext(TecnicosContext);
-  if (!context)
+  if (!context) {
     throw new Error("useTecnicos deve ser usado dentro de um TecnicosProvider");
+  }
   return context;
 }

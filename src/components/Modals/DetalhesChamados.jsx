@@ -1,56 +1,8 @@
-import { useState, useEffect } from "react";
 import { Modal, Box, Typography, IconButton, Avatar, Divider } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import StatusChip from "../StatusChip";
-import api from "../../services/api";
 
-export default function ModalChamadoDetalhes({ isOpen, onClose, chamado }) {
-  const [cliente, setCliente] = useState(null);
-  const [tecnico, setTecnico] = useState(null);
-  const [loadingCliente, setLoadingCliente] = useState(false);
-  const [loadingTecnico, setLoadingTecnico] = useState(false);
-
-  useEffect(() => {
-    if (!chamado) return;
-
-    async function fetchCliente() {
-      if (!chamado.cliente_id) {
-        setCliente(null);
-        return;
-      }
-      setLoadingCliente(true);
-      try {
-        const res = await api.get(`/clientes/${chamado.cliente_id}`);
-        setCliente(Array.isArray(res.data) ? res.data[0] : res.data);
-      } catch (error) {
-        console.error("Erro ao buscar cliente:", error);
-        setCliente(null);
-      } finally {
-        setLoadingCliente(false);
-      }
-    }
-
-    async function fetchTecnico() {
-      if (!chamado.tecnico_id) {
-        setTecnico(null);
-        return;
-      }
-      setLoadingTecnico(true);
-      try {
-        const res = await api.get(`/tecnicos/${chamado.tecnico_id}`);
-        setTecnico(Array.isArray(res.data) ? res.data[0] : res.data);
-      } catch (error) {
-        console.error("Erro ao buscar técnico:", error);
-        setTecnico(null);
-      } finally {
-        setLoadingTecnico(false);
-      }
-    }
-
-    fetchCliente();
-    fetchTecnico();
-  }, [chamado]);
-
+export default function ModalChamadoDetalhes({ isOpen, onClose, chamado, tecnicos = [] }) {
   if (!chamado) return null;
 
   const style = {
@@ -67,14 +19,36 @@ export default function ModalChamadoDetalhes({ isOpen, onClose, chamado }) {
     fontFamily: "Lato",
   };
 
-  const getInitials = (name) =>
-    name
-      ? name
-          .split(" ")
-          .map((n) => n[0])
-          .join("")
-          .toUpperCase()
-      : "??";
+  const getInitials = (name) => {
+    if (!name) return "??";
+    const parts = name.trim().split(" ");
+    if (parts.length === 1) {
+      return parts[0][0].toUpperCase();
+    }
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  };
+
+  const cliente = {
+    nome: chamado.cliente_nome || chamado.usuario_nome || null,
+    email: chamado.cliente_email || chamado.usuario_email || null,
+  };
+
+  let tecnico = {
+    nome: chamado.tecnico_nome || null,
+    email: chamado.tecnico_email || null,
+    id: chamado.tecnico_id || null,
+  };
+
+  if ((!tecnico.nome || !tecnico.email) && tecnico.id && tecnicos.length > 0) {
+    const tecnicoEncontrado = tecnicos.find((t) => t.id === tecnico.id);
+    if (tecnicoEncontrado) {
+      tecnico = {
+        ...tecnico,
+        nome: tecnicoEncontrado.nome,
+        email: tecnicoEncontrado.email,
+      };
+    }
+  }
 
   return (
     <Modal open={isOpen} onClose={onClose}>
@@ -99,7 +73,7 @@ export default function ModalChamadoDetalhes({ isOpen, onClose, chamado }) {
             Descrição
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            {chamado.descricao}
+            {chamado.descricao || "—"}
           </Typography>
         </Box>
 
@@ -118,56 +92,73 @@ export default function ModalChamadoDetalhes({ isOpen, onClose, chamado }) {
           </Typography>
         </Box>
 
+        {chamado.prioridade && (
+          <Box mb={2}>
+            <Typography variant="subtitle2" fontWeight="medium" mb={0.5}>
+              Prioridade
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              {chamado.prioridade}
+            </Typography>
+          </Box>
+        )}
+
         <Divider sx={{ my: 2 }} />
 
-        {/* Cliente */}
         <Box>
           <Typography variant="subtitle2" fontWeight="medium" mb={1}>
             Cliente
           </Typography>
-          {loadingCliente ? (
-            <Typography variant="body2" color="text.secondary">
-              Carregando cliente...
-            </Typography>
-          ) : cliente ? (
+          {cliente.nome ? (
             <Box display="flex" alignItems="center" gap={1}>
               <Avatar sx={{ bgcolor: "#2E3DA3" }}>{getInitials(cliente.nome)}</Avatar>
               <Box>
                 <Typography variant="body2">{cliente.nome}</Typography>
-                <Typography variant="caption" color="text.secondary">
-                  {cliente.email}
-                </Typography>
+                {cliente.email && (
+                  <Typography variant="caption" color="text.secondary">
+                    {cliente.email}
+                  </Typography>
+                )}
               </Box>
             </Box>
           ) : (
             <Typography variant="body2" color="text.secondary">
-              Sem cliente atribuído
+              Informações do cliente não disponíveis
             </Typography>
           )}
         </Box>
 
-        {/* Técnico */}
         <Box mt={2}>
           <Typography variant="subtitle2" fontWeight="medium" mb={1}>
             Técnico responsável
           </Typography>
-          {loadingTecnico ? (
-            <Typography variant="body2" color="text.secondary">
-              Carregando técnico...
-            </Typography>
-          ) : tecnico ? (
+          {tecnico.nome ? (
             <Box display="flex" alignItems="center" gap={1}>
-              <Avatar sx={{ bgcolor: "#2E3DA3" }}>{getInitials(tecnico.nome)}</Avatar>
+              <Avatar sx={{ bgcolor: "#28a745" }}>{getInitials(tecnico.nome)}</Avatar>
               <Box>
                 <Typography variant="body2">{tecnico.nome}</Typography>
+                {tecnico.email && (
+                  <Typography variant="caption" color="text.secondary">
+                    {tecnico.email}
+                  </Typography>
+                )}
+              </Box>
+            </Box>
+          ) : tecnico.id ? (
+            <Box display="flex" alignItems="center" gap={1}>
+              <Avatar sx={{ bgcolor: "#6c757d" }}>??</Avatar>
+              <Box>
+                <Typography variant="body2" color="text.secondary">
+                  Técnico ID: {tecnico.id}
+                </Typography>
                 <Typography variant="caption" color="text.secondary">
-                  {tecnico.email}
+                  Informações não disponíveis
                 </Typography>
               </Box>
             </Box>
           ) : (
             <Typography variant="body2" color="text.secondary">
-              Sem técnico atribuído
+              Nenhum técnico atribuído
             </Typography>
           )}
         </Box>

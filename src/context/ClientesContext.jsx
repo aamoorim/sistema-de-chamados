@@ -5,16 +5,16 @@ const ClientesContext = createContext();
 
 export function ClientesProvider({ children }) {
   const [clientes, setClientes] = useState([]);
-  const { token } = useAuth(); // pega token do contexto
+  const { token, user } = useAuth(); // pega token e dados do usuário
 
   useEffect(() => {
-    if (!token) {
-      // Se não tiver token, não tenta buscar
-      console.warn("ClientesContext: token indefinido, não buscando clientes");
+    // Só busca clientes se for admin e tiver token
+    if (!token || user?.role !== "admin") {
+      setClientes([]); // limpa lista se não for admin
       return;
     }
 
-    fetch("https://api-sdc.onrender.com/clientes", {
+    fetch("https://api-sdc-teste.onrender.com/clientes", {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
@@ -32,7 +32,7 @@ export function ClientesProvider({ children }) {
       .catch((err) => {
         console.error("Falha ao carregar clientes:", err);
       });
-  }, [token]);
+  }, [token, user]);
 
   const addCliente = (cliente) => {
     setClientes((prev) => [...prev, cliente]);

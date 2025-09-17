@@ -1,32 +1,43 @@
 import api from "./api";
 
-// Chamados do admin
-const getAllChamados = async () => {
+const getChamadosDoCliente = async () => {
   const res = await api.get("/chamados");
   return res.data;
 };
 
-// Criar chamado (cliente)
 const criarChamado = async (dados) => {
-  const res = await api.post("/chamados", dados);
+  const res = await api.post("/chamados", {
+    titulo: dados.titulo,
+    descricao: dados.descricao,
+  });
   return res.data;
 };
 
-// Atualizar chamado (admin ou técnico)
 const atualizarChamado = async (id, dados) => {
   const res = await api.put(`/chamados/${id}`, dados);
   return res.data;
 };
 
-// Excluir chamado (admin)
+const atribuirChamado = async (id, dados) => {
+  const res = await api.put(`/chamados/${id}/atribuir`, dados);
+  return res.data;
+};
+
 const excluirChamado = async (id) => {
   const res = await api.delete(`/chamados/${id}`);
   return res.data;
 };
 
+const getChamadosAbertosDisponiveis = async () => {
+  const res = await api.get("/chamados/abertos");
+  return res.data;
+};
+
 export default {
-  getAllChamados,
+  getChamadosDoCliente,
   criarChamado,
   atualizarChamado,
-  excluirChamado
+  atribuirChamado,
+  excluirChamado,
+  getChamadosAbertosDisponiveis,
 };
