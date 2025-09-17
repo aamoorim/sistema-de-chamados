@@ -17,6 +17,7 @@ import ModalChamadoDetalhes from "./Modals/DetalhesChamados";
 import api from "../services/api";
 import { useSearch } from "../context/search-context";
 import StatusChip from "./StatusChip";
+import EditTicketModal from "./Modals/EditarChamado";
 
 // Avatar com iniciais
 function AvatarInitials({ name }) {
@@ -65,6 +66,9 @@ export default function ListTable() {
 
   const [openDetailsModal, setOpenDetailsModal] = useState(false);
   const [selectedChamadoDetalhes, setSelectedChamadoDetalhes] = useState(null);
+
+  const [openEditModal, setOpenEditModal] = useState(false);
+  const [selectedTicket, setSelectedTicket] = useState(null); // opcional: passar dados para o modal
 
   const fetchChamados = async () => {
     try {
@@ -122,9 +126,12 @@ export default function ListTable() {
       const matchesSearch =
         !textToSearch ||
         item.titulo.toLowerCase().includes(textToSearch) ||
-        (item.descricao && item.descricao.toLowerCase().includes(textToSearch)) ||
-        (item.cliente_nome && item.cliente_nome.toLowerCase().includes(textToSearch)) ||
-        (item.tecnico_nome && item.tecnico_nome.toLowerCase().includes(textToSearch));
+        (item.descricao &&
+          item.descricao.toLowerCase().includes(textToSearch)) ||
+        (item.cliente_nome &&
+          item.cliente_nome.toLowerCase().includes(textToSearch)) ||
+        (item.tecnico_nome &&
+          item.tecnico_nome.toLowerCase().includes(textToSearch));
 
       if (!matchesSearch) return false;
 
@@ -154,9 +161,7 @@ export default function ListTable() {
   if (loading)
     return <div style={{ fontFamily: "Lato" }}>Carregando chamados...</div>;
   if (error)
-    return (
-      <div style={{ color: "red", fontFamily: "Lato" }}>{error}</div>
-    );
+    return <div style={{ color: "red", fontFamily: "Lato" }}>{error}</div>;
 
   return (
     <div
@@ -329,6 +334,15 @@ export default function ListTable() {
         onClose={handleCloseDetails}
         chamado={selectedChamadoDetalhes}
       />
+
+      {/* Modal de editar chamado */}
+      {openEditModal && (
+        <EditTicketModal
+          open={openEditModal}
+          onClose={handleCloseEdit}
+          ticket={selectedTicket} // opcional, caso queira passar os dados do ticket
+        />
+      )}
     </div>
   );
 }
