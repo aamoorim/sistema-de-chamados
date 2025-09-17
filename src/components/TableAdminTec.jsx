@@ -11,6 +11,7 @@ import IconButton from "@mui/material/IconButton";
 import { Pencil, Trash2 } from "lucide-react";
 import { DeletarPerfil } from "./Modals/DeletarPerfil";
 import { useSearch } from "../context/search-context";
+import { ModalEditarTecnico } from "./Modals/EditarTecnico";
 
 function Avatar({ initials }) {
   return (
@@ -41,6 +42,10 @@ export default function TechnicianTable() {
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
 
+  // Estados para modal de edição
+  const [openEditModal, setOpenEditModal] = useState(false);
+  const [selectedTecnicoEdit, setSelectedTecnicoEdit] = useState(null);
+
   const handleOpenDelete = (row) => {
     setSelectedRow(row);
     setOpenDeleteModal(true);
@@ -63,6 +68,17 @@ export default function TechnicianTable() {
     } catch (error) {
       alert("Erro ao deletar técnico: " + error.message);
     }
+  };
+
+  // Abrir modal de editar técnico
+  const handleOpenEdit = (tecnico) => {
+    setSelectedTecnicoEdit(tecnico);
+    setOpenEditModal(true);
+  };
+
+  const handleCloseEdit = () => {
+    setSelectedTecnicoEdit(null);
+    setOpenEditModal(false);
   };
 
   const filteredRows = tecnicos.filter(
@@ -125,7 +141,7 @@ export default function TechnicianTable() {
                   <TableCell>{row.cargo || "-"}</TableCell>
                   <TableCell>{row.email || "-"}</TableCell>
                   <TableCell>
-                    <IconButton>
+                    <IconButton onClick={() => handleOpenEdit(row)}>
                       <Pencil size={18} />
                     </IconButton>
                     <IconButton
@@ -156,6 +172,13 @@ export default function TechnicianTable() {
         onClose={handleCloseDelete}
         onDelete={() => handleDeleteConfirmed(selectedRow?.id)}
         usuario={selectedRow}
+      />
+
+      {/* Modal de edição */}
+      <ModalEditarTecnico
+        isOpen={openEditModal}
+        onClose={handleCloseEdit}
+        tecnico={selectedTecnicoEdit}
       />
     </div>
   );

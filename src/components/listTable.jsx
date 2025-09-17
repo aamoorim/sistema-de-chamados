@@ -13,7 +13,9 @@ import {
 import { Trash2, Pencil } from "lucide-react";
 import DeletarChamado from "./Modals/DeletarChamado";
 import ModalChamadoDetalhes from "./Modals/DetalhesChamados";
+import EditTicketModal from "./Modals/EditarChamado";
 import api from "../services/api";
+import chamadosService from "../services/chamadosService";
 import { useSearch } from "../context/search-context";
 import StatusChip from "./StatusChip";
 
@@ -97,11 +99,13 @@ export default function ListTable() {
   const [openDetailsModal, setOpenDetailsModal] = useState(false);
   const [selectedChamadoDetalhes, setSelectedChamadoDetalhes] = useState(null);
 
+  const [openEditModal, setOpenEditModal] = useState(false);
+  const [selectedChamadoEdit, setSelectedChamadoEdit] = useState(null);
+
   const fetchChamados = async () => {
     try {
       setLoading(true);
       const response = await api.get("/chamados");
-      // PARA ADMIN: pega TODOS os chamados, sem filtro por status
       setRows(response.data);
       setError(null);
     } catch (err) {
@@ -147,7 +151,36 @@ export default function ListTable() {
     setOpenDetailsModal(false);
   };
 
-  // Função que aplica a busca e filtros dinamicamente
+  const handleOpenEdit = (chamado) => {
+    setSelectedChamadoEdit(chamado);
+    setOpenEditModal(true);
+  };
+
+  const handleCloseEdit = () => {
+    setSelectedChamadoEdit(null);
+    setOpenEditModal(false);
+  };
+
+  const handleEditSave = async (dadosEditados) => {
+    // Validação simples para evitar campos vazios
+    if (!dadosEditados.titulo?.trim() || !dadosEditados.descricao?.trim()) {
+      alert("Por favor, informe título e descrição.");
+      return;
+    }
+
+    try {
+      await chamadosService.atualizarChamado(selectedChamadoEdit.id, {
+        titulo: dadosEditados.titulo,
+        descricao: dadosEditados.descricao,
+      });
+      await fetchChamados();
+      handleCloseEdit();
+    } catch (error) {
+      console.error("Erro ao atualizar chamado:", error);
+      alert("Erro ao atualizar chamado. Verifique os dados e tente novamente.");
+    }
+  };
+
   const applySearchAndFilters = (data) => {
     const textToSearch = search.toLowerCase().trim();
 
@@ -185,7 +218,6 @@ export default function ListTable() {
   const filteredRows = applySearchAndFilters(rows);
 
   if (loading) return <LoadingSpinner />;
-
   if (error)
     return <div style={{ color: "red", fontFamily: "Lato" }}>{error}</div>;
 
@@ -240,16 +272,11 @@ export default function ListTable() {
                   </TableCell>
                   <TableCell>{row.id}</TableCell>
                   <TableCell>
-                    <Typography
-                      variant="subtitle1"
-                      component="div"
-                      fontWeight="bold"
-                    >
+                    <Typography variant="subtitle1" fontWeight="bold">
                       {row.titulo}
                     </Typography>
                     <Typography
                       variant="body2"
-                      component="div"
                       color="text.secondary"
                       noWrap
                     >
@@ -268,7 +295,7 @@ export default function ListTable() {
                     <StatusChip label={row.status} />
                   </TableCell>
                   <TableCell onClick={(e) => e.stopPropagation()}>
-                    <IconButton>
+                    <IconButton onClick={() => handleOpenEdit(row)}>
                       <Pencil size={18} />
                     </IconButton>
                     <IconButton
@@ -285,7 +312,11 @@ export default function ListTable() {
               <TableRow>
                 <TableCell
                   colSpan={7}
-                  style={{ textAlign: "center", padding: "40px", color: "#999" }}
+                  style={{
+                    textAlign: "center",
+                    padding: "40px",
+                    color: "#999",
+                  }}
                 >
                   Nenhum chamado encontrado
                 </TableCell>
@@ -295,6 +326,7 @@ export default function ListTable() {
         </Table>
       </TableContainer>
 
+      {/* Modais */}
       <DeletarChamado
         isOpen={openDeleteModal}
         onClose={handleCloseDelete}
@@ -306,6 +338,13 @@ export default function ListTable() {
         isOpen={openDetailsModal}
         onClose={handleCloseDetails}
         chamado={selectedChamadoDetalhes}
+      />
+
+      <EditTicketModal
+        open={openEditModal}
+        onClose={handleCloseEdit}
+        ticket={selectedChamadoEdit}
+        onSave={handleEditSave}
       />
     </div>
   );

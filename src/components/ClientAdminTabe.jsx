@@ -1,8 +1,7 @@
-// src/components/ClientAdminTabe.jsx
 
 import { useSearch } from "../context/search-context";
-import { useClientes } from "../context/ClientesContext"; 
-import { useAuth } from "../context/auth-context"; // para pegar o token
+import { useClientes } from "../context/ClientesContext";
+import { useAuth } from "../context/auth-context";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -13,6 +12,7 @@ import Paper from "@mui/material/Paper";
 import IconButton from "@mui/material/IconButton";
 import { Pencil, Trash2 } from "lucide-react";
 import { DeletarPerfil } from "./Modals/DeletarPerfil";
+import { ModalEditarCliente } from "./Modals/EditarCliente";
 import { useState } from "react";
 
 function Avatar({ initials }) {
@@ -45,6 +45,11 @@ export default function ClientTable() {
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
 
+  // Estados para modal de edição
+  const [openEditModal, setOpenEditModal] = useState(false);
+  const [selectedClienteEdit, setSelectedClienteEdit] = useState(null);
+
+  // Abrir modal de deletar
   const handleOpenDelete = (row) => {
     setSelectedRow(row);
     setOpenDeleteModal(true);
@@ -61,12 +66,12 @@ export default function ClientTable() {
     }
     try {
       const res = await fetch(
-        `https://api-sdc.onrender.com/clientes/${selectedRow.id}`,
+        `https://api-sdc-teste.onrender.com/clientes/${selectedRow.id}`,
         {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,  
+            Authorization: `Bearer ${token}`,
           },
         }
       );
@@ -83,6 +88,17 @@ export default function ClientTable() {
     } finally {
       handleCloseDelete();
     }
+  };
+
+  // Abrir modal de editar
+  const handleOpenEdit = (cliente) => {
+    setSelectedClienteEdit(cliente);
+    setOpenEditModal(true);
+  };
+
+  const handleCloseEdit = () => {
+    setSelectedClienteEdit(null);
+    setOpenEditModal(false);
   };
 
   const filteredRows = clientes.filter((row) => {
@@ -152,9 +168,12 @@ export default function ClientTable() {
                     <TableCell>{row.setor || "-"}</TableCell>
                     <TableCell>{row.email || "-"}</TableCell>
                     <TableCell>
-                      <IconButton>
+                      {/* Botão para editar */}
+                      <IconButton onClick={() => handleOpenEdit(row)}>
                         <Pencil size={18} />
                       </IconButton>
+
+                      {/* Botão para deletar */}
                       <IconButton
                         color="error"
                         onClick={() => handleOpenDelete(row)}
@@ -179,11 +198,19 @@ export default function ClientTable() {
         </Table>
       </TableContainer>
 
+      {/* Modal de deletar */}
       <DeletarPerfil
         isOpen={openDeleteModal}
         onClose={handleCloseDelete}
         onDelete={handleDeleteConfirmed}
         usuario={selectedRow}
+      />
+
+      {/* Modal de editar */}
+      <ModalEditarCliente
+        isOpen={openEditModal}
+        onClose={handleCloseEdit}
+        cliente={selectedClienteEdit}
       />
     </div>
   );

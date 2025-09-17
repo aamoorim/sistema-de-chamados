@@ -9,21 +9,22 @@ import {
   IconButton,
   Box,
   Typography,
-  Chip
+  Stack,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import StatusChip from '../StatusChip'; 
 
 const EditTicketModal = ({ open = false, onClose, ticket, onSave }) => {
   const [ticketData, setTicketData] = useState({
-    title: '',
-    description: '',
+    titulo: '',
+    descricao: '',
   });
 
   useEffect(() => {
     if (ticket) {
       setTicketData({
-        title: ticket.titulo || '',
-        description: ticket.descricao || '',
+        titulo: ticket.titulo || '',
+        descricao: ticket.descricao || '',
       });
     }
   }, [ticket]);
@@ -38,121 +39,94 @@ const EditTicketModal = ({ open = false, onClose, ticket, onSave }) => {
     }
   };
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'aberto':
-      case 'espera':
-        return '#D03E3E';
-      case 'em_andamento':
-      case 'em-atendimento':
-        return '#2196f3';
-      case 'encerrado':
-        return '#4caf50';
-      default:
-        return '#757575';
-    }
-  };
-
-  const getStatusLabel = (status) => {
-    switch (status) {
-      case 'aberto':
-      case 'espera':
-        return 'Em Espera';
-      case 'em_andamento':
-      case 'em-atendimento':
-        return 'Em Atendimento';
-      case 'encerrado':
-        return 'Encerrado';
-      default:
-        return status;
-    }
-  };
-
   return (
     <Dialog
       open={open}
       onClose={onClose}
       fullWidth
       maxWidth="sm"
-      PaperProps={{
-        sx: {
-          borderRadius: 3,
-          overflow: 'hidden',
-          boxShadow: '0 8px 20px rgba(0,0,0,0.12)',
-          maxWidth: 480,
+      slotProps={{
+        paper: {
+          sx: {
+            borderRadius: 2,
+            overflow: 'hidden',
+            boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+            maxWidth: 480,
+          },
         },
       }}
     >
       {/* Header */}
       <DialogTitle
         sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          borderBottom: '1px solid #eee',
           px: 3,
-          py: 2,
-          flexDirection: 'column',
-          alignItems: 'flex-start',
-          gap: 1,
+          py: 2.5,
+          borderBottom: '1px solid #eee',
+          position: 'relative',
         }}
       >
-        <Typography variant="h6" fontWeight={600}>
-          Editar Chamado
-        </Typography>
-        <Chip
-          label={getStatusLabel(ticket?.status)}
-          sx={{
-            backgroundColor: `${getStatusColor(ticket?.status)}20`,
-            color: getStatusColor(ticket?.status),
-            fontWeight: 600,
-            fontSize: '0.8rem',
-            borderRadius: 2,
-            px: 2,
-            py: 0.5,
-            alignSelf: 'flex-start',
-          }}
-        />
-        <IconButton
-          onClick={onClose}
-          sx={{ color: '#555', position: 'absolute', right: 8, top: 8 }}
-          aria-label="fechar"
+        <Stack
+          direction="row"
+          alignItems="center"
+          justifyContent="space-between"
+          spacing={2}
         >
-          <CloseIcon />
-        </IconButton>
+          <Box>
+            <Typography variant="h6" fontWeight={600}>
+              Editar Chamado
+            </Typography>
+            {ticket?.status && (
+              <Box mt={1} ml={-2}>
+                <StatusChip label={ticket.status} />
+              </Box>
+            )}
+          </Box>
+
+          <IconButton
+            onClick={onClose}
+            sx={{ color: '#555', position: 'absolute', top: 12, right: 12 }}
+            aria-label="Fechar"
+          >
+            <CloseIcon />
+          </IconButton>
+        </Stack>
       </DialogTitle>
 
       {/* Conteúdo */}
-      <DialogContent dividers sx={{ px: 3, py: 2 }}>
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          {/* Título */}
+      <DialogContent dividers sx={{ px: 3, py: 3 }}>
+        <Stack spacing={3}>
           <TextField
             label="Título"
-            value={ticketData.title}
-            onChange={handleChange('title')}
+            value={ticketData.titulo}
+            onChange={handleChange('titulo')}
             fullWidth
             variant="standard"
             size="small"
-            sx={{ backgroundColor: '#fafafa', borderRadius: 1 }}
+            sx={{
+              backgroundColor: '#fafafa',
+              borderRadius: 1,
+            }}
           />
 
-          {/* Descrição */}
           <TextField
             label="Descrição"
-            value={ticketData.description}
-            onChange={handleChange('description')}
+            value={ticketData.descricao}
+            onChange={handleChange('descricao')}
             fullWidth
             size="small"
             variant="standard"
             multiline
-            minRows={3}
-            sx={{ backgroundColor: '#fafafa', borderRadius: 1 }}
+            minRows={4}
+            sx={{
+              backgroundColor: '#fafafa',
+              borderRadius: 1,
+            }}
           />
-        </Box>
+        </Stack>
       </DialogContent>
 
       {/* Ações */}
-      <DialogActions sx={{ px: 3, py: 2, borderTop: '1px solid #eee' }}>
+      <DialogActions sx={{ px: 3, py: 2.5, borderTop: '1px solid #eee' }}>
         <Button
           onClick={onClose}
           variant="outlined"

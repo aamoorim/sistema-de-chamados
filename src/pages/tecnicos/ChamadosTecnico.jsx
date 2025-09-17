@@ -174,22 +174,6 @@ export default function ChamadosTecnico() {
     <div className="tecnico-chamados">
       <div className="header">
         <h1>Meus chamados</h1>
-        <div
-          style={{
-            fontSize: "12px",
-            color: "#666",
-            marginTop: "8px",
-            padding: "8px",
-            backgroundColor: "#f5f5f5",
-            borderRadius: "4px",
-          }}
-        >
-          <div>Token: {token ? "✓ Presente" : "✗ Ausente"}</div>
-          <div>Total: {chamados.length} chamados</div>
-          <div>Em andamento: {andamentoChamados.length}</div>
-          <div>Encerrados: {finalizadosChamados.length}</div>
-          <div>Técnicos: {tecnicos.length}</div>
-        </div>
       </div>
 
       {loading ? (
