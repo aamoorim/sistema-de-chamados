@@ -14,7 +14,6 @@ import IconButton from "@mui/material/IconButton";
 import { Pencil, Trash2 } from "lucide-react";
 import { DeletarPerfil } from "./Modals/DeletarPerfil";
 import { useState } from "react";
-import EditTicketModal from "./Modals/EditarChamado";
 
 function Avatar({ initials }) {
   return (
@@ -45,10 +44,6 @@ export default function ClientTable() {
 
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
-
-  const [openEditModal, setOpenEditModal] = useState(false);
-  const [selectedTicket, setSelectedTicket] = useState(null); // opcional: passar dados para o modal
-  
 
   const handleOpenDelete = (row) => {
     setSelectedRow(row);
@@ -88,16 +83,6 @@ export default function ClientTable() {
     } finally {
       handleCloseDelete();
     }
-  };
-
-    const handleOpenEdit = (row) => {
-    setSelectedTicket(row); // opcional: enviar dados do ticket
-    setOpenEditModal(true);
-  };
-
-  const handleCloseEdit = () => {
-    setSelectedTicket(null);
-    setOpenEditModal(false);
   };
 
   const filteredRows = clientes.filter((row) => {
@@ -167,7 +152,7 @@ export default function ClientTable() {
                     <TableCell>{row.setor || "-"}</TableCell>
                     <TableCell>{row.email || "-"}</TableCell>
                     <TableCell>
-                      <IconButton onClick={() => handleOpenEdit(row)}> 
+                      <IconButton>
                         <Pencil size={18} />
                       </IconButton>
                       <IconButton
@@ -200,15 +185,6 @@ export default function ClientTable() {
         onDelete={handleDeleteConfirmed}
         usuario={selectedRow}
       />
-
-      {/* Modal de editar chamado */}
-      {openEditModal && (
-        <EditTicketModal
-          open={openEditModal}
-          onClose={handleCloseEdit}
-          ticket={selectedTicket} // opcional, caso queira passar os dados do ticket
-        />
-      )}
     </div>
   );
 }

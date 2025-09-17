@@ -11,8 +11,6 @@ import IconButton from "@mui/material/IconButton";
 import { Pencil, Trash2 } from "lucide-react";
 import { DeletarPerfil } from "./Modals/DeletarPerfil";
 import { useSearch } from "../context/search-context";
-import EditTicketModal from "./Modals/EditarChamado";
-
 
 function Avatar({ initials }) {
   return (
@@ -43,10 +41,6 @@ export default function TechnicianTable() {
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
 
-   // Novo estado para abrir modal de edição
-  const [openEditModal, setOpenEditModal] = useState(false);
-  const [selectedTicket, setSelectedTicket] = useState(null); // opcional: passar dados para o modal
-
   const handleOpenDelete = (row) => {
     setSelectedRow(row);
     setOpenDeleteModal(true);
@@ -70,18 +64,6 @@ export default function TechnicianTable() {
       alert("Erro ao deletar técnico: " + error.message);
     }
   };
-
-  const handleOpenEdit = (row) => {
-    setSelectedTicket(row); // opcional: enviar dados do ticket
-    setOpenEditModal(true);
-  };
-
-  const handleCloseEdit = () => {
-    setSelectedTicket(null);
-    setOpenEditModal(false);
-  };
-
-
 
   const filteredRows = tecnicos.filter(
     (row) =>
@@ -143,7 +125,7 @@ export default function TechnicianTable() {
                   <TableCell>{row.cargo || "-"}</TableCell>
                   <TableCell>{row.email || "-"}</TableCell>
                   <TableCell>
-                    <IconButton onClick={() => handleOpenEdit(row)}>
+                    <IconButton>
                       <Pencil size={18} />
                     </IconButton>
                     <IconButton
@@ -175,15 +157,6 @@ export default function TechnicianTable() {
         onDelete={() => handleDeleteConfirmed(selectedRow?.id)}
         usuario={selectedRow}
       />
-
-      {/* Modal de editar chamado */}
-      {openEditModal && (
-        <EditTicketModal
-          open={openEditModal}
-          onClose={handleCloseEdit}
-          ticket={selectedTicket} // opcional, caso queira passar os dados do ticket
-        />
-      )}
     </div>
   );
 }
