@@ -19,7 +19,6 @@ api.interceptors.request.use((config) => {
 
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
-    console.log("api.js - token enviado no header Authorization:", token);
   } else {
     console.log("api.js - Nenhum token encontrado para enviar");
   }
