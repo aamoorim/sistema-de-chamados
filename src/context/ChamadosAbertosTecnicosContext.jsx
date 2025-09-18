@@ -11,7 +11,7 @@ export function ChamadosAbertosTecnicosProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const { token, role } = useAuth(); // <- Agora também pega a role
+  const { token, role } = useAuth(); 
 
   const fetchChamados = async () => {
     // Verifica se está autenticado e é técnico
