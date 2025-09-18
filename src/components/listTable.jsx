@@ -88,6 +88,8 @@ const LoadingSpinner = () => (
 
 export default function ListTable() {
   const { search, filters } = useSearch();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm")); // detecta mobile
 
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -194,6 +196,12 @@ export default function ListTable() {
           item.cliente_nome.toLowerCase().includes(textToSearch)) ||
         (item.tecnico_nome &&
           item.tecnico_nome.toLowerCase().includes(textToSearch));
+        (item.descricao &&
+          item.descricao.toLowerCase().includes(textToSearch)) ||
+        (item.cliente_nome &&
+          item.cliente_nome.toLowerCase().includes(textToSearch)) ||
+        (item.tecnico_nome &&
+          item.tecnico_nome.toLowerCase().includes(textToSearch));
 
       if (!matchesSearch) return false;
 
@@ -207,6 +215,7 @@ export default function ListTable() {
               ? item.tecnico_nome
               : filterType === "client"
               ? item.cliente_nome
+              : ""
               : ""
           )
         ) {
@@ -223,6 +232,7 @@ export default function ListTable() {
   if (loading) return <LoadingSpinner />;
   if (error)
     return <div style={{ color: "red", fontFamily: "Lato" }}>{error}</div>;
+    return <div style={{ color: "red", fontFamily: "Lato" }}>{error}</div>;
 
   return (
     <div style={{ fontFamily: "Lato" }}>
@@ -233,9 +243,17 @@ export default function ListTable() {
 
       <TableContainer
         component={Paper}
-        style={{ borderRadius: 14, boxShadow: "0 2px 8px rgba(44,62,80,0.04)" }}
+        style={{
+          borderRadius: 14,
+          boxShadow: "0 2px 8px rgba(44,62,80,0.04)",
+          overflowX: "auto", // permite scroll no mobile
+        }}
       >
-        <Table sx={{ minWidth: 900 }} aria-label="tabela de chamados">
+        <Table
+          sx={{ minWidth: isMobile ? 500 : 900 }} // menor largura no mobile
+          aria-label="tabela de chamados"
+          size={isMobile ? "small" : "medium"}
+        >
           <TableHead>
             <TableRow>
               <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
@@ -244,14 +262,18 @@ export default function ListTable() {
               <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
                 ID
               </TableCell>
+              {!isMobile && (
+                <>
+                  <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
+                    Cliente
+                  </TableCell>
+                  <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
+                    Técnico
+                  </TableCell>
+                </>
+              )}
               <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
                 Título / Descrição
-              </TableCell>
-              <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
-                Cliente
-              </TableCell>
-              <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
-                Técnico
               </TableCell>
               <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
                 Status
@@ -298,6 +320,7 @@ export default function ListTable() {
                     <StatusChip label={row.status} />
                   </TableCell>
                   <TableCell onClick={(e) => e.stopPropagation()}>
+                    <IconButton onClick={() => handleOpenEdit(row)}>
                     <IconButton onClick={() => handleOpenEdit(row)}>
                       <Pencil size={18} />
                     </IconButton>

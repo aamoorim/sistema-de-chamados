@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useSearch } from "../context/search-context";
-import '../index.css';
+import '../styles/search-bar/search-bar.scss'
 import { Search, Filter, ChevronDown, X } from 'lucide-react';
 
 const SearchBar = ({ filterOptions }) => {
@@ -103,7 +103,7 @@ const SearchBar = ({ filterOptions }) => {
                 )}
               </div>
 
-              {Object.entries(filterOptions).map(([filterType, options]) => (
+              {Object.entries(filterOptions || {}).map(([filterType, options]) => (
                 <div key={filterType} className="filter-section">
                   <h4 className="filter-title">{friendlyNames[filterType] || filterType}</h4>
                   <div className="filter-options">

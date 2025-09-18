@@ -61,9 +61,8 @@ export default function ClientTable() {
   };
 
   const handleDeleteConfirmed = async () => {
-    if (!selectedRow) {
-      return;
-    }
+    if (!selectedRow) return;
+
     try {
       const res = await fetch(
         `https://api-sdc.onrender.com/clientes/${selectedRow.id}`,
@@ -80,7 +79,7 @@ export default function ClientTable() {
         throw new Error(`Erro ao deletar cliente: status ${res.status}`);
       }
 
-      // Remove do contexto / estado local
+      // Atualiza lista de clientes
       setClientes((prev) => prev.filter((c) => c.id !== selectedRow.id));
     } catch (error) {
       console.error("Erro ao deletar cliente:", error);
@@ -114,37 +113,33 @@ export default function ClientTable() {
   });
 
   return (
-    <div>
+    <div style={{ fontFamily: "Lato" }}>
       <div style={{ marginBottom: 16, color: "#666", fontSize: 14 }}>
         Mostrando {filteredRows.length} de {clientes.length} clientes
       </div>
 
       <TableContainer
         component={Paper}
-        style={{
-          borderRadius: 14,
+        sx={{
+          borderRadius: 2,
           boxShadow: "0 2px 8px rgba(44,62,80,0.04)",
-          marginBottom: 32,
+          marginBottom: 4,
+          overflowX: "auto", // 🔑 rolagem horizontal em telas pequenas
+          "@media (max-width: 768px)": {
+            "& table": {
+              minWidth: "700px", // 🔑 largura mínima para mobile
+            },
+          },
         }}
       >
-        <Table sx={{ minWidth: 900 }} aria-label="tabela de clientes">
+        <Table aria-label="tabela de clientes">
           <TableHead>
             <TableRow>
-              <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
-                Nome
-              </TableCell>
-              <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
-                Empresa
-              </TableCell>
-              <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
-                Setor
-              </TableCell>
-              <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
-                E-mail
-              </TableCell>
-              <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
-                Ações
-              </TableCell>
+              <TableCell sx={{ color: "#858B99", fontWeight: 600 }}>Nome</TableCell>
+              <TableCell sx={{ color: "#858B99", fontWeight: 600 }}>Empresa</TableCell>
+              <TableCell sx={{ color: "#858B99", fontWeight: 600 }}>Setor</TableCell>
+              <TableCell sx={{ color: "#858B99", fontWeight: 600 }}>E-mail</TableCell>
+              <TableCell sx={{ color: "#858B99", fontWeight: 600 }}>Ações</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -159,7 +154,7 @@ export default function ClientTable() {
                   : "??";
 
                 return (
-                  <TableRow key={row.id}>
+                  <TableRow key={row.id} hover>
                     <TableCell>
                       <Avatar initials={initials} />
                       {row.nome || "-"}
@@ -188,7 +183,11 @@ export default function ClientTable() {
               <TableRow>
                 <TableCell
                   colSpan={5}
-                  style={{ textAlign: "center", padding: "40px", color: "#999" }}
+                  style={{
+                    textAlign: "center",
+                    padding: "40px",
+                    color: "#999",
+                  }}
                 >
                   Nenhum cliente encontrado com os filtros aplicados
                 </TableCell>
