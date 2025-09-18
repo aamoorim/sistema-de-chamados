@@ -13,14 +13,11 @@ import {
   styled
 } from '@mui/material';
 import {
-  Visibility,
-  VisibilityOff,
   Close as CloseIcon,
   DeleteOutlineOutlined as DeleteIcon
 } from '@mui/icons-material';
 import { useModal } from '../../context/modal-context';
 import { useAuth } from '../../context/auth-context';
-import ChangePasswordModal from './ChangePasswordModal';
 
 // Styled components
 const StyledDialog = styled(Dialog)(() => ({
@@ -72,7 +69,6 @@ export default function ProfileModal() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    password: ''
   });
 
   useEffect(() => {
@@ -80,21 +76,12 @@ export default function ProfileModal() {
       setFormData({
         name: user.name || '',
         email: user.email || '',
-        password: user.password || '' // cuidado: só se a senha estiver disponível no user (não recomendável em prod)
       });
     }
   }, [user]);
 
   const handleClose = () => {
     closeProfileModal();
-  };
-
-  const handleOpenChangePassword = () => {
-    setOpenChangePassword(true);
-  };
-
-  const handleCloseChangePassword = () => {
-    setOpenChangePassword(false);
   };
 
   const getInitials = (name) => {
@@ -105,9 +92,6 @@ export default function ProfileModal() {
       : words[0][0].toUpperCase();
   };
 
-  const togglePasswordVisibility = () => {
-    setShowPassword((prev) => !prev);
-  };
 
   return (
     <StyledDialog
@@ -172,7 +156,7 @@ export default function ProfileModal() {
               value={formData.name}
               variant="standard"
               disabled
-              InputProps={{ disableUnderline: false }}
+              slotProps={{ disableUnderline: false }}
             />
           </Box>
 
@@ -184,51 +168,10 @@ export default function ProfileModal() {
               value={formData.email}
               variant="standard"
               disabled
-              InputProps={{ disableUnderline: false }}
+              slotProps={{ disableUnderline: false }}
             />
           </Box>
 
-          {/* Senha */}
-          <Box>
-            <FieldLabel>SENHA</FieldLabel>
-            <StyledTextField
-              fullWidth
-              type={showPassword ? 'text' : 'password'}
-              value={formData.password}
-              variant="standard"
-              disabled
-              InputProps={{
-                disableUnderline: false,
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      onClick={togglePasswordVisibility}
-                      edge="end"
-                      sx={{ padding: 0, marginRight: 1 }}
-                    >
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                    <Button
-                      variant="text"
-                      size="small"
-                      sx={{
-                        fontSize: '14px',
-                        textTransform: 'none',
-                        color: '#000',
-                        padding: '3px 8px',
-                        backgroundColor: '#E3E5E8',
-                        borderRadius: '5px',
-                        '&:hover': { backgroundColor: '#D1D5DB' }
-                      }}
-                      onClick={handleOpenChangePassword}
-                    >
-                      Alterar
-                    </Button>
-                  </InputAdornment>
-                )
-              }}
-            />
-          </Box>
 
           {/* Botão de Salvar */}
           <StyledButton
@@ -241,11 +184,6 @@ export default function ProfileModal() {
           </StyledButton>
         </Box>
       </DialogContent>
-
-      <ChangePasswordModal
-        open={OpenChangePassword}
-        onClose={handleCloseChangePassword}
-      />
     </StyledDialog>
   );
 }
