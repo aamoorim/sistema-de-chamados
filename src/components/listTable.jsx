@@ -9,6 +9,7 @@ import {
   Paper,
   IconButton,
   Typography,
+  useMediaQuery,
 } from "@mui/material";
 import { Trash2, Pencil } from "lucide-react";
 import DeletarChamado from "./Modals/DeletarChamado";
@@ -18,6 +19,7 @@ import api from "../services/api";
 import chamadosService from "../services/chamadosService";
 import { useSearch } from "../context/search-context";
 import StatusChip from "./StatusChip";
+import { useTheme } from "@emotion/react";
 
 // Avatar com iniciais
 function AvatarInitials({ name }) {
@@ -216,7 +218,6 @@ export default function ListTable() {
               : filterType === "client"
               ? item.cliente_nome
               : ""
-              : ""
           )
         ) {
           return false;
@@ -231,7 +232,6 @@ export default function ListTable() {
 
   if (loading) return <LoadingSpinner />;
   if (error)
-    return <div style={{ color: "red", fontFamily: "Lato" }}>{error}</div>;
     return <div style={{ color: "red", fontFamily: "Lato" }}>{error}</div>;
 
   return (
@@ -320,7 +320,6 @@ export default function ListTable() {
                     <StatusChip label={row.status} />
                   </TableCell>
                   <TableCell onClick={(e) => e.stopPropagation()}>
-                    <IconButton onClick={() => handleOpenEdit(row)}>
                     <IconButton onClick={() => handleOpenEdit(row)}>
                       <Pencil size={18} />
                     </IconButton>
