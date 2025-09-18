@@ -4,7 +4,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import ContentPasteIcon from "@mui/icons-material/ContentPaste";
 import StatusChip from "../StatusChip";
 import chamadosService from "../../services/chamadosService";
-import { useAuth } from "../../context/auth-context"; // use o hook customizado
+import { useAuth } from "../../context/auth-context"; 
 
 export default function ModalAtenderChamado({ isOpen, onClose, chamado, onChamadoAtualizado }) {
   const style = {
@@ -73,15 +73,6 @@ export default function ModalAtenderChamado({ isOpen, onClose, chamado, onChamad
             </Typography>
             <StatusChip
               label={chamado.status === "aberto" ? "Aberto" : chamado.status}
-              sx={{
-                bgcolor: chamado.status === "aberto" ? "#fde7ec" : undefined,
-                color: chamado.status === "aberto" ? "#d6336c" : undefined,
-                fontWeight: "bold",
-                borderRadius: "16px",
-                fontSize: "0.75rem",
-                px: 1.5,
-                py: 0.5,
-              }}
             />
           </Box>
 
