@@ -233,6 +233,7 @@ export default function ListTable() {
   if (loading) return <LoadingSpinner />;
   if (error)
     return <div style={{ color: "red", fontFamily: "Lato" }}>{error}</div>;
+    return <div style={{ color: "red", fontFamily: "Lato" }}>{error}</div>;
 
   return (
     <div style={{ fontFamily: "Lato" }}>

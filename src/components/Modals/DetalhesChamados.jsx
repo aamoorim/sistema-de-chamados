@@ -10,13 +10,16 @@ export default function ModalChamadoDetalhes({ isOpen, onClose, chamado, tecnico
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    width: 450,
+    width: "90%",           // ocupa 90% da tela por padrão
+    maxWidth: 500,          // limite em telas grandes
     bgcolor: "background.paper",
     boxShadow: 24,
     borderRadius: 3,
-    p: 3,
+    p: { xs: 2, sm: 3 },    // padding menor no celular
     outline: "none",
     fontFamily: "Lato",
+    maxHeight: "90vh",      // não passa da altura da tela
+    overflowY: "auto", 
   };
 
   const getInitials = (name) => {

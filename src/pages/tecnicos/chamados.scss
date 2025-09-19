@@ -173,7 +173,7 @@ body {
 
 .main-content {
   flex: 1;
-  background:#f5f8fc; 
+  background:#0e5dc5; 
   padding: 20px;
 
   @include responsive($breakpoint-xl) { padding: $spacing-2xl $spacing-3xl; }
@@ -233,7 +233,10 @@ body {
 // ========================================
 
 .chamados-list {
-  @include flex(column, stretch, flex-start, $spacing-md);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: $spacing-lg;
+  
 }
 
 .chamado-card {
@@ -249,9 +252,10 @@ body {
   font-size: 14px;  
   line-height: 1.4;
   transition: all $transition-base;
-
-  height: 220px;  
-  width: 346px;
+  min-height: 220px;      
+  max-width: 22rem;
+  width: 100%;
+  
 
   &.finalizado {
     @include status-border($color-success);
@@ -307,6 +311,12 @@ body {
     color: $text-secondary;
     line-height: 1.4;
     margin-bottom: 18px;
+
+      display: -webkit-box;
+      -webkit-line-clamp: 2; // número de linhas máximas
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
   }
 
   .chamado-data {
@@ -325,7 +335,7 @@ body {
   font-size: $text-xs;
   font-weight: $font-medium;
   border-radius: 6px;
-  width: 96px;
+  width: 6  rem;
   height: 31px;
 
   @include flex(row, center, center);
@@ -337,30 +347,30 @@ body {
 }
 
 // ========================================
-// CARD FOOTER (CORRIGIDO)
+// CARD FOOTER
 // ========================================
 
 .card-footer {
   border-top: 1px solid $border-light;
-  padding-top: $spacing-md;
-  margin-top: auto;  // fixa o footer no fundo do card
+  padding-top: 16px;
+  margin-top: 32px;
 
-  @include flex(row, center, space-between, $spacing-sm);
-  flex: 1;
-  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .user-info {
-  @include flex(row, center, flex-start, $spacing-sm);
-  flex: 1;
-  min-width: 0; // Para evitar overflow com texto longo
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1
 }
 
 .user-avatar {
   @include avatar(26px, $color-primary);
   font-size: 11px;
   font-weight: $font-bold;
-  flex-shrink: 0;
 }
 
 .user-name {
@@ -368,10 +378,6 @@ body {
   color: $text-primary;
   font-weight: $font-medium;
   flex: 1;
-  min-width: 0; // Permite o truncamento
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .check-icon {
@@ -382,7 +388,6 @@ body {
   color: $color-success;
   border-radius: $radius-full;
   margin-left: auto;
-  flex-shrink: 0;
 }
 
 // ========================================
@@ -394,7 +399,7 @@ body {
     flex-direction: column;
     gap: 16px;
   }
-  
+    
   .card-right {
     justify-content: flex-start;
   }
@@ -490,5 +495,173 @@ $ripple-easing: cubic-bezier(0.4, 0, 0.2, 1);
     background: color.adjust($color-warning, $lightness: 10%);
     color: $color-icon;
   }
+
+  &.finalizado {
+    background: color.adjust($color-success, $lightness: 10%);
+    color: #2E7D32;
+  }
 }
- 
+
+
+  // ========================================
+  // BREAKPOINTS PARA AJUSTES FINOS
+  // ========================================
+
+  // até 480px (mobile pequeno)
+  @include responsive($breakpoint-xs) {
+  .chamado-card {
+    width: 23rem;        // ocupa toda a largura disponível
+    max-width: 17rem;    // evita travar o tamanho
+    padding: $spacing-lg; 
+    min-height: auto;
+    border-radius: $radius-sm;   // deixa altu ra se ajustar ao conteúdo
+  }
+  
+
+  .card-main {
+    flex-direction: column;
+    gap: $spacing-sm;
+  }
+
+  .btn-encerrar {
+    width: 100%;          // botão ocupa toda a largura
+    height: auto;
+    padding: 8px;                                                                           
+    font-size: $text-sm;
+  }                            
+
+  .chamado-info {
+    .chamado-titulo {
+      font-size: $text-base;
+    }
+
+    .chamado-descricao {
+      font-size: $text-xs;
+    }
+  }
+
+  .card-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: $spacing-sm;
+    margin-top: $spacing-md;
+  }
+}
+
+ // até 992px (notebook/tablet grande)
+@include responsive($breakpoint-lg) { 
+  .chamados-list {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  }
+
+  .chamado-card {
+    padding: 18px 22px;
+  }
+}
+
+// até 768px (tablet)
+@include responsive($breakpoint-md) { 
+  .chamados-list {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); // empilha no tablet/celular
+  }
+
+  .chamado-card {
+    padding: $spacing-md; 
+  }
+}
+
+
+
+
+// ========================================
+// RESPONSIVIDADE FINAL
+// ========================================
+
+// até 480px (mobile pequeno)
+@include responsive($breakpoint-xs) {
+  .chamado-card {
+    width: 100%;
+    max-width: 100%;
+    padding: $spacing-sm; 
+    min-height: auto;
+    border-radius: $radius-sm;
+  }
+
+  .card-main {
+    flex-direction: column;
+    gap: $spacing-sm;
+  }
+
+  .btn-encerrar {
+    width: 100%;          
+    height: auto;
+    padding: 8px;                                                                           
+    font-size: $text-sm;
+  }                            
+
+  .chamado-info {
+    .chamado-titulo { font-size: $text-base; }
+    .chamado-descricao { font-size: $text-xs; }
+  }
+
+  .card-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: $spacing-sm;
+    margin-top: $spacing-md;
+  }
+}
+
+// até 576px (celulares médios)
+@include responsive($breakpoint-sm) {
+  .chamados-list {
+    grid-template-columns: 1fr; // força apenas 1 card por linha
+  }
+
+  .chamado-card {
+    max-width: 100%;
+    padding: $spacing-md;
+  }
+
+  .chamado-info {
+    .chamado-titulo { font-size: $text-lg; }
+    .chamado-descricao { font-size: $text-sm; }
+  }
+}
+
+// até 768px (tablet)
+@include responsive($breakpoint-md) { 
+  .chamados-list {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+  }
+
+  .chamado-card {
+    padding: $spacing-md; 
+  }
+
+  .main-content {
+    padding: $spacing-xl;
+  }
+}
+
+// até 992px (notebooks pequenos)
+@include responsive($breakpoint-lg) { 
+  .chamados-list {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  }
+
+  .chamado-card {
+    padding: 18px 22px;
+  }
+}
+
+// até 1200px (telas grandes)
+@include responsive($breakpoint-xl) {
+  .main-content {
+    padding: $spacing-3xl $spacing-4xl; // mais respiro lateral
+  }
+
+  .chamados-list {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+}
