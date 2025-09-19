@@ -313,7 +313,7 @@ body {
     margin-bottom: 18px;
 
       display: -webkit-box;
-      -webkit-line-clamp: 2; // número de linhas máximas
+      -webkit-line-clamp: 1; // número de linhas máximas
       -webkit-box-orient: vertical;
       overflow: hidden;
       text-overflow: ellipsis;
