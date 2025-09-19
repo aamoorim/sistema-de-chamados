@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Modal,
@@ -33,6 +34,22 @@ export function ModalSairPerfil({ isOpen, onClose }) {
     p: 2,
   };
 
+      const { user } = useAuth();
+
+    const [formData, setFormData] = useState({
+      name: '',
+      email: '',
+    });
+  
+    useEffect(() => {
+      if (user) {
+        setFormData({
+          name: user.name || '',
+          email: user.email || '',
+        });
+      }
+    }, [user]);
+
   return (
     <Modal open={isOpen} onClose={onClose} >
       <Box sx={style}>
@@ -54,9 +71,9 @@ export function ModalSairPerfil({ isOpen, onClose }) {
           mt={3}
           mb={2}
         >
-          <Avatar alt="André Lima" src="/perfil.jpg" />
+          <Avatar alt={formData.name} src="/perfil.jpg" />
           <Typography variant="body1" fontWeight="500" sx={{margin: "2px"}} >
-            André Lima
+            {formData.name}
           </Typography>
         </Box>
 
