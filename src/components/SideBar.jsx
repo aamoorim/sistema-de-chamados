@@ -99,7 +99,9 @@ const SideBar = () => {
           <img src="/squad_favicon.svg" alt="Squad BI Logo" />
           <div className="name_user">
             <span className="aside_company">SquadBi</span>
-            <span className="aside_user">{user?.role || 'Visitante'}</span>
+            <span className="aside_user">
+              {(user?.role || 'Visitante').toUpperCase()}
+            </span>
           </div>
         </div>
 
@@ -125,6 +127,7 @@ const SideBar = () => {
 
         {/* Footer com dropdown */}
         <div className="aside_footer" style={{ position: 'relative' }}>
+          
           {/* Menu dropdown */}
           {isUserMenuOpen && (
             <div className="user_dropdown_menu">
@@ -147,8 +150,7 @@ const SideBar = () => {
               <span>{user?.name?.charAt(0)?.toUpperCase() || 'U'}</span>
             </div>
             <div className="user_info">
-              <p>{user?.name || 'Admin Teste'}</p>
-              <p>{user?.email || 'admin@email.com'}</p>
+              <p>{user?.name || 'Usuário desconhecido'}</p>
             </div>
           </button>
         </div>
