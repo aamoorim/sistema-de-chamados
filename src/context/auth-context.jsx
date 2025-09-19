@@ -29,7 +29,10 @@
 
     // Função de login, deve receber objeto user com token e role
     const login = (userData) => {
-      setUser(userData);
+      setUser({
+        ...userData,
+        name: userData.name || userData.nome || "", 
+      });
     };
 
     const logout = () => {

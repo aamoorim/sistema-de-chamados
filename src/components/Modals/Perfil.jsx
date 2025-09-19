@@ -12,10 +12,7 @@ import {
   InputAdornment,
   styled
 } from '@mui/material';
-import {
-  Close as CloseIcon,
-  DeleteOutlineOutlined as DeleteIcon
-} from '@mui/icons-material';
+import { Close as CloseIcon } from '@mui/icons-material';
 import { useModal } from '../../context/modal-context';
 import { useAuth } from '../../context/auth-context';
 
@@ -63,8 +60,6 @@ const FieldLabel = styled(Typography)(() => ({
 export default function ProfileModal() {
   const { isProfileModalOpen, closeProfileModal } = useModal();
   const { user } = useAuth();
-  const [OpenChangePassword, setOpenChangePassword] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -112,7 +107,7 @@ export default function ProfileModal() {
         }}
       >
         Perfil
-        <IconButton onClick={handleClose} sx={{ padding: 0, color: '#6b7280' }}>
+        <IconButton onClick={handleClose} sx={{ padding: 0, color: '#6b7280ff' }}>
           <CloseIcon fontSize="small" />
         </IconButton>
       </DialogTitle>
@@ -133,19 +128,6 @@ export default function ProfileModal() {
             >
               {getInitials(formData.name)}
             </Avatar>
-            <IconButton
-              sx={{
-                bgcolor: '#F3F4F6',
-                width: 36,
-                height: 36,
-                borderRadius: '8px',
-                '&:hover': {
-                  bgcolor: '#e5e7eb'
-                }
-              }}
-            >
-              <DeleteIcon sx={{ fontSize: 20, color: '#ef4444' }} />
-            </IconButton>
           </Box>
 
           {/* Nome */}

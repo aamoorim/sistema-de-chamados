@@ -25,12 +25,19 @@ export default function Login() {
     setError("");
 
     try {
-      const userData = await authService.login(email, senha); // usa o service
-      login(userData);
+      const userData = await authService.login(email, senha);
 
-      // Redireciona conforme role
-      if (userData.role === "admin") navigate("/admin");
-      else if (userData.role === "tecnico") navigate("/tecnico");
+      // Padroniza o campo "nome" para "name" antes de salvar
+      const normalizedUser = {
+        ...userData,
+        name: userData.name || userData.nome || "", 
+      };
+
+      login(normalizedUser);
+
+      // Redirecionamento conforme role
+      if (normalizedUser.role === "admin") navigate("/admin");
+      else if (normalizedUser.role === "tecnico") navigate("/tecnico");
       else navigate("/cliente");
     } catch (err) {
       setError("Credenciais inválidas ou erro no servidor");
