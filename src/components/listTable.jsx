@@ -231,9 +231,7 @@ export default function ListTable() {
   const filteredRows = applySearchAndFilters(rows);
 
   if (loading) return <LoadingSpinner />;
-  if (error)
-    return <div style={{ color: "red", fontFamily: "Lato" }}>{error}</div>;
-    return <div style={{ color: "red", fontFamily: "Lato" }}>{error}</div>;
+  if (error) return null;
 
   return (
     <div style={{ fontFamily: "Lato" }}>
