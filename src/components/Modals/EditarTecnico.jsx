@@ -9,7 +9,6 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { useTecnicos } from "../../context/TecnicosContext";
-import { useAuth } from "../../context/auth-context";
 
 export function ModalEditarTecnico({ isOpen, onClose, tecnico }) {
   const style = {
@@ -24,21 +23,20 @@ export function ModalEditarTecnico({ isOpen, onClose, tecnico }) {
     p: 4,
   };
 
-  const { setTecnicos } = useTecnicos();
-  const { token } = useAuth();
+  const { updateTecnico } = useTecnicos();
 
-  // Inicializa os estados com os dados do técnico recebido (ou vazio)
+  // Estados locais para os campos do formulário
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [cargo, setCargo] = useState("");
-  const [senha, setSenha] = useState(""); // pode ser senha nova ou vazio
+  const [senha, setSenha] = useState(""); // senha nova (opcional)
 
   useEffect(() => {
     if (tecnico) {
       setNome(tecnico.nome || "");
       setEmail(tecnico.email || "");
       setCargo(tecnico.cargo || "");
-      setSenha(""); // não preenche senha para segurança
+      setSenha(""); // nunca preenche senha por segurança
     }
   }, [tecnico]);
 
@@ -49,38 +47,15 @@ export function ModalEditarTecnico({ isOpen, onClose, tecnico }) {
       nome,
       email,
       cargo,
-      // Só inclui senha se foi preenchida (atualizar senha)
       ...(senha.trim() ? { senha } : {}),
     };
 
     try {
-      const response = await fetch(
-        `https://api-sdc.onrender.com/tecnicos/${tecnico.id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(tecnicoAtualizado),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Erro ao atualizar técnico");
-      }
-
-      const data = await response.json();
-
-      // Atualiza o contexto para refletir a alteração na tabela
-      setTecnicos((prev) =>
-        prev.map((t) => (t.id === data.id ? data : t))
-      );
-
-      onClose();
+      await updateTecnico(tecnico.id, tecnicoAtualizado);
+      onClose(); // fecha o modal após sucesso
     } catch (error) {
-      console.error(error);
-      alert("Erro ao atualizar técnico");
+      console.error("Erro ao atualizar técnico:", error);
+      alert("Erro ao atualizar técnico. Tente novamente.");
     }
   };
 
@@ -107,11 +82,7 @@ export function ModalEditarTecnico({ isOpen, onClose, tecnico }) {
         </Typography>
 
         <form onSubmit={handleSubmit}>
-          <Typography
-            variant="caption"
-            fontWeight="bold"
-            color="text.secondary"
-          >
+          <Typography variant="caption" fontWeight="bold" color="text.secondary">
             NOME
           </Typography>
           <TextField
@@ -124,11 +95,7 @@ export function ModalEditarTecnico({ isOpen, onClose, tecnico }) {
             onChange={(e) => setNome(e.target.value)}
           />
 
-          <Typography
-            variant="caption"
-            fontWeight="bold"
-            color="text.secondary"
-          >
+          <Typography variant="caption" fontWeight="bold" color="text.secondary">
             E-MAIL
           </Typography>
           <TextField
@@ -142,11 +109,7 @@ export function ModalEditarTecnico({ isOpen, onClose, tecnico }) {
             onChange={(e) => setEmail(e.target.value)}
           />
 
-          <Typography
-            variant="caption"
-            fontWeight="bold"
-            color="text.secondary"
-          >
+          <Typography variant="caption" fontWeight="bold" color="text.secondary">
             CARGO
           </Typography>
           <TextField
@@ -160,11 +123,7 @@ export function ModalEditarTecnico({ isOpen, onClose, tecnico }) {
             onChange={(e) => setCargo(e.target.value)}
           />
 
-          <Typography
-            variant="caption"
-            fontWeight="bold"
-            color="text.secondary"
-          >
+          <Typography variant="caption" fontWeight="bold" color="text.secondary">
             SENHA (DEIXE VAZIO CASO NÃO QUEIRA ALTERAR)
           </Typography>
           <TextField

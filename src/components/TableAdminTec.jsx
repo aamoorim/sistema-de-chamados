@@ -118,19 +118,26 @@ export default function TechnicianTable() {
   };
 
   const handleDeleteConfirmed = async (id) => {
-    if (!id) {
-      alert("Usuário não identificado para deleção.");
-      return;
-    }
-    try {
-      await deleteTecnico(id);
-    } catch (error) {
-      console.error("Erro ao deletar técnico:", error);
-      alert("Erro ao deletar técnico: " + error.message);
-    } finally {
-      handleCloseDelete();
-    }
-  };
+  if (!id) {
+    alert("Usuário não identificado.");
+    return;
+  }
+
+  try {
+    await deleteTecnico(id);
+    handleCloseDelete();
+  } catch (error) {
+    console.error("Erro ao deletar técnico:", error);
+
+    const apiMessage =
+      error.response?.data?.erro || // API personalizada
+      error.response?.data?.message || // fallback padrão
+      error.message;
+
+    alert(`Erro ao deletar técnico: ${apiMessage}`);
+  }
+};
+
 
   const filteredRows = tecnicos.filter((row) => {
     const term = search.toLowerCase();
