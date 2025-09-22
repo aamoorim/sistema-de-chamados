@@ -53,7 +53,7 @@ function AvatarInitials({ name }) {
 
 export default function ListTable() {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm")); // telas menores que 600px
+  const isMobile = useMediaQuery(theme.breakpoints.down("md")); // telas menores que 600px
 
   const { search, filters } = useSearch();
   const [rows, setRows] = useState([]);
@@ -165,11 +165,11 @@ export default function ListTable() {
     <div
       style={{
         width: "100%",
-        maxWidth: 1200, // desktop
+        maxWidth: 1200,
         margin: "0 auto",
         padding: "12px 16px",
         boxSizing: "border-box",
-        overflowX: "auto", // permite scroll horizontal se necessário
+        overflowX: "auto",
         fontFamily: "Lato",
       }}
     >
@@ -178,242 +178,351 @@ export default function ListTable() {
         {filteredRows.length !== 1 ? "s" : ""}
       </div>
 
-      <TableContainer
-        component={Paper}
-        sx={{
-          borderRadius: 2,
-          boxShadow: "0 2px 8px rgba(44,62,80,0.04)",
-          overflowX: "auto",
-        }}
-      >
-        <Table
-          aria-label="tabela de chamados"
-          size={isMobile ? "small" : "medium"}
-          sx={{ minWidth: 650 }}
-        >
-          <TableHead>
-            <TableRow>
-              <TableCell
-                sx={{ color: "#858B99", fontWeight: 600, whiteSpace: "nowrap" }}
-              >
-                Criado em
-              </TableCell>
-
-              {!isMobile && (
-                <>
-                  <TableCell
-                    sx={{
-                      color: "#858B99",
-                      fontWeight: 600,
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    ID
-                  </TableCell>
-                  <TableCell
-                    sx={{
-                      color: "#858B99",
-                      fontWeight: 600,
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    Cliente
-                  </TableCell>
-                  <TableCell
-                    sx={{
-                      color: "#858B99",
-                      fontWeight: 600,
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    Técnico
-                  </TableCell>
-                </>
-              )}
-
-              <TableCell
-                sx={{
-                  color: "#858B99",
-                  fontWeight: 600,
-                  maxWidth: { xs: 150, sm: "auto" },
-                  whiteSpace: { xs: "normal", sm: "nowrap" },
-                  wordWrap: "break-word",
+      {isMobile ? (
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          {filteredRows.length > 0 ? (
+            filteredRows.map((row) => (
+              <div
+                key={row.id}
+                style={{
+                  background: "#fff",
+                  borderRadius: 12,
+                  boxShadow: "0 2px 8px rgba(44,62,80,0.07)",
+                  padding: 16,
+                  marginBottom: 8,
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 8,
+                  position: "relative",
+                  cursor: "pointer",
                 }}
+                onClick={() => handleRowClick(row)}
               >
-                Título / Descrição
-              </TableCell>
-
-              <TableCell
-                sx={{ color: "#858B99", fontWeight: 600, whiteSpace: "nowrap" }}
-              >
-                Status
-              </TableCell>
-              <TableCell
-                sx={{ color: "#858B99", fontWeight: 600, whiteSpace: "nowrap" }}
-              >
-                Ações
-              </TableCell>
-            </TableRow>
-          </TableHead>
-
-          <TableBody>
-            {filteredRows.length > 0 ? (
-              filteredRows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  hover
-                  onClick={() => handleRowClick(row)}
-                  sx={{ cursor: "pointer" }}
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
                 >
-                  <TableCell sx={{ display: "flex", alignItems: "center" }}>
+                  <span style={{ color: "#858B99", fontSize: 13 }}>
                     {new Date(row.data_criacao).toLocaleDateString("pt-BR")}
-                  </TableCell>
-
-                  {!isMobile && (
-                    <>
-                      <TableCell sx={{ whiteSpace: "nowrap" }}>
-                        {row.id}
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          whiteSpace: "nowrap",
-                          display: "table-cell",
-                          verticalAlign: "middle",
-                          maxWidth: 180,
-                          paddingY: 1,
-                          paddingX: 1,
-                        }}
-                      >
-                        <div
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            minWidth: 0,
-                          }}
-                        >
-                          <AvatarInitials name={row.cliente_nome} />
-                          <span
-                            style={{
-                              overflow: "hidden",
-                              textOverflow: "ellipsis",
-                              whiteSpace: "nowrap",
-                              display: "inline-block",
-                              maxWidth: 120,
-                              verticalAlign: "middle",
-                            }}
-                          >
-                            {row.cliente_nome || "Sem cliente"}
-                          </span>
-                        </div>
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          whiteSpace: "nowrap",
-                          display: "table-cell",
-                          verticalAlign: "middle",
-                          maxWidth: 180,
-                          paddingY: 1,
-                          paddingX: 1,
-                        }}
-                      >
-                        <div
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            minWidth: 0,
-                          }}
-                        >
-                          <AvatarInitials name={row.tecnico_nome} />
-                          <span
-                            style={{
-                              overflow: "hidden",
-                              textOverflow: "ellipsis",
-                              whiteSpace: "nowrap",
-                              display: "inline-block",
-                              maxWidth: 120,
-                              verticalAlign: "middle",
-                            }}
-                          >
-                            {row.tecnico_nome || "Sem técnico"}
-                          </span>
-                        </div>
-                      </TableCell>
-                    </>
-                  )}
-
-                  <TableCell
-                    sx={{
-                      maxWidth: 220,
-                      minWidth: 120,
-                      whiteSpace: "nowrap",
+                  </span>
+                  <StatusChip label={row.status} />
+                </div>
+                <div
+                  style={{
+                    fontWeight: 600,
+                    fontSize: 16,
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {row.titulo}
+                </div>
+                <div
+                  style={{
+                    color: "#888",
+                    fontSize: 13,
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {row.descricao}
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                    marginTop: 4,
+                  }}
+                >
+                  <AvatarInitials name={row.cliente_nome} />
+                  <span
+                    style={{
+                      fontSize: 14,
+                      fontWeight: 500,
                       overflow: "hidden",
                       textOverflow: "ellipsis",
-                      verticalAlign: "middle",
-                      paddingY: 1,
-                      paddingX: 1,
+                      whiteSpace: "nowrap",
                     }}
                   >
-                    <span
-                      style={{
-                        fontWeight: 600,
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        whiteSpace: "nowrap",
-                        display: "block",
-                        maxWidth: 210,
-                      }}
-                    >
-                      {row.titulo}
-                    </span>
-                    <span
-                      style={{
-                        color: "#888",
-                        fontSize: 13,
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        whiteSpace: "nowrap",
-                        display: "block",
-                        maxWidth: 210,
-                      }}
-                    >
-                      {row.descricao}
-                    </span>
-                  </TableCell>
-
-                  <TableCell sx={{ whiteSpace: "nowrap" }}>
-                    <StatusChip label={row.status} />
-                  </TableCell>
-
-                  <TableCell
-                    onClick={(e) => e.stopPropagation()}
-                    sx={{ whiteSpace: "nowrap" }}
+                    {row.cliente_nome || "Sem cliente"}
+                  </span>
+                  <span style={{ color: "#aaa", fontSize: 12 }}>|</span>
+                  <AvatarInitials name={row.tecnico_nome} />
+                  <span
+                    style={{
+                      fontSize: 14,
+                      fontWeight: 500,
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    }}
                   >
-                    <IconButton size={isMobile ? "small" : "medium"}>
-                      <Pencil size={18} />
-                    </IconButton>
-                    <IconButton
-                      color="error"
-                      size={isMobile ? "small" : "medium"}
-                      onClick={() => handleOpenDelete(row)}
-                    >
-                      <Trash2 size={18} />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))
-            ) : (
+                    {row.tecnico_nome || "Sem técnico"}
+                  </span>
+                </div>
+                <div
+                  style={{ display: "flex", gap: 8, marginTop: 8 }}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <IconButton size="small">
+                    <Pencil size={18} />
+                  </IconButton>
+                  <IconButton
+                    color="error"
+                    size="small"
+                    onClick={() => handleOpenDelete(row)}
+                  >
+                    <Trash2 size={18} />
+                  </IconButton>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div style={{ textAlign: "center", color: "#999", padding: 32 }}>
+              Nenhum chamado encontrado
+            </div>
+          )}
+        </div>
+      ) : (
+        <TableContainer
+          component={Paper}
+          sx={{
+            borderRadius: 2,
+            boxShadow: "0 2px 8px rgba(44,62,80,0.04)",
+            overflowX: "auto",
+          }}
+        >
+          <Table
+            aria-label="tabela de chamados"
+            size="medium"
+            sx={{ minWidth: 650 }}
+          >
+            <TableHead>
               <TableRow>
                 <TableCell
-                  colSpan={isMobile ? 5 : 7}
-                  sx={{ textAlign: "center", padding: 4, color: "#999" }}
+                  sx={{
+                    color: "#858B99",
+                    fontWeight: 600,
+                    whiteSpace: "nowrap",
+                  }}
                 >
-                  Nenhum chamado encontrado
+                  Criado em
+                </TableCell>
+                <TableCell
+                  sx={{
+                    color: "#858B99",
+                    fontWeight: 600,
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  ID
+                </TableCell>
+                <TableCell
+                  sx={{
+                    color: "#858B99",
+                    fontWeight: 600,
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  Cliente
+                </TableCell>
+                <TableCell
+                  sx={{
+                    color: "#858B99",
+                    fontWeight: 600,
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  Técnico
+                </TableCell>
+                <TableCell
+                  sx={{
+                    color: "#858B99",
+                    fontWeight: 600,
+                    maxWidth: 150,
+                    whiteSpace: "nowrap",
+                    wordWrap: "break-word",
+                  }}
+                >
+                  Título / Descrição
+                </TableCell>
+                <TableCell
+                  sx={{
+                    color: "#858B99",
+                    fontWeight: 600,
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  Status
+                </TableCell>
+                <TableCell
+                  sx={{
+                    color: "#858B99",
+                    fontWeight: 600,
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  Ações
                 </TableCell>
               </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
+            </TableHead>
+            <TableBody>
+              {filteredRows.length > 0 ? (
+                filteredRows.map((row) => (
+                  <TableRow
+                    key={row.id}
+                    hover
+                    onClick={() => handleRowClick(row)}
+                    sx={{ cursor: "pointer" }}
+                  >
+                    <TableCell sx={{ display: "flex", alignItems: "center" }}>
+                      {new Date(row.data_criacao).toLocaleDateString("pt-BR")}
+                    </TableCell>
+                    <TableCell sx={{ whiteSpace: "nowrap" }}>
+                      {row.id}
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        whiteSpace: "nowrap",
+                        display: "table-cell",
+                        verticalAlign: "middle",
+                        maxWidth: 180,
+                        paddingY: 1,
+                        paddingX: 1,
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          minWidth: 0,
+                        }}
+                      >
+                        <AvatarInitials name={row.cliente_nome} />
+                        <span
+                          style={{
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            whiteSpace: "nowrap",
+                            display: "inline-block",
+                            maxWidth: 120,
+                            verticalAlign: "middle",
+                          }}
+                        >
+                          {row.cliente_nome || "Sem cliente"}
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        whiteSpace: "nowrap",
+                        display: "table-cell",
+                        verticalAlign: "middle",
+                        maxWidth: 180,
+                        paddingY: 1,
+                        paddingX: 1,
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          minWidth: 0,
+                        }}
+                      >
+                        <AvatarInitials name={row.tecnico_nome} />
+                        <span
+                          style={{
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            whiteSpace: "nowrap",
+                            display: "inline-block",
+                            maxWidth: 120,
+                            verticalAlign: "middle",
+                          }}
+                        >
+                          {row.tecnico_nome || "Sem técnico"}
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        maxWidth: 220,
+                        minWidth: 120,
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        verticalAlign: "middle",
+                        paddingY: 1,
+                        paddingX: 1,
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontWeight: 600,
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                          display: "block",
+                          maxWidth: 210,
+                        }}
+                      >
+                        {row.titulo}
+                      </span>
+                      <span
+                        style={{
+                          color: "#888",
+                          fontSize: 13,
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                          display: "block",
+                          maxWidth: 210,
+                        }}
+                      >
+                        {row.descricao}
+                      </span>
+                    </TableCell>
+                    <TableCell sx={{ whiteSpace: "nowrap" }}>
+                      <StatusChip label={row.status} />
+                    </TableCell>
+                    <TableCell
+                      onClick={(e) => e.stopPropagation()}
+                      sx={{ whiteSpace: "nowrap" }}
+                    >
+                      <IconButton size="medium">
+                        <Pencil size={18} />
+                      </IconButton>
+                      <IconButton
+                        color="error"
+                        size="medium"
+                        onClick={() => handleOpenDelete(row)}
+                      >
+                        <Trash2 size={18} />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={7}
+                    sx={{ textAlign: "center", padding: 4, color: "#999" }}
+                  >
+                    Nenhum chamado encontrado
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
 
       <DeletarChamado
         isOpen={openDeleteModal}

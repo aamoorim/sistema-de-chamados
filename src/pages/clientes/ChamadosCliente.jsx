@@ -161,7 +161,6 @@ const ChamadosCliente = () => {
 
   return (
     <div className="tecnico-chamados">
-      {/* Conteúdo principal */}
       <div className="main-content-wrapper">
         <div className="header">
           <h1>Meus chamados</h1>

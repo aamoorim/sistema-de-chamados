@@ -1,7 +1,7 @@
 // src/components/ClientAdminTabe.jsx
 
 import { useSearch } from "../context/search-context";
-import { useClientes } from "../context/ClientesContext"; 
+import { useClientes } from "../context/ClientesContext";
 import { useAuth } from "../context/auth-context"; // para pegar o token
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -15,6 +15,8 @@ import { Pencil, Trash2 } from "lucide-react";
 import { DeletarPerfil } from "./Modals/DeletarPerfil";
 import { useState } from "react";
 import EditTicketModal from "./Modals/EditarChamado";
+import useIsMobile from "../hooks/useIsMobile";
+import "../styles/tables/clientTable.scss";
 
 function Avatar({ initials }) {
   return (
@@ -39,6 +41,8 @@ function Avatar({ initials }) {
 }
 
 export default function ClientTable() {
+  // md = 900px (Material UI padrão)
+  const isMobile = useIsMobile(900);
   const { search } = useSearch();
   const { clientes, setClientes } = useClientes();
   const { token } = useAuth();
@@ -48,7 +52,6 @@ export default function ClientTable() {
 
   const [openEditModal, setOpenEditModal] = useState(false);
   const [selectedTicket, setSelectedTicket] = useState(null); // opcional: passar dados para o modal
-  
 
   const handleOpenDelete = (row) => {
     setSelectedRow(row);
@@ -71,7 +74,7 @@ export default function ClientTable() {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,  
+            Authorization: `Bearer ${token}`,
           },
         }
       );
@@ -90,7 +93,7 @@ export default function ClientTable() {
     }
   };
 
-    const handleOpenEdit = (row) => {
+  const handleOpenEdit = (row) => {
     setSelectedTicket(row); // opcional: enviar dados do ticket
     setOpenEditModal(true);
   };
@@ -118,81 +121,137 @@ export default function ClientTable() {
         Mostrando {filteredRows.length} de {clientes.length} clientes
       </div>
 
-      <TableContainer
-        component={Paper}
-        style={{
-          borderRadius: 14,
-          boxShadow: "0 2px 8px rgba(44,62,80,0.04)",
-          marginBottom: 32,
-        }}
-      >
-        <Table sx={{ minWidth: 900 }} aria-label="tabela de clientes">
-          <TableHead>
-            <TableRow>
-              <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
-                Nome
-              </TableCell>
-              <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
-                Empresa
-              </TableCell>
-              <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
-                Setor
-              </TableCell>
-              <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
-                E-mail
-              </TableCell>
-              <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
-                Ações
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {filteredRows.length > 0 ? (
-              filteredRows.map((row) => {
-                const initials = row.nome
-                  ? row.nome
-                      .split(" ")
-                      .map((n) => (n && n.length > 0 ? n[0] : ""))
-                      .join("")
-                      .slice(0, 2)
-                  : "??";
-
-                return (
-                  <TableRow key={row.id}>
-                    <TableCell>
-                      <Avatar initials={initials} />
-                      {row.nome || "-"}
-                    </TableCell>
-                    <TableCell>{row.empresa || "-"}</TableCell>
-                    <TableCell>{row.setor || "-"}</TableCell>
-                    <TableCell>{row.email || "-"}</TableCell>
-                    <TableCell>
-                      <IconButton onClick={() => handleOpenEdit(row)}> 
-                        <Pencil size={18} />
-                      </IconButton>
-                      <IconButton
-                        color="error"
-                        onClick={() => handleOpenDelete(row)}
-                      >
-                        <Trash2 size={18} />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                );
-              })
-            ) : (
+      {/* TABELA DESKTOP */}
+      <div className="client-table-desktop">
+        <TableContainer
+          component={Paper}
+          style={{
+            borderRadius: 14,
+            boxShadow: "0 2px 8px rgba(44,62,80,0.04)",
+            marginBottom: 32,
+          }}
+        >
+          <Table sx={{ minWidth: 900 }} aria-label="tabela de clientes">
+            <TableHead>
               <TableRow>
-                <TableCell
-                  colSpan={5}
-                  style={{ textAlign: "center", padding: "40px", color: "#999" }}
-                >
-                  Nenhum cliente encontrado com os filtros aplicados
+                <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
+                  Nome
+                </TableCell>
+                <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
+                  Empresa
+                </TableCell>
+                <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
+                  Setor
+                </TableCell>
+                <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
+                  E-mail
+                </TableCell>
+                <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
+                  Ações
                 </TableCell>
               </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
+            </TableHead>
+            <TableBody>
+              {filteredRows.length > 0 ? (
+                filteredRows.map((row) => {
+                  const initials = row.nome
+                    ? row.nome
+                        .split(" ")
+                        .map((n) => (n && n.length > 0 ? n[0] : ""))
+                        .join("")
+                        .slice(0, 2)
+                    : "??";
+
+                  return (
+                    <TableRow key={row.id}>
+                      <TableCell>
+                        <Avatar initials={initials} />
+                        {row.nome || "-"}
+                      </TableCell>
+                      <TableCell>{row.empresa || "-"}</TableCell>
+                      <TableCell>{row.setor || "-"}</TableCell>
+                      <TableCell>{row.email || "-"}</TableCell>
+                      <TableCell>
+                        <IconButton onClick={() => handleOpenEdit(row)}>
+                          <Pencil size={18} />
+                        </IconButton>
+                        <IconButton
+                          color="error"
+                          onClick={() => handleOpenDelete(row)}
+                        >
+                          <Trash2 size={18} />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={5}
+                    style={{
+                      textAlign: "center",
+                      padding: "40px",
+                      color: "#999",
+                    }}
+                  >
+                    Nenhum cliente encontrado com os filtros aplicados
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </div>
+
+      {/* CARDS MOBILE */}
+      <div className="client-table-mobile">
+        {filteredRows.length > 0 ? (
+          filteredRows.map((row) => {
+            const initials = row.nome
+              ? row.nome
+                  .split(" ")
+                  .map((n) => (n && n.length > 0 ? n[0] : ""))
+                  .join("")
+                  .slice(0, 2)
+              : "??";
+            return (
+              <div className="client-card" key={row.id}>
+                <div className="client-card-header">
+                  <Avatar initials={initials} />
+                  <div className="client-card-title">{row.nome || "-"}</div>
+                </div>
+                <div className="client-card-info">
+                  <div>
+                    <b>Empresa:</b> {row.empresa || "-"}
+                  </div>
+                  <div>
+                    <b>Setor:</b> {row.setor || "-"}
+                  </div>
+                  <div>
+                    <b>E-mail:</b> {row.email || "-"}
+                  </div>
+                </div>
+                <div className="client-card-actions">
+                  <IconButton onClick={() => handleOpenEdit(row)}>
+                    <Pencil size={18} />
+                  </IconButton>
+                  <IconButton
+                    color="error"
+                    onClick={() => handleOpenDelete(row)}
+                  >
+                    <Trash2 size={18} />
+                  </IconButton>
+                </div>
+              </div>
+            );
+          })
+        ) : (
+          <div className="client-card-empty">
+            Nenhum cliente encontrado com os filtros aplicados
+          </div>
+        )}
+      </div>
 
       <DeletarPerfil
         isOpen={openDeleteModal}
@@ -206,7 +265,7 @@ export default function ClientTable() {
         <EditTicketModal
           open={openEditModal}
           onClose={handleCloseEdit}
-          ticket={selectedTicket} // opcional, caso queira passar os dados do ticket
+          ticket={selectedTicket}
         />
       )}
     </div>
