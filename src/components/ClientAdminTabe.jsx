@@ -12,10 +12,9 @@ import IconButton from "@mui/material/IconButton";
 import { Pencil, Trash2 } from "lucide-react";
 import { DeletarPerfil } from "./Modals/DeletarPerfil";
 import { ModalEditarCliente } from "./Modals/EditarCliente";
-import { useState } from "react";
-import useIsMobile from "../hooks/useIsMobile";
-import "../styles/tables/clientTable.scss";
+import { useState, useEffect } from "react";
 
+// Avatar com iniciais
 function Avatar({ initials }) {
   return (
     <span
@@ -38,21 +37,62 @@ function Avatar({ initials }) {
   );
 }
 
+// Spinner (mesmo do listTable)
+const LoadingSpinner = () => (
+  <div
+    style={{
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      height: "100vh",
+      width: "100vw",
+      position: "fixed",
+      top: 0,
+      left: 0,
+      backgroundColor: "rgba(255, 255, 255, 0.7)",
+      zIndex: 9999,
+    }}
+  >
+    <div
+      style={{
+        border: "6px solid #f3f3f3",
+        borderTop: "6px solid #604FEB",
+        borderRadius: "50%",
+        width: "40px",
+        height: "40px",
+        animation: "spin 1s linear infinite",
+      }}
+    />
+    <style>{`
+      @keyframes spin {
+        0% { transform: rotate(0deg);}
+        100% { transform: rotate(360deg);}
+      }
+    `}</style>
+  </div>
+);
+
 export default function ClientTable() {
-  // md = 900px (Material UI padrão)
-  const isMobile = useIsMobile(900);
   const { search } = useSearch();
   const { clientes, setClientes } = useClientes();
   const { token } = useAuth();
 
+  const [loading, setLoading] = useState(true);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
 
-  // Estados para modal de edição
   const [openEditModal, setOpenEditModal] = useState(false);
   const [selectedClienteEdit, setSelectedClienteEdit] = useState(null);
 
-  // Abrir modal de deletar
+  useEffect(() => {
+    // Simula carregamento (caso useClientes já tenha os dados)
+    const timeout = setTimeout(() => {
+      setLoading(false);
+    }, 500); // Delay pequeno só para exibir o spinner
+
+    return () => clearTimeout(timeout);
+  }, [clientes]);
+
   const handleOpenDelete = (row) => {
     setSelectedRow(row);
     setOpenDeleteModal(true);
@@ -82,7 +122,6 @@ export default function ClientTable() {
         throw new Error(`Erro ao deletar cliente: status ${res.status}`);
       }
 
-      // Atualiza lista de clientes
       setClientes((prev) => prev.filter((c) => c.id !== selectedRow.id));
     } catch (error) {
       console.error("Erro ao deletar cliente:", error);
@@ -92,7 +131,6 @@ export default function ClientTable() {
     }
   };
 
-  // Abrir modal de editar
   const handleOpenEdit = (cliente) => {
     setSelectedClienteEdit(cliente);
     setOpenEditModal(true);
@@ -115,97 +153,89 @@ export default function ClientTable() {
     );
   });
 
+  if (loading) return <LoadingSpinner />;
+
   return (
     <div style={{ fontFamily: "Lato" }}>
       <div style={{ marginBottom: 16, color: "#666", fontSize: 14 }}>
         Mostrando {filteredRows.length} de {clientes.length} clientes
       </div>
 
-      {/* TABELA DESKTOP */}
-      <div className="client-table-desktop">
-        <TableContainer
-          component={Paper}
-          style={{
-            borderRadius: 14,
-            boxShadow: "0 2px 8px rgba(44,62,80,0.04)",
-            marginBottom: 32,
-          }}
-        >
-          <Table sx={{ minWidth: 900 }} aria-label="tabela de clientes">
-            <TableHead>
+      <TableContainer
+        component={Paper}
+        sx={{
+          borderRadius: 2,
+          boxShadow: "0 2px 8px rgba(44,62,80,0.04)",
+          marginBottom: 4,
+          overflowX: "auto",
+          "@media (max-width: 768px)": {
+            "& table": {
+              minWidth: "700px",
+            },
+          },
+        }}
+      >
+        <Table aria-label="tabela de clientes">
+          <TableHead>
+            <TableRow>
+              <TableCell sx={{ color: "#858B99", fontWeight: 600 }}>Nome</TableCell>
+              <TableCell sx={{ color: "#858B99", fontWeight: 600 }}>Empresa</TableCell>
+              <TableCell sx={{ color: "#858B99", fontWeight: 600 }}>Setor</TableCell>
+              <TableCell sx={{ color: "#858B99", fontWeight: 600 }}>E-mail</TableCell>
+              <TableCell sx={{ color: "#858B99", fontWeight: 600 }}>Ações</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {filteredRows.length > 0 ? (
+              filteredRows.map((row) => {
+                const initials = row.nome
+                  ? row.nome
+                      .split(" ")
+                      .map((n) => (n && n.length > 0 ? n[0] : ""))
+                      .join("")
+                      .slice(0, 2)
+                  : "??";
+
+                return (
+                  <TableRow key={row.id} hover>
+                    <TableCell>
+                      <Avatar initials={initials} />
+                      {row.nome || "-"}
+                    </TableCell>
+                    <TableCell>{row.empresa || "-"}</TableCell>
+                    <TableCell>{row.setor || "-"}</TableCell>
+                    <TableCell>{row.email || "-"}</TableCell>
+                    <TableCell>
+                      <IconButton onClick={() => handleOpenEdit(row)}>
+                        <Pencil size={18} />
+                      </IconButton>
+                      <IconButton
+                        color="error"
+                        onClick={() => handleOpenDelete(row)}
+                      >
+                        <Trash2 size={18} />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                );
+              })
+            ) : (
               <TableRow>
-                <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
-                  Nome
-                </TableCell>
-                <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
-                  Empresa
-                </TableCell>
-                <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
-                  Setor
-                </TableCell>
-                <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
-                  E-mail
-                </TableCell>
-                <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
-                  Ações
+                <TableCell
+                  colSpan={5}
+                  style={{
+                    textAlign: "center",
+                    padding: "40px",
+                    color: "#999",
+                  }}
+                >
+                  Nenhum cliente encontrado com os filtros aplicados
                 </TableCell>
               </TableRow>
-            </TableHead>
-            <TableBody>
-              {filteredRows.length > 0 ? (
-                filteredRows.map((row) => {
-                  const initials = row.nome
-                    ? row.nome
-                        .split(" ")
-                        .map((n) => (n && n.length > 0 ? n[0] : ""))
-                        .join("")
-                        .slice(0, 2)
-                    : "??";
-
-                  return (
-                    <TableRow key={row.id} hover>
-                      <TableCell>
-                        <Avatar initials={initials} />
-                        {row.nome || "-"}
-                      </TableCell>
-                      <TableCell>{row.empresa || "-"}</TableCell>
-                      <TableCell>{row.setor || "-"}</TableCell>
-                      <TableCell>{row.email || "-"}</TableCell>
-                      <TableCell>
-                        {/* Botão para editar */}
-                        <IconButton onClick={() => handleOpenEdit(row)}>
-                          <Pencil size={18} />
-                        </IconButton>
-
-                        {/* Botão para deletar */}
-                        <IconButton
-                          color="error"
-                          onClick={() => handleOpenDelete(row)}
-                        >
-                          <Trash2 size={18} />
-                        </IconButton>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })
-              ) : (
-                <TableRow>
-                  <TableCell
-                    colSpan={5}
-                    style={{
-                      textAlign: "center",
-                      padding: "40px",
-                      color: "#999",
-                    }}
-                  >
-                    Nenhum cliente encontrado com os filtros aplicados
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </div>
+            )}
+          </TableBody>
+        </Table>
+      </TableContainer>
 
       {/* Modal de deletar */}
       <DeletarPerfil

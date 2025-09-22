@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useTecnicos } from "../context/TecnicosContext";
+import { useSearch } from "../context/search-context";
+import useIsMobile from "../hooks/useIsMobile";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -10,11 +12,45 @@ import Paper from "@mui/material/Paper";
 import IconButton from "@mui/material/IconButton";
 import { Pencil, Trash2 } from "lucide-react";
 import { DeletarPerfil } from "./Modals/DeletarPerfil";
-import { useSearch } from "../context/search-context";
-import EditTicketModal from "./Modals/EditarChamado";
-import useIsMobile from "../hooks/useIsMobile";
+import { ModalEditarTecnico } from "./Modals/EditarTecnico";  
 import "../styles/tables/listTable.scss";
 
+// Spinner component
+const LoadingSpinner = () => (
+  <div
+    style={{
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      height: "100vh",
+      width: "100vw",
+      position: "fixed",
+      top: 0,
+      left: 0,
+      backgroundColor: "rgba(255, 255, 255, 0.7)",
+      zIndex: 9999,
+    }}
+  >
+    <div
+      style={{
+        border: "6px solid #f3f3f3",
+        borderTop: "6px solid #604FEB",
+        borderRadius: "50%",
+        width: "40px",
+        height: "40px",
+        animation: "spin 1s linear infinite",
+      }}
+    />
+    <style>{`
+      @keyframes spin {
+        0% { transform: rotate(0deg);}
+        100% { transform: rotate(360deg);}
+      }
+    `}</style>
+  </div>
+);
+
+// Avatar com iniciais
 function Avatar({ initials }) {
   return (
     <span
@@ -38,17 +74,38 @@ function Avatar({ initials }) {
 }
 
 export default function TechnicianTable() {
-  // md = 900px (Material UI padrão)
   const isMobile = useIsMobile(900);
   const { search } = useSearch();
   const { tecnicos, deleteTecnico } = useTecnicos();
 
+  const [loading, setLoading] = useState(true);
+
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
 
-  // Novo estado para abrir modal de edição
   const [openEditModal, setOpenEditModal] = useState(false);
   const [selectedTecnicoEdit, setSelectedTecnicoEdit] = useState(null);
+
+  // Quando tecnicos muda, parar o loading
+  useEffect(() => {
+    if (tecnicos && Array.isArray(tecnicos)) {
+      // você pode ajustar esse timeout ou removê-lo
+      const timer = setTimeout(() => {
+        setLoading(false);
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [tecnicos]);
+
+  const handleOpenEdit = (tecnico) => {
+    setSelectedTecnicoEdit(tecnico);
+    setOpenEditModal(true);
+  };
+
+  const handleCloseEdit = () => {
+    setSelectedTecnicoEdit(null);
+    setOpenEditModal(false);
+  };
 
   const handleOpenDelete = (row) => {
     setSelectedRow(row);
@@ -62,36 +119,32 @@ export default function TechnicianTable() {
 
   const handleDeleteConfirmed = async (id) => {
     if (!id) {
-      alert("Usuário não identificado.");
+      alert("Usuário não identificado para deleção.");
       return;
     }
-
     try {
       await deleteTecnico(id);
-      handleCloseDelete();
     } catch (error) {
+      console.error("Erro ao deletar técnico:", error);
       alert("Erro ao deletar técnico: " + error.message);
+    } finally {
+      handleCloseDelete();
     }
   };
 
-  // Abrir modal de editar técnico
-  const handleOpenEdit = (tecnico) => {
-    setSelectedTecnicoEdit(tecnico);
-    setOpenEditModal(true);
-  };
-
-  const handleCloseEdit = () => {
-    setSelectedTecnicoEdit(null);
-    setOpenEditModal(false);
-  };
-
-  const filteredRows = tecnicos.filter(
-    (row) =>
+  const filteredRows = tecnicos.filter((row) => {
+    const term = search.toLowerCase();
+    return (
       search === "" ||
-      (row.nome && row.nome.toLowerCase().includes(search.toLowerCase())) ||
-      (row.cargo && row.cargo.toLowerCase().includes(search.toLowerCase())) ||
-      (row.email && row.email.toLowerCase().includes(search.toLowerCase()))
-  );
+      (row.nome && row.nome.toLowerCase().includes(term)) ||
+      (row.cargo && row.cargo.toLowerCase().includes(term)) ||
+      (row.email && row.email.toLowerCase().includes(term))
+    );
+  });
+
+  if (loading) {
+    return <LoadingSpinner />;
+  }
 
   return (
     <div style={{ fontFamily: "Lato" }}>
@@ -129,7 +182,7 @@ export default function TechnicianTable() {
             <TableBody>
               {filteredRows.length > 0 ? (
                 filteredRows.map((row) => (
-                  <TableRow key={row.id}>
+                  <TableRow key={row.id} hover>
                     <TableCell>
                       <Avatar
                         initials={
@@ -147,12 +200,20 @@ export default function TechnicianTable() {
                     <TableCell>{row.cargo || "-"}</TableCell>
                     <TableCell>{row.email || "-"}</TableCell>
                     <TableCell>
-                      <IconButton onClick={() => handleOpenEdit(row)}>
+                      <IconButton
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenEdit(row);
+                        }}
+                      >
                         <Pencil size={18} />
                       </IconButton>
                       <IconButton
                         color="error"
-                        onClick={() => handleOpenDelete(row)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenDelete(row);
+                        }}
                       >
                         <Trash2 size={18} />
                       </IconButton>
@@ -178,7 +239,7 @@ export default function TechnicianTable() {
         </TableContainer>
       </div>
 
-      {/* CARDS MOBILE */}
+      {/* MOBILE CARDS */}
       <div className="client-table-mobile">
         {filteredRows.length > 0 ? (
           filteredRows.map((row) => {
@@ -204,12 +265,20 @@ export default function TechnicianTable() {
                   </div>
                 </div>
                 <div className="client-card-actions">
-                  <IconButton onClick={() => handleOpenEdit(row)}>
+                  <IconButton
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleOpenEdit(row);
+                    }}
+                  >
                     <Pencil size={18} />
                   </IconButton>
                   <IconButton
                     color="error"
-                    onClick={() => handleOpenDelete(row)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleOpenDelete(row);
+                    }}
                   >
                     <Trash2 size={18} />
                   </IconButton>
@@ -224,6 +293,7 @@ export default function TechnicianTable() {
         )}
       </div>
 
+      {/* Modal de deleção */}
       <DeletarPerfil
         isOpen={openDeleteModal}
         onClose={handleCloseDelete}
@@ -232,7 +302,7 @@ export default function TechnicianTable() {
       />
 
       {/* Modal de edição */}
-      <EditTicketModal
+      <ModalEditarTecnico
         isOpen={openEditModal}
         onClose={handleCloseEdit}
         tecnico={selectedTecnicoEdit}
