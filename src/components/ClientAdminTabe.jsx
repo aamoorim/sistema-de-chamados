@@ -1,4 +1,3 @@
-
 import { useSearch } from "../context/search-context";
 import { useClientes } from "../context/ClientesContext";
 import { useAuth } from "../context/auth-context";
@@ -14,7 +13,6 @@ import { Pencil, Trash2 } from "lucide-react";
 import { DeletarPerfil } from "./Modals/DeletarPerfil";
 import { ModalEditarCliente } from "./Modals/EditarCliente";
 import { useState } from "react";
-import EditTicketModal from "./Modals/EditarChamado";
 import useIsMobile from "../hooks/useIsMobile";
 import "../styles/tables/clientTable.scss";
 
@@ -164,49 +162,50 @@ export default function ClientTable() {
                         .slice(0, 2)
                     : "??";
 
-                return (
-                  <TableRow key={row.id} hover>
-                    <TableCell>
-                      <Avatar initials={initials} />
-                      {row.nome || "-"}
-                    </TableCell>
-                    <TableCell>{row.empresa || "-"}</TableCell>
-                    <TableCell>{row.setor || "-"}</TableCell>
-                    <TableCell>{row.email || "-"}</TableCell>
-                    <TableCell>
-                      {/* Botão para editar */}
-                      <IconButton onClick={() => handleOpenEdit(row)}>
-                        <Pencil size={18} />
-                      </IconButton>
+                  return (
+                    <TableRow key={row.id} hover>
+                      <TableCell>
+                        <Avatar initials={initials} />
+                        {row.nome || "-"}
+                      </TableCell>
+                      <TableCell>{row.empresa || "-"}</TableCell>
+                      <TableCell>{row.setor || "-"}</TableCell>
+                      <TableCell>{row.email || "-"}</TableCell>
+                      <TableCell>
+                        {/* Botão para editar */}
+                        <IconButton onClick={() => handleOpenEdit(row)}>
+                          <Pencil size={18} />
+                        </IconButton>
 
-                      {/* Botão para deletar */}
-                      <IconButton
-                        color="error"
-                        onClick={() => handleOpenDelete(row)}
-                      >
-                        <Trash2 size={18} />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                );
-              })
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={5}
-                  style={{
-                    textAlign: "center",
-                    padding: "40px",
-                    color: "#999",
-                  }}
-                >
-                  Nenhum cliente encontrado com os filtros aplicados
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
+                        {/* Botão para deletar */}
+                        <IconButton
+                          color="error"
+                          onClick={() => handleOpenDelete(row)}
+                        >
+                          <Trash2 size={18} />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={5}
+                    style={{
+                      textAlign: "center",
+                      padding: "40px",
+                      color: "#999",
+                    }}
+                  >
+                    Nenhum cliente encontrado com os filtros aplicados
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </div>
 
       {/* Modal de deletar */}
       <DeletarPerfil
