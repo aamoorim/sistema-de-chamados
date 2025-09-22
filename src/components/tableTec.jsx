@@ -14,6 +14,8 @@ import {
 import { ClipboardList } from "lucide-react";
 import { ChamadosAbertosTecnicosContext } from "../context/ChamadosAbertosTecnicosContext";
 import ModalAtenderChamado from "./Modals/AtenderChamado";
+import useIsMobile from "../hooks/useIsMobile";
+import "../styles/tables/listTable.scss";
 
 const LoadingSpinner = () => (
   <div
@@ -54,6 +56,7 @@ export default function ListTableTec() {
 
   const [open, setOpen] = useState(false);
   const [selectedChamado, setSelectedChamado] = useState(null);
+  const isMobile = useIsMobile(900);
 
   const handleOpenModal = (chamado) => {
     const chamadoFormatado = {

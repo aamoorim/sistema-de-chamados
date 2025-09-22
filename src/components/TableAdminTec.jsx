@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useTecnicos } from "../context/TecnicosContext";
+import { useSearch } from "../context/search-context";
+import useIsMobile from "../hooks/useIsMobile";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -10,9 +12,45 @@ import Paper from "@mui/material/Paper";
 import IconButton from "@mui/material/IconButton";
 import { Pencil, Trash2 } from "lucide-react";
 import { DeletarPerfil } from "./Modals/DeletarPerfil";
-import { useSearch } from "../context/search-context";
-import { ModalEditarTecnico } from "./Modals/EditarTecnico";
+import { ModalEditarTecnico } from "./Modals/EditarTecnico";  
+import "../styles/tables/listTable.scss";
 
+// Spinner component
+const LoadingSpinner = () => (
+  <div
+    style={{
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      height: "100vh",
+      width: "100vw",
+      position: "fixed",
+      top: 0,
+      left: 0,
+      backgroundColor: "rgba(255, 255, 255, 0.7)",
+      zIndex: 9999,
+    }}
+  >
+    <div
+      style={{
+        border: "6px solid #f3f3f3",
+        borderTop: "6px solid #604FEB",
+        borderRadius: "50%",
+        width: "40px",
+        height: "40px",
+        animation: "spin 1s linear infinite",
+      }}
+    />
+    <style>{`
+      @keyframes spin {
+        0% { transform: rotate(0deg);}
+        100% { transform: rotate(360deg);}
+      }
+    `}</style>
+  </div>
+);
+
+// Avatar com iniciais
 function Avatar({ initials }) {
   return (
     <span
@@ -36,15 +74,38 @@ function Avatar({ initials }) {
 }
 
 export default function TechnicianTable() {
+  const isMobile = useIsMobile(900);
   const { search } = useSearch();
   const { tecnicos, deleteTecnico } = useTecnicos();
+
+  const [loading, setLoading] = useState(true);
 
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
 
-  // Estados para modal de edição
   const [openEditModal, setOpenEditModal] = useState(false);
   const [selectedTecnicoEdit, setSelectedTecnicoEdit] = useState(null);
+
+  // Quando tecnicos muda, parar o loading
+  useEffect(() => {
+    if (tecnicos && Array.isArray(tecnicos)) {
+      // você pode ajustar esse timeout ou removê-lo
+      const timer = setTimeout(() => {
+        setLoading(false);
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [tecnicos]);
+
+  const handleOpenEdit = (tecnico) => {
+    setSelectedTecnicoEdit(tecnico);
+    setOpenEditModal(true);
+  };
+
+  const handleCloseEdit = () => {
+    setSelectedTecnicoEdit(null);
+    setOpenEditModal(false);
+  };
 
   const handleOpenDelete = (row) => {
     setSelectedRow(row);
@@ -57,37 +118,40 @@ export default function TechnicianTable() {
   };
 
   const handleDeleteConfirmed = async (id) => {
-    if (!id) {
-      alert("Usuário não identificado.");
-      return;
-    }
+  if (!id) {
+    alert("Usuário não identificado.");
+    return;
+  }
 
-    try {
-      await deleteTecnico(id);
-      handleCloseDelete();
-    } catch (error) {
-      alert("Erro ao deletar técnico: " + error.message);
-    }
-  };
+  try {
+    await deleteTecnico(id);
+    handleCloseDelete();
+  } catch (error) {
+    console.error("Erro ao deletar técnico:", error);
 
-  // Abrir modal de editar técnico
-  const handleOpenEdit = (tecnico) => {
-    setSelectedTecnicoEdit(tecnico);
-    setOpenEditModal(true);
-  };
+    const apiMessage =
+      error.response?.data?.erro || // API personalizada
+      error.response?.data?.message || // fallback padrão
+      error.message;
 
-  const handleCloseEdit = () => {
-    setSelectedTecnicoEdit(null);
-    setOpenEditModal(false);
-  };
+    alert(`Erro ao deletar técnico: ${apiMessage}`);
+  }
+};
 
-  const filteredRows = tecnicos.filter(
-    (row) =>
+
+  const filteredRows = tecnicos.filter((row) => {
+    const term = search.toLowerCase();
+    return (
       search === "" ||
-      (row.nome && row.nome.toLowerCase().includes(search.toLowerCase())) ||
-      (row.cargo && row.cargo.toLowerCase().includes(search.toLowerCase())) ||
-      (row.email && row.email.toLowerCase().includes(search.toLowerCase()))
-  );
+      (row.nome && row.nome.toLowerCase().includes(term)) ||
+      (row.cargo && row.cargo.toLowerCase().includes(term)) ||
+      (row.email && row.email.toLowerCase().includes(term))
+    );
+  });
+
+  if (loading) {
+    return <LoadingSpinner />;
+  }
 
   return (
     <div style={{ fontFamily: "Lato" }}>
@@ -95,88 +159,148 @@ export default function TechnicianTable() {
         Mostrando {filteredRows.length} de {tecnicos.length} técnicos
       </div>
 
-      <TableContainer
-        component={Paper}
-        sx={{
-          borderRadius: 2,
-          boxShadow: "0 2px 8px rgba(44,62,80,0.04)",
-          marginBottom: 4,
-          overflowX: "auto", // 🔑 habilita scroll horizontal em telas pequenas
-          "@media (max-width: 768px)": {
-            "& table": {
-              minWidth: "600px", // largura mínima para rolagem em mobile
-            },
-          },
-        }}
-      >
-        <Table aria-label="tabela de técnicos">
-          <TableHead>
-            <TableRow>
-              <TableCell sx={{ color: "#858B99", fontWeight: 600 }}>
-                Nome
-              </TableCell>
-              <TableCell sx={{ color: "#858B99", fontWeight: 600 }}>
-                Cargo
-              </TableCell>
-              <TableCell sx={{ color: "#858B99", fontWeight: 600 }}>
-                E-mail
-              </TableCell>
-              <TableCell sx={{ color: "#858B99", fontWeight: 600 }}>
-                Ações
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {filteredRows.length > 0 ? (
-              filteredRows.map((row) => (
-                <TableRow key={row.id} hover>
-                  <TableCell>
-                    <Avatar
-                      initials={
-                        row.nome
-                          ? row.nome
-                              .split(" ")
-                              .map((n) => n[0])
-                              .join("")
-                              .slice(0, 2)
-                          : "??"
-                      }
-                    />
-                    {row.nome || "-"}
-                  </TableCell>
-                  <TableCell>{row.cargo || "-"}</TableCell>
-                  <TableCell>{row.email || "-"}</TableCell>
-                  <TableCell>
-                    <IconButton onClick={() => handleOpenEdit(row)}>
-                      <Pencil size={18} />
-                    </IconButton>
-                    <IconButton
-                      color="error"
-                      onClick={() => handleOpenDelete(row)}
-                    >
-                      <Trash2 size={18} />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))
-            ) : (
+      {/* TABELA DESKTOP */}
+      <div className="client-table-desktop">
+        <TableContainer
+          component={Paper}
+          style={{
+            borderRadius: 14,
+            boxShadow: "0 2px 8px rgba(44,62,80,0.04)",
+            marginBottom: 32,
+          }}
+        >
+          <Table sx={{ minWidth: 900 }} aria-label="tabela de técnicos">
+            <TableHead>
               <TableRow>
-                <TableCell
-                  colSpan={4}
-                  style={{
-                    textAlign: "center",
-                    padding: "40px",
-                    color: "#999",
-                  }}
-                >
-                  Nenhum técnico encontrado com os filtros aplicados
+                <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
+                  Nome
+                </TableCell>
+                <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
+                  Cargo
+                </TableCell>
+                <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
+                  E-mail
+                </TableCell>
+                <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
+                  Ações
                 </TableCell>
               </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
+            </TableHead>
+            <TableBody>
+              {filteredRows.length > 0 ? (
+                filteredRows.map((row) => (
+                  <TableRow key={row.id} hover>
+                    <TableCell>
+                      <Avatar
+                        initials={
+                          row.nome
+                            ? row.nome
+                                .split(" ")
+                                .map((n) => n[0])
+                                .join("")
+                                .slice(0, 2)
+                            : "??"
+                        }
+                      />
+                      {row.nome || "-"}
+                    </TableCell>
+                    <TableCell>{row.cargo || "-"}</TableCell>
+                    <TableCell>{row.email || "-"}</TableCell>
+                    <TableCell>
+                      <IconButton
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenEdit(row);
+                        }}
+                      >
+                        <Pencil size={18} />
+                      </IconButton>
+                      <IconButton
+                        color="error"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenDelete(row);
+                        }}
+                      >
+                        <Trash2 size={18} />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={4}
+                    style={{
+                      textAlign: "center",
+                      padding: "40px",
+                      color: "#999",
+                    }}
+                  >
+                    Nenhum técnico encontrado com os filtros aplicados
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </div>
 
+      {/* MOBILE CARDS */}
+      <div className="client-table-mobile">
+        {filteredRows.length > 0 ? (
+          filteredRows.map((row) => {
+            const initials = row.nome
+              ? row.nome
+                  .split(" ")
+                  .map((n) => (n && n.length > 0 ? n[0] : ""))
+                  .join("")
+                  .slice(0, 2)
+              : "??";
+            return (
+              <div className="client-card" key={row.id}>
+                <div className="client-card-header">
+                  <Avatar initials={initials} />
+                  <div className="client-card-title">{row.nome || "-"}</div>
+                </div>
+                <div className="client-card-info">
+                  <div>
+                    <b>Cargo:</b> {row.cargo || "-"}
+                  </div>
+                  <div>
+                    <b>E-mail:</b> {row.email || "-"}
+                  </div>
+                </div>
+                <div className="client-card-actions">
+                  <IconButton
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleOpenEdit(row);
+                    }}
+                  >
+                    <Pencil size={18} />
+                  </IconButton>
+                  <IconButton
+                    color="error"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleOpenDelete(row);
+                    }}
+                  >
+                    <Trash2 size={18} />
+                  </IconButton>
+                </div>
+              </div>
+            );
+          })
+        ) : (
+          <div className="client-card-empty">
+            Nenhum técnico encontrado com os filtros aplicados
+          </div>
+        )}
+      </div>
+
+      {/* Modal de deleção */}
       <DeletarPerfil
         isOpen={openDeleteModal}
         onClose={handleCloseDelete}
