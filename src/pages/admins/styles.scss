@@ -95,7 +95,6 @@
 .header-admin {
   display: flex;
   align-items: center; /* Garante alinhamento vertical */
-  gap: 270px; /* Aumentei o gap para melhor espaçamento */
   width: 100%;
   margin-bottom: 24px; /* Adiciona espaçamento inferior consistente */
   
@@ -112,6 +111,16 @@
     min-width: 44px;
     padding: 8px 12px;
     border-radius: 12px; /* Combina com o input */
+  }
+
+  @media (max-width: 980px) {
+    flex-direction: column;   /* SearchBar em cima, botão embaixo */
+    align-items: stretch;     /* botão ocupa largura total */
+    
+    .botao {
+      margin-top: 8px;        /* espaço entre search e botão */
+      width: 100%;            /* botão responsivo */
+    }
   }
 }
 

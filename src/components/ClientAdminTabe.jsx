@@ -13,7 +13,8 @@ import { Pencil, Trash2 } from "lucide-react";
 import { DeletarPerfil } from "./Modals/DeletarPerfil";
 import { ModalEditarCliente } from "./Modals/EditarCliente";
 import { useState, useEffect } from "react";
-
+import useIsMobile from "../hooks/useIsMobile";
+import "../styles/tables/clientTable.scss"
 // Avatar com iniciais
 function Avatar({ initials }) {
   return (
@@ -73,6 +74,7 @@ const LoadingSpinner = () => (
 );
 
 export default function ClientTable() {
+  const isMobile = useIsMobile(1200);
   const { search } = useSearch();
   const { clientes, setClientes } = useClientes();
   const { token } = useAuth();
@@ -161,7 +163,29 @@ export default function ClientTable() {
         Mostrando {filteredRows.length} de {clientes.length} clientes
       </div>
 
-      <TableContainer
+      
+
+{isMobile ? (
+  <div className="client-table-mobile">
+    {filteredRows.map((row) => (
+      <div key={row.id} className="client-card">
+        <div><b>Nome:</b> {row.nome}</div>
+        <div><b>Empresa:</b> {row.empresa}</div>
+        <div><b>Setor:</b> {row.setor}</div>
+        <div><b>Email:</b> {row.email}</div>
+        <div className="actions">
+          <IconButton onClick={() => handleOpenEdit(row)}>
+            <Pencil size={18} />
+          </IconButton>
+          <IconButton color="error" onClick={() => handleOpenDelete(row)}>
+            <Trash2 size={18} />
+          </IconButton>
+        </div>
+      </div>
+    ))}
+  </div>
+) : (
+  <TableContainer
         component={Paper}
         sx={{
           borderRadius: 2,
@@ -236,6 +260,7 @@ export default function ClientTable() {
           </TableBody>
         </Table>
       </TableContainer>
+)}
 
       {/* Modal de deletar */}
       <DeletarPerfil

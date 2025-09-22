@@ -20,6 +20,7 @@ import chamadosService from "../services/chamadosService";
 import { useSearch } from "../context/search-context";
 import StatusChip from "./StatusChip";
 import { useTheme } from "@emotion/react";
+import useIsMobile from "../hooks/useIsMobile";
 
 // Avatar com iniciais
 function AvatarInitials({ name }) {
@@ -90,7 +91,7 @@ const LoadingSpinner = () => (
 
 export default function ListTable() {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("md")); // telas menores que 600px
+  const isMobile = useIsMobile(1200); // telas menores que 600px
 
   const { search, filters } = useSearch();
   const [rows, setRows] = useState([]);

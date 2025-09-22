@@ -15,7 +15,30 @@ import { DeletarPerfil } from "./Modals/DeletarPerfil";
 import { ModalEditarTecnico } from "./Modals/EditarTecnico";  
 import "../styles/tables/listTable.scss";
 
-// Spinner component
+// Avatar com iniciais
+function Avatar({ initials }) {
+  return (
+    <span
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+        width: 28,
+        height: 28,
+        borderRadius: "50%",
+        background: "#2E3DA3",
+        color: "#fff",
+        fontWeight: 600,
+        fontSize: 14,
+        marginRight: 8,
+      }}
+    >
+      {initials}
+    </span>
+  );
+}
+
+// Spinner
 const LoadingSpinner = () => (
   <div
     style={{
@@ -50,62 +73,21 @@ const LoadingSpinner = () => (
   </div>
 );
 
-// Avatar com iniciais
-function Avatar({ initials }) {
-  return (
-    <span
-      style={{
-        display: "inline-flex",
-        alignItems: "center",
-        justifyContent: "center",
-        width: 28,
-        height: 28,
-        borderRadius: "50%",
-        background: "#2E3DA3",
-        color: "#fff",
-        fontWeight: 600,
-        fontSize: 14,
-        marginRight: 8,
-      }}
-    >
-      {initials}
-    </span>
-  );
-}
-
 export default function TechnicianTable() {
-  const isMobile = useIsMobile(900);
+  const isMobile = useIsMobile(1200);
   const { search } = useSearch();
   const { tecnicos, deleteTecnico } = useTecnicos();
 
   const [loading, setLoading] = useState(true);
-
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
-
   const [openEditModal, setOpenEditModal] = useState(false);
   const [selectedTecnicoEdit, setSelectedTecnicoEdit] = useState(null);
 
-  // Quando tecnicos muda, parar o loading
   useEffect(() => {
-    if (tecnicos && Array.isArray(tecnicos)) {
-      // você pode ajustar esse timeout ou removê-lo
-      const timer = setTimeout(() => {
-        setLoading(false);
-      }, 300);
-      return () => clearTimeout(timer);
-    }
+    const timeout = setTimeout(() => setLoading(false), 500);
+    return () => clearTimeout(timeout);
   }, [tecnicos]);
-
-  const handleOpenEdit = (tecnico) => {
-    setSelectedTecnicoEdit(tecnico);
-    setOpenEditModal(true);
-  };
-
-  const handleCloseEdit = () => {
-    setSelectedTecnicoEdit(null);
-    setOpenEditModal(false);
-  };
 
   const handleOpenDelete = (row) => {
     setSelectedRow(row);
@@ -117,29 +99,30 @@ export default function TechnicianTable() {
     setOpenDeleteModal(false);
   };
 
-  const handleDeleteConfirmed = async (id) => {
-  if (!id) {
-    alert("Usuário não identificado.");
-    return;
-  }
+  const handleDeleteConfirmed = async () => {
+    if (!selectedRow) return;
+    try {
+      await deleteTecnico(selectedRow.id);
+    } catch (error) {
+      console.error("Erro ao deletar técnico:", error);
+      alert("Não foi possível deletar técnico.");
+    } finally {
+      handleCloseDelete();
+    }
+  };
 
-  try {
-    await deleteTecnico(id);
-    handleCloseDelete();
-  } catch (error) {
-    console.error("Erro ao deletar técnico:", error);
+  const handleOpenEdit = (tecnico) => {
+    setSelectedTecnicoEdit(tecnico);
+    setOpenEditModal(true);
+  };
 
-    const apiMessage =
-      error.response?.data?.erro || // API personalizada
-      error.response?.data?.message || // fallback padrão
-      error.message;
-
-    alert(`Erro ao deletar técnico: ${apiMessage}`);
-  }
-};
-
+  const handleCloseEdit = () => {
+    setSelectedTecnicoEdit(null);
+    setOpenEditModal(false);
+  };
 
   const filteredRows = tecnicos.filter((row) => {
+    if (!row) return false;
     const term = search.toLowerCase();
     return (
       search === "" ||
@@ -149,9 +132,7 @@ export default function TechnicianTable() {
     );
   });
 
-  if (loading) {
-    return <LoadingSpinner />;
-  }
+  if (loading) return <LoadingSpinner />;
 
   return (
     <div style={{ fontFamily: "Lato" }}>
@@ -159,83 +140,86 @@ export default function TechnicianTable() {
         Mostrando {filteredRows.length} de {tecnicos.length} técnicos
       </div>
 
-      {/* TABELA DESKTOP */}
-      <div className="client-table-desktop">
+      {isMobile ? (
+        <div className="client-table-mobile">
+          {filteredRows.length > 0 ? (
+            filteredRows.map((row) => (
+              <div key={row.id} className="client-card">
+                <div><b>Nome:</b> {row.nome}</div>
+                <div><b>Cargo:</b> {row.cargo}</div>
+                <div><b>Email:</b> {row.email}</div>
+                <div className="actions">
+                  <IconButton onClick={() => handleOpenEdit(row)}>
+                    <Pencil size={18} />
+                  </IconButton>
+                  <IconButton color="error" onClick={() => handleOpenDelete(row)}>
+                    <Trash2 size={18} />
+                  </IconButton>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="client-card-empty">
+              Nenhum técnico encontrado com os filtros aplicados
+            </div>
+          )}
+        </div>
+      ) : (
         <TableContainer
           component={Paper}
-          style={{
-            borderRadius: 14,
+          sx={{
+            borderRadius: 2,
             boxShadow: "0 2px 8px rgba(44,62,80,0.04)",
-            marginBottom: 32,
+            marginBottom: 4,
+            overflowX: "auto",
+            "@media (max-width: 768px)": {
+              "& table": { minWidth: "700px" },
+            },
           }}
         >
-          <Table sx={{ minWidth: 900 }} aria-label="tabela de técnicos">
+          <Table aria-label="tabela de técnicos">
             <TableHead>
               <TableRow>
-                <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
-                  Nome
-                </TableCell>
-                <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
-                  Cargo
-                </TableCell>
-                <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
-                  E-mail
-                </TableCell>
-                <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
-                  Ações
-                </TableCell>
+                <TableCell sx={{ color: "#858B99", fontWeight: 600 }}>Nome</TableCell>
+                <TableCell sx={{ color: "#858B99", fontWeight: 600 }}>Cargo</TableCell>
+                <TableCell sx={{ color: "#858B99", fontWeight: 600 }}>E-mail</TableCell>
+                <TableCell sx={{ color: "#858B99", fontWeight: 600 }}>Ações</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {filteredRows.length > 0 ? (
-                filteredRows.map((row) => (
-                  <TableRow key={row.id} hover>
-                    <TableCell>
-                      <Avatar
-                        initials={
-                          row.nome
-                            ? row.nome
-                                .split(" ")
-                                .map((n) => n[0])
-                                .join("")
-                                .slice(0, 2)
-                            : "??"
-                        }
-                      />
-                      {row.nome || "-"}
-                    </TableCell>
-                    <TableCell>{row.cargo || "-"}</TableCell>
-                    <TableCell>{row.email || "-"}</TableCell>
-                    <TableCell>
-                      <IconButton
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleOpenEdit(row);
-                        }}
-                      >
-                        <Pencil size={18} />
-                      </IconButton>
-                      <IconButton
-                        color="error"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleOpenDelete(row);
-                        }}
-                      >
-                        <Trash2 size={18} />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                ))
+                filteredRows.map((row) => {
+                  const initials = row.nome
+                    ? row.nome
+                        .split(" ")
+                        .map((n) => (n && n.length > 0 ? n[0] : ""))
+                        .join("")
+                        .slice(0, 2)
+                    : "??";
+                  return (
+                    <TableRow key={row.id} hover>
+                      <TableCell>
+                        <Avatar initials={initials} />
+                        {row.nome || "-"}
+                      </TableCell>
+                      <TableCell>{row.cargo || "-"}</TableCell>
+                      <TableCell>{row.email || "-"}</TableCell>
+                      <TableCell>
+                        <IconButton onClick={() => handleOpenEdit(row)}>
+                          <Pencil size={18} />
+                        </IconButton>
+                        <IconButton color="error" onClick={() => handleOpenDelete(row)}>
+                          <Trash2 size={18} />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
               ) : (
                 <TableRow>
                   <TableCell
                     colSpan={4}
-                    style={{
-                      textAlign: "center",
-                      padding: "40px",
-                      color: "#999",
-                    }}
+                    style={{ textAlign: "center", padding: "40px", color: "#999" }}
                   >
                     Nenhum técnico encontrado com os filtros aplicados
                   </TableCell>
@@ -244,71 +228,15 @@ export default function TechnicianTable() {
             </TableBody>
           </Table>
         </TableContainer>
-      </div>
+      )}
 
-      {/* MOBILE CARDS */}
-      <div className="client-table-mobile">
-        {filteredRows.length > 0 ? (
-          filteredRows.map((row) => {
-            const initials = row.nome
-              ? row.nome
-                  .split(" ")
-                  .map((n) => (n && n.length > 0 ? n[0] : ""))
-                  .join("")
-                  .slice(0, 2)
-              : "??";
-            return (
-              <div className="client-card" key={row.id}>
-                <div className="client-card-header">
-                  <Avatar initials={initials} />
-                  <div className="client-card-title">{row.nome || "-"}</div>
-                </div>
-                <div className="client-card-info">
-                  <div>
-                    <b>Cargo:</b> {row.cargo || "-"}
-                  </div>
-                  <div>
-                    <b>E-mail:</b> {row.email || "-"}
-                  </div>
-                </div>
-                <div className="client-card-actions">
-                  <IconButton
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleOpenEdit(row);
-                    }}
-                  >
-                    <Pencil size={18} />
-                  </IconButton>
-                  <IconButton
-                    color="error"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleOpenDelete(row);
-                    }}
-                  >
-                    <Trash2 size={18} />
-                  </IconButton>
-                </div>
-              </div>
-            );
-          })
-        ) : (
-          <div className="client-card-empty">
-            Nenhum técnico encontrado com os filtros aplicados
-          </div>
-        )}
-      </div>
-
-      {/* Modal de deleção */}
       <DeletarPerfil
         isOpen={openDeleteModal}
         onClose={handleCloseDelete}
-        onDelete={() => handleDeleteConfirmed(selectedRow?.id)}
+        onDelete={handleDeleteConfirmed}
         usuario={selectedRow}
       />
 
-      {/* Modal de edição */}
       <ModalEditarTecnico
         isOpen={openEditModal}
         onClose={handleCloseEdit}
