@@ -14,6 +14,9 @@ import { Pencil, Trash2 } from "lucide-react";
 import { DeletarPerfil } from "./Modals/DeletarPerfil";
 import { ModalEditarCliente } from "./Modals/EditarCliente";
 import { useState } from "react";
+import EditTicketModal from "./Modals/EditarChamado";
+import useIsMobile from "../hooks/useIsMobile";
+import "../styles/tables/clientTable.scss";
 
 function Avatar({ initials }) {
   return (
@@ -38,6 +41,8 @@ function Avatar({ initials }) {
 }
 
 export default function ClientTable() {
+  // md = 900px (Material UI padrão)
+  const isMobile = useIsMobile(900);
   const { search } = useSearch();
   const { clientes, setClientes } = useClientes();
   const { token } = useAuth();
@@ -118,40 +123,46 @@ export default function ClientTable() {
         Mostrando {filteredRows.length} de {clientes.length} clientes
       </div>
 
-      <TableContainer
-        component={Paper}
-        sx={{
-          borderRadius: 2,
-          boxShadow: "0 2px 8px rgba(44,62,80,0.04)",
-          marginBottom: 4,
-          overflowX: "auto", // 🔑 rolagem horizontal em telas pequenas
-          "@media (max-width: 768px)": {
-            "& table": {
-              minWidth: "700px", // 🔑 largura mínima para mobile
-            },
-          },
-        }}
-      >
-        <Table aria-label="tabela de clientes">
-          <TableHead>
-            <TableRow>
-              <TableCell sx={{ color: "#858B99", fontWeight: 600 }}>Nome</TableCell>
-              <TableCell sx={{ color: "#858B99", fontWeight: 600 }}>Empresa</TableCell>
-              <TableCell sx={{ color: "#858B99", fontWeight: 600 }}>Setor</TableCell>
-              <TableCell sx={{ color: "#858B99", fontWeight: 600 }}>E-mail</TableCell>
-              <TableCell sx={{ color: "#858B99", fontWeight: 600 }}>Ações</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {filteredRows.length > 0 ? (
-              filteredRows.map((row) => {
-                const initials = row.nome
-                  ? row.nome
-                      .split(" ")
-                      .map((n) => (n && n.length > 0 ? n[0] : ""))
-                      .join("")
-                      .slice(0, 2)
-                  : "??";
+      {/* TABELA DESKTOP */}
+      <div className="client-table-desktop">
+        <TableContainer
+          component={Paper}
+          style={{
+            borderRadius: 14,
+            boxShadow: "0 2px 8px rgba(44,62,80,0.04)",
+            marginBottom: 32,
+          }}
+        >
+          <Table sx={{ minWidth: 900 }} aria-label="tabela de clientes">
+            <TableHead>
+              <TableRow>
+                <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
+                  Nome
+                </TableCell>
+                <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
+                  Empresa
+                </TableCell>
+                <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
+                  Setor
+                </TableCell>
+                <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
+                  E-mail
+                </TableCell>
+                <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
+                  Ações
+                </TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {filteredRows.length > 0 ? (
+                filteredRows.map((row) => {
+                  const initials = row.nome
+                    ? row.nome
+                        .split(" ")
+                        .map((n) => (n && n.length > 0 ? n[0] : ""))
+                        .join("")
+                        .slice(0, 2)
+                    : "??";
 
                 return (
                   <TableRow key={row.id} hover>

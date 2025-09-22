@@ -1,15 +1,15 @@
 // ========================================
 // VARIÁVEIS
 // ========================================
-
-// Colors
 $color-primary: #3b83f6;
+//
+
 $color-primary-hover: #2563eb;
-$color-secondary: #64748b;  
+$color-secondary: #64748b;
 $color-success: #caecb1;
-$color-warning:#a5bbeb;
+$color-warning: #a5bbeb;
 $color-danger: #ef4444;
-$color-icon:#355EC5 ;
+$color-icon: #355ec5;
 $color-espera: #ffd93d;
 
 // Background Colors
@@ -108,7 +108,11 @@ $breakpoint-xl: 1200px;
   }
 }
 
-@mixin button($bg: $color-primary, $color: $text-white, $padding: $spacing-sm $spacing-lg) {
+@mixin button(
+  $bg: $color-primary,
+  $color: $text-white,
+  $padding: $spacing-sm $spacing-lg
+) {
   background: $bg;
   color: $color;
   border: none;
@@ -117,7 +121,7 @@ $breakpoint-xl: 1200px;
   font-weight: $font-medium;
   cursor: pointer;
   transition: all $transition-base;
-  
+
   &:hover {
     background: darken($bg, 10%);
     transform: translateY(-1px);
@@ -172,13 +176,21 @@ body {
 
 .main-content {
   flex: 1;
-  background:#f5f8fc; 
+  background: #f5f8fc;
   padding: 20px;
 
-  @include responsive($breakpoint-xl) { padding: $spacing-2xl $spacing-3xl; }
-  @include responsive($breakpoint-lg) { padding: $spacing-2xl; }
-  @include responsive($breakpoint-md) { padding: $spacing-xl; }
-  @include responsive($breakpoint-xs) { padding: $spacing-lg; }
+  @include responsive($breakpoint-xl) {
+    padding: $spacing-2xl $spacing-3xl;
+  }
+  @include responsive($breakpoint-lg) {
+    padding: $spacing-2xl;
+  }
+  @include responsive($breakpoint-md) {
+    padding: $spacing-xl;
+  }
+  @include responsive($breakpoint-xs) {
+    padding: $spacing-lg;
+  }
 }
 
 // ========================================
@@ -189,18 +201,85 @@ body {
   margin-top: 40px;
   display: flex;
   justify-content: space-between;
+  align-items: center;
 
   h1 {
     font-size: $text-3xl;
     font-weight: $font-semibold;
-    color:#2E3DA3;
+    color: #2e3da3;
     margin-bottom: $spacing-2xl;
     letter-spacing: -0.025em;
     margin-left: 2px;
   }
+  .MuiButton-root,
+  button,
+  .botao,
+  .btn-encerrar {
+    min-width: 120px;
+    max-width: 100%;
+  }
 }
 
-.search-bar{
+@media (max-width: 900px) {
+  html,
+  body {
+    width: 100vw !important;
+    min-width: 0 !important;
+    max-width: 100vw !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow-x: hidden !important;
+    background: #f5f6fa !important;
+  }
+  #root,
+  .tecnico-chamados,
+  .app-container,
+  .main-content,
+  .main-content-wrapper {
+    width: 100vw !important;
+    min-width: 0 !important;
+    max-width: 100vw !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+    background: #f5f6fa !important;
+    overflow-x: hidden !important;
+  }
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    margin-top: 18px;
+    h1 {
+      margin-bottom: 0;
+      font-size: 1.5rem;
+    }
+    .MuiButton-root,
+    button,
+    .botao,
+    .btn-encerrar {
+      width: 100%;
+      min-width: 0;
+      font-size: 1rem;
+      justify-content: center;
+    }
+  }
+  .main-content-wrapper {
+    margin-right: 0 !important;
+    padding: 0 !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
+  }
+  .sidebar-container {
+    position: static;
+    width: 100vw !important;
+    height: auto !important;
+    min-height: unset !important;
+    z-index: 10;
+  }
+}
+
+.search-bar {
   margin-top: -20px;
 }
 
@@ -213,7 +292,6 @@ body {
   margin-right: 280px; /* Espaço para a sidebar */
   transition: margin-right 0.3s ease;
 }
-
 
 /* Sidebar posicionada à direita */
 .sidebar-container {
@@ -256,7 +334,7 @@ body {
 
   &.finalizado {
     background: $color-success;
-    color: #508B26;
+    color: #508b26;
   }
 }
 
@@ -269,7 +347,7 @@ body {
   flex-direction: row;
   flex-wrap: wrap;
   gap: 13px;
-  align-items: flex-start;       /* evita esticar verticalmente */
+  align-items: flex-start; /* evita esticar verticalmente */
 }
 
 .chamado-card {
@@ -281,12 +359,12 @@ body {
   border-radius: 12px;
   padding: 24px 28px;
   box-shadow: $shadow-sm;
-  font-size: 14px;  
+  font-size: 14px;
   line-height: 1.4;
   transition: all $transition-base;
 
   // Aumentei largura
-  max-width: 360px;  
+  max-width: 360px;
   width: 346px;
 
   &.espera {
@@ -301,17 +379,17 @@ body {
     @include status-border($color-warning);
   }
 
-  @include responsive($breakpoint-lg) { 
-    max-width: 450px; 
+  @include responsive($breakpoint-lg) {
+    max-width: 450px;
     padding: 18px 22px;
   }
-  @include responsive($breakpoint-md) { 
-    max-width: 100%; 
-    padding: $spacing-md; 
+  @include responsive($breakpoint-md) {
+    max-width: 100%;
+    padding: $spacing-md;
   }
-  @include responsive($breakpoint-xs) { 
-    padding: $spacing-sm; 
-    border-radius: $radius-sm; 
+  @include responsive($breakpoint-xs) {
+    padding: $spacing-sm;
+    border-radius: $radius-sm;
   }
 }
 
@@ -326,13 +404,13 @@ body {
 
 .chamado-info {
   flex: 1;
-  
+
   .chamado-codigo {
     font-size: $text-xs;
     color: $text-secondary;
     margin-bottom: 4px;
     font-weight: $font-medium;
-  } 
+  }
 
   .chamado-titulo {
     font-size: $text-lg;
@@ -365,15 +443,19 @@ body {
   font-size: $text-xs;
   font-weight: $font-medium;
   border-radius: 6px;
-  width: 96px; // aumentou de 90px para 100px
-  height: 31px; // aumentou de 28px para 32px
-
+  width: auto;
+  min-width: 0;
+  max-width: 100%;
+  height: 31px;
   @include flex(row, center, center);
-
   position: relative;
   overflow: hidden;
-
-  &:hover { background: #1f2937; }
+  white-space: nowrap;
+  padding-left: 12px;
+  padding-right: 12px;
+  &:hover {
+    background: #1f2937;
+  }
 }
 
 // ========================================
@@ -395,7 +477,7 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-  flex: 1
+  flex: 1;
 }
 
 .user-avatar {
@@ -430,7 +512,7 @@ body {
     flex-direction: column;
     gap: 16px; // aumentou o gap
   }
-  
+
   .card-right {
     justify-content: flex-start;
   }
@@ -445,14 +527,19 @@ body {
     @include avatar(28px, $color-primary); // aumentou de 22px para 28px
     font-size: 12px; // aumentou de 10px para 12px
   }
-  
+
   .btn-encerrar {
-    padding: 6px 16px; // aumentou o padding
-    font-size: 12px; // aumentou de 10px para 12px
-    width: 110px; // aumentou de 90px para 110px
-    height: 36px; // aumentou de 28px para 36px
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    font-size: 1rem;
+    white-space: normal;
+    height: 38px;
+    padding-left: 0;
+    padding-right: 0;
+    margin-top: 8px;
   }
-  
+
   .check-icon {
     width: 24px; // aumentou de 20px para 24px
     height: 24px;
@@ -462,7 +549,7 @@ body {
     .chamado-titulo {
       font-size: $text-lg; // mantém legível no mobile
     }
-    
+
     .chamado-descricao {
       font-size: $text-sm; // mantém legível no mobile
     }
@@ -483,12 +570,12 @@ $ripple-easing: cubic-bezier(0.4, 0, 0.2, 1);
 .btn-encerrar {
   position: relative;
   overflow: hidden;
-  
+
   // Melhora a interação visual
   &:active {
     transform: translateY(0px) scale(0.98);
   }
-  
+
   // Efeito ripple
   .ripple {
     position: absolute;
@@ -508,11 +595,11 @@ $ripple-easing: cubic-bezier(0.4, 0, 0.2, 1);
     opacity: 0.6;
     transform: translate(-50%, -50%) scale(0);
   }
-  
+
   50% {
     opacity: 0.4;
   }
-  
+
   100% {
     width: $ripple-size;
     height: $ripple-size;
@@ -525,7 +612,7 @@ $ripple-easing: cubic-bezier(0.4, 0, 0.2, 1);
   @include flex(row, center, center);
   width: 26px;
   height: 26px;
-  
+
   border-radius: $radius-full;
 
   &.espera {
@@ -540,7 +627,7 @@ $ripple-easing: cubic-bezier(0.4, 0, 0.2, 1);
 
   &.finalizado {
     background: lighten($color-success, 10%);
-    color: #2E7D32;
+    color: #2e7d32;
   }
 }
 
@@ -548,13 +635,10 @@ $ripple-easing: cubic-bezier(0.4, 0, 0.2, 1);
 // LAYOUT PRINCIPAL ADAPTADO
 // ========================================
 
-
-.section .chamados-list { 
-  display: flex !important; 
-  flex-direction: row !important; 
-  flex-wrap: wrap; 
+.section .chamados-list {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: wrap;
   margin-left: 2px;
-  gap: 13px; 
+  gap: 13px;
 }
-
-  
