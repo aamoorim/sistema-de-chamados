@@ -232,7 +232,7 @@ export default function TechnicianTable() {
       />
 
       {/* Modal de edição */}
-      <ModalEditarTecnico
+      <EditTicketModal
         isOpen={openEditModal}
         onClose={handleCloseEdit}
         tecnico={selectedTecnicoEdit}

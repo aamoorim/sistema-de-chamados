@@ -15,7 +15,6 @@ import { Trash2, Pencil } from "lucide-react";
 import DeletarChamado from "./Modals/DeletarChamado";
 import ModalChamadoDetalhes from "./Modals/DetalhesChamados";
 import EditTicketModal from "./Modals/EditarChamado";
-import EditTicketModal from "./Modals/EditarChamado";
 import api from "../services/api";
 import chamadosService from "../services/chamadosService";
 import { useSearch } from "../context/search-context";
@@ -232,7 +231,6 @@ export default function ListTable() {
 
   if (loading) return <LoadingSpinner />;
   if (error)
-    return <div style={{ color: "red", fontFamily: "Lato" }}>{error}</div>;
     return <div style={{ color: "red", fontFamily: "Lato" }}>{error}</div>;
 
   return (
