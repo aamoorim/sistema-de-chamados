@@ -6,8 +6,11 @@ import {
   TextField,
   Button,
   IconButton,
+  InputAdornment,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { useTecnicos } from "../../context/TecnicosContext";
 
 export function ModalEditarTecnico({ isOpen, onClose, tecnico }) {
@@ -25,23 +28,38 @@ export function ModalEditarTecnico({ isOpen, onClose, tecnico }) {
 
   const { updateTecnico } = useTecnicos();
 
-  // Estados locais para os campos do formulário
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [cargo, setCargo] = useState("");
-  const [senha, setSenha] = useState(""); // senha nova (opcional)
+  const [senha, setSenha] = useState("");
+  const [confirmarSenha, setConfirmarSenha] = useState("");
+
+  // visibilidade dos campos
+  const [mostrarSenha, setMostrarSenha] = useState(false);
+  const [mostrarConfirmar, setMostrarConfirmar] = useState(false);
+
+  // erro de confirmação
+  const [erroConfirmacao, setErroConfirmacao] = useState(false);
 
   useEffect(() => {
     if (tecnico) {
       setNome(tecnico.nome || "");
       setEmail(tecnico.email || "");
       setCargo(tecnico.cargo || "");
-      setSenha(""); // nunca preenche senha por segurança
+      setSenha("");
+      setConfirmarSenha("");
+      setErroConfirmacao(false);
     }
   }, [tecnico]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // só valida senha se o usuário digitou algo
+    if (senha.trim() && senha !== confirmarSenha) {
+      setErroConfirmacao(true);
+      return;
+    }
 
     const tecnicoAtualizado = {
       nome,
@@ -52,7 +70,7 @@ export function ModalEditarTecnico({ isOpen, onClose, tecnico }) {
 
     try {
       await updateTecnico(tecnico.id, tecnicoAtualizado);
-      onClose(); // fecha o modal após sucesso
+      onClose();
     } catch (error) {
       console.error("Erro ao atualizar técnico:", error);
       alert("Erro ao atualizar técnico. Tente novamente.");
@@ -82,6 +100,7 @@ export function ModalEditarTecnico({ isOpen, onClose, tecnico }) {
         </Typography>
 
         <form onSubmit={handleSubmit}>
+          {/* Nome */}
           <Typography variant="caption" fontWeight="bold" color="text.secondary">
             NOME
           </Typography>
@@ -95,6 +114,7 @@ export function ModalEditarTecnico({ isOpen, onClose, tecnico }) {
             onChange={(e) => setNome(e.target.value)}
           />
 
+          {/* Email */}
           <Typography variant="caption" fontWeight="bold" color="text.secondary">
             E-MAIL
           </Typography>
@@ -109,6 +129,7 @@ export function ModalEditarTecnico({ isOpen, onClose, tecnico }) {
             onChange={(e) => setEmail(e.target.value)}
           />
 
+          {/* Cargo */}
           <Typography variant="caption" fontWeight="bold" color="text.secondary">
             CARGO
           </Typography>
@@ -123,19 +144,60 @@ export function ModalEditarTecnico({ isOpen, onClose, tecnico }) {
             onChange={(e) => setCargo(e.target.value)}
           />
 
+          {/* Senha */}
           <Typography variant="caption" fontWeight="bold" color="text.secondary">
             SENHA (DEIXE VAZIO CASO NÃO QUEIRA ALTERAR)
           </Typography>
           <TextField
             fullWidth
-            type="password"
+            type={mostrarSenha ? "text" : "password"}
             variant="standard"
             placeholder="Senha"
-            sx={{ mb: 4 }}
+            sx={{ mb: 3 }}
             value={senha}
             onChange={(e) => setSenha(e.target.value)}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton onClick={() => setMostrarSenha(!mostrarSenha)}>
+                    {mostrarSenha ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
           />
 
+          {/* Confirmar Senha */}
+          <Typography variant="caption" fontWeight="bold" color="text.secondary">
+            CONFIRMAR SENHA
+          </Typography>
+          <TextField
+            fullWidth
+            type={mostrarConfirmar ? "text" : "password"}
+            variant="standard"
+            placeholder="Confirme a Senha"
+            sx={{ mb: 4 }}
+            value={confirmarSenha}
+            onChange={(e) => {
+              setConfirmarSenha(e.target.value);
+              setErroConfirmacao(false);
+            }}
+            error={erroConfirmacao}
+            helperText={erroConfirmacao ? "As senhas não coincidem" : ""}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    onClick={() => setMostrarConfirmar(!mostrarConfirmar)}
+                  >
+                    {mostrarConfirmar ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+          />
+
+          {/* Botão */}
           <Box display="flex" justifyContent="center">
             <Button
               type="submit"

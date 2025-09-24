@@ -6,8 +6,11 @@ import {
   TextField,
   Button,
   IconButton,
+  InputAdornment,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { useTecnicos } from "../../context/TecnicosContext";
 
 export function ModalCriarTecnico({ isOpen, onClose }) {
@@ -17,9 +20,15 @@ export function ModalCriarTecnico({ isOpen, onClose }) {
   const [email, setEmail] = useState("");
   const [cargo, setCargo] = useState("");
   const [senha, setSenha] = useState("");
+  const [confirmarSenha, setConfirmarSenha] = useState("");
+
+  const [showSenha, setShowSenha] = useState(false);
+  const [showConfirmarSenha, setShowConfirmarSenha] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  const senhasNaoConferem = senha && confirmarSenha && senha !== confirmarSenha;
 
   const style = {
     position: "absolute",
@@ -38,6 +47,12 @@ export function ModalCriarTecnico({ isOpen, onClose }) {
     setLoading(true);
     setError(null);
 
+    if (senhasNaoConferem) {
+      setError("As senhas não coincidem");
+      setLoading(false);
+      return;
+    }
+
     try {
       await addTecnico({ nome, email, cargo, senha });
       // Limpa o formulário
@@ -45,6 +60,7 @@ export function ModalCriarTecnico({ isOpen, onClose }) {
       setEmail("");
       setCargo("");
       setSenha("");
+      setConfirmarSenha("");
       onClose();
     } catch (err) {
       setError(err.message || "Erro ao criar técnico");
@@ -77,11 +93,8 @@ export function ModalCriarTecnico({ isOpen, onClose }) {
         </Typography>
 
         <form onSubmit={handleSubmit}>
-          <Typography
-            variant="caption"
-            fontWeight="bold"
-            color="text.secondary"
-          >
+          {/* Nome */}
+          <Typography variant="caption" fontWeight="bold" color="text.secondary">
             NOME
           </Typography>
           <TextField
@@ -95,11 +108,8 @@ export function ModalCriarTecnico({ isOpen, onClose }) {
             disabled={loading}
           />
 
-          <Typography
-            variant="caption"
-            fontWeight="bold"
-            color="text.secondary"
-          >
+          {/* E-mail */}
+          <Typography variant="caption" fontWeight="bold" color="text.secondary">
             E-MAIL
           </Typography>
           <TextField
@@ -114,11 +124,8 @@ export function ModalCriarTecnico({ isOpen, onClose }) {
             disabled={loading}
           />
 
-          <Typography
-            variant="caption"
-            fontWeight="bold"
-            color="text.secondary"
-          >
+          {/* Cargo */}
+          <Typography variant="caption" fontWeight="bold" color="text.secondary">
             CARGO
           </Typography>
           <TextField
@@ -133,23 +140,58 @@ export function ModalCriarTecnico({ isOpen, onClose }) {
             disabled={loading}
           />
 
-          <Typography
-            variant="caption"
-            fontWeight="bold"
-            color="text.secondary"
-          >
+          {/* Senha */}
+          <Typography variant="caption" fontWeight="bold" color="text.secondary">
             SENHA
           </Typography>
           <TextField
             fullWidth
-            type="password"
+            type={showSenha ? "text" : "password"}
             variant="standard"
             placeholder="Senha"
-            sx={{ mb: 4 }}
+            sx={{ mb: 3 }}
             required
             value={senha}
             onChange={(e) => setSenha(e.target.value)}
             disabled={loading}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton onClick={() => setShowSenha(!showSenha)}>
+                    {showSenha ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+          />
+
+          {/* Confirmar Senha */}
+          <Typography variant="caption" fontWeight="bold" color="text.secondary">
+            CONFIRMAR SENHA
+          </Typography>
+          <TextField
+            fullWidth
+            type={showConfirmarSenha ? "text" : "password"}
+            variant="standard"
+            placeholder="Confirme a senha"
+            sx={{ mb: 4 }}
+            required
+            value={confirmarSenha}
+            onChange={(e) => setConfirmarSenha(e.target.value)}
+            disabled={loading}
+            error={senhasNaoConferem}
+            helperText={senhasNaoConferem ? "As senhas não coincidem" : ""}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    onClick={() => setShowConfirmarSenha(!showConfirmarSenha)}
+                  >
+                    {showConfirmarSenha ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
           />
 
           {error && (
@@ -162,7 +204,7 @@ export function ModalCriarTecnico({ isOpen, onClose }) {
             <Button
               type="submit"
               variant="contained"
-              disabled={loading}
+              disabled={loading || senhasNaoConferem}
               sx={{
                 bgcolor: "#111",
                 px: 6,
