@@ -179,6 +179,20 @@ export function ModalEditarCliente({ isOpen, onClose, cliente }) {
             onChange={(e) => setEmpresa(e.target.value)}
           />
 
+          <Typography variant="caption" fontWeight="bold" color="text.secondary">
+            SENHA ATUAL
+          </Typography>
+          <TextField
+            fullWidth
+            type="text"
+            variant="standard"
+            placeholder="Senha Atual"
+            sx={{ mb: 2 }}
+            required
+          />
+
+
+
           {/* Senha */}
           <Typography variant="caption" fontWeight="bold" color="text.secondary">
             SENHA (DEIXE VAZIO CASO NÃO QUEIRA ALTERAR)

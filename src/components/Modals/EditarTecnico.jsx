@@ -154,6 +154,19 @@ export function ModalEditarTecnico({ isOpen, onClose, tecnico }) {
             disabled={loading}
           />
 
+          <Typography variant="caption" fontWeight="bold" color="text.secondary">
+            SENHA ATUAL
+          </Typography>
+          <TextField
+            fullWidth
+            type="text"
+            variant="standard"
+            placeholder="Senha Atual"
+            sx={{ mb: 3 }}
+            required  
+            
+          />
+
           {/* Senha */}
           <Typography variant="caption" fontWeight="bold" color="text.secondary">
             SENHA (DEIXE VAZIO CASO NÃO QUEIRA ALTERAR)
