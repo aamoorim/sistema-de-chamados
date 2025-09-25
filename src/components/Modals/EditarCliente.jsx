@@ -1,11 +1,11 @@
-import { 
-  Box, 
-  Modal, 
-  Typography, 
-  TextField, 
-  Button, 
-  IconButton, 
-  InputAdornment 
+import {
+  Box,
+  Modal,
+  Typography,
+  TextField,
+  Button,
+  IconButton,
+  InputAdornment
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import Visibility from "@mui/icons-material/Visibility";
@@ -13,6 +13,7 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { useState, useEffect } from "react";
 import { useClientes } from "../../context/ClientesContext";
 import { useAuth } from "../../context/auth-context";
+import api from "../../services/api"; 
 
 export function ModalEditarCliente({ isOpen, onClose, cliente }) {
   const style = {
@@ -71,23 +72,17 @@ export function ModalEditarCliente({ isOpen, onClose, cliente }) {
     };
 
     try {
-      const response = await fetch(
-        `https://api-sdc.onrender.com/clientes/${cliente.id}`,
+      const response = await api.put(
+        `/clientes/${cliente.id}`,
+        clienteAtualizado,
         {
-          method: "PUT",
           headers: {
-            "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify(clienteAtualizado),
         }
       );
 
-      if (!response.ok) {
-        throw new Error("Erro ao atualizar cliente");
-      }
-
-      const data = await response.json();
+      const data = response.data;
 
       setClientes((prev) =>
         prev.map((c) => (c.id === data.id ? data : c))
@@ -179,20 +174,6 @@ export function ModalEditarCliente({ isOpen, onClose, cliente }) {
             onChange={(e) => setEmpresa(e.target.value)}
           />
 
-          <Typography variant="caption" fontWeight="bold" color="text.secondary">
-            SENHA ATUAL
-          </Typography>
-          <TextField
-            fullWidth
-            type="text"
-            variant="standard"
-            placeholder="Senha Atual"
-            sx={{ mb: 2 }}
-            required
-          />
-
-
-
           {/* Senha */}
           <Typography variant="caption" fontWeight="bold" color="text.secondary">
             SENHA (DEIXE VAZIO CASO NÃO QUEIRA ALTERAR)
@@ -233,14 +214,16 @@ export function ModalEditarCliente({ isOpen, onClose, cliente }) {
             }}
             error={senhasNaoConferem || erroConfirmacao}
             helperText={senhasNaoConferem ? "As senhas não coincidem" : ""}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton onClick={() => setMostrarConfirmar(!mostrarConfirmar)}>
-                    {mostrarConfirmar ? <VisibilityOff /> : <Visibility />}
-                  </IconButton>
-                </InputAdornment>
-              ),
+            slotProps={{
+              input: {
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={() => setMostrarConfirmar(!mostrarConfirmar)}>
+                      {mostrarConfirmar ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }
             }}
           />
 
@@ -270,4 +253,3 @@ export function ModalEditarCliente({ isOpen, onClose, cliente }) {
     </Modal>
   );
 }
-  

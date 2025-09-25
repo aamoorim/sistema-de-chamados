@@ -344,7 +344,7 @@ export default function ListTable() {
                   onClick={(e) => e.stopPropagation()}
                 >
                   <IconButton size="small">
-                    <Pencil size={18} />
+                    <Pencil size={18} onClick={() => handleOpenEdit(row)} />
                   </IconButton>
                   <IconButton
                     color="error"
@@ -569,7 +569,7 @@ export default function ListTable() {
                       onClick={(e) => e.stopPropagation()}
                       sx={{ whiteSpace: "nowrap" }}
                     >
-                      <IconButton size="medium">
+                      <IconButton size="medium" onClick={() => handleOpenEdit(row)}>
                         <Pencil size={18} />
                       </IconButton>
                       <IconButton

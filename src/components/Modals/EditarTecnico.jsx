@@ -12,9 +12,12 @@ import CloseIcon from "@mui/icons-material/Close";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { useTecnicos } from "../../context/TecnicosContext";
+import { useAuth } from "../../context/auth-context";
+import api from "../../services/api"; // ✅ Importação do api.js
 
 export function ModalEditarTecnico({ isOpen, onClose, tecnico }) {
-  const { updateTecnico } = useTecnicos();
+  const { setTecnicos } = useTecnicos(); // ✅ Troca de updateTecnico por setTecnicos
+  const { token } = useAuth();
 
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
@@ -28,7 +31,6 @@ export function ModalEditarTecnico({ isOpen, onClose, tecnico }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // 🚨 mesma lógica do ModalCriarTecnico
   const senhasNaoConferem =
     senha && confirmarSenha && senha !== confirmarSenha;
 
@@ -62,10 +64,26 @@ export function ModalEditarTecnico({ isOpen, onClose, tecnico }) {
     };
 
     try {
-      await updateTecnico(tecnico.id, tecnicoAtualizado);
+      const response = await api.put(
+        `/tecnicos/${tecnico.id}`,
+        tecnicoAtualizado,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const data = response.data;
+
+      // Atualiza o técnico na lista do contexto
+      setTecnicos((prev) =>
+        prev.map((t) => (t.id === data.id ? data : t))
+      );
+
       onClose();
     } catch (err) {
-      setError(err.message || "Erro ao atualizar técnico");
+      setError(err?.response?.data?.message || "Erro ao atualizar técnico");
     } finally {
       setLoading(false);
     }
@@ -154,19 +172,6 @@ export function ModalEditarTecnico({ isOpen, onClose, tecnico }) {
             disabled={loading}
           />
 
-          <Typography variant="caption" fontWeight="bold" color="text.secondary">
-            SENHA ATUAL
-          </Typography>
-          <TextField
-            fullWidth
-            type="text"
-            variant="standard"
-            placeholder="Senha Atual"
-            sx={{ mb: 3 }}
-            required  
-            
-          />
-
           {/* Senha */}
           <Typography variant="caption" fontWeight="bold" color="text.secondary">
             SENHA (DEIXE VAZIO CASO NÃO QUEIRA ALTERAR)
@@ -180,17 +185,19 @@ export function ModalEditarTecnico({ isOpen, onClose, tecnico }) {
             value={senha}
             onChange={(e) => setSenha(e.target.value)}
             disabled={loading}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton
-                    onClick={() => setMostrarSenha(!mostrarSenha)}
-                    disabled={loading}
+            slotProps={{
+              input: {
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() => setMostrarSenha(!mostrarSenha)}
+                      disabled={loading}
                   >
                     {mostrarSenha ? <VisibilityOff /> : <Visibility />}
                   </IconButton>
                 </InputAdornment>
               ),
+             }
             }}
           />
 
@@ -209,17 +216,19 @@ export function ModalEditarTecnico({ isOpen, onClose, tecnico }) {
             disabled={loading}
             error={senhasNaoConferem}
             helperText={senhasNaoConferem ? "As senhas não coincidem" : ""}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton
-                    onClick={() => setMostrarConfirmar(!mostrarConfirmar)}
-                    disabled={loading}
+            slotProps={{
+              input: {
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() => setMostrarConfirmar(!mostrarConfirmar)}
+                      disabled={loading}
                   >
                     {mostrarConfirmar ? <VisibilityOff /> : <Visibility />}
                   </IconButton>
                 </InputAdornment>
               ),
+             }
             }}
           />
 
