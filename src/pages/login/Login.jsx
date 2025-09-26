@@ -64,18 +64,25 @@ export default function Login() {
     } finally {
       setLoading(false);
     }
-  };
+  };  
 
   return (
     <div className="login-container">
-
+      {/* Alertas ao redirecionar para login */}
       {reason === "expired" && (
-        <Alert variant="outlined" severity="info">Sua sessão expirou. Por favor, faça login novamente.</Alert>
+        <Alert severity="info" sx={{ w: "20rem", h: "5rem" }}>
+          <AlertTitle>Token Expirado</AlertTitle>
+          Sua sessão expirou. Por favor, faça login novamente.
+        </Alert>
       )}
       {reason === "invalid" && (
-        <Alert variant="outlined" severity="info">Token inválido. Por favor, faça login novamente.</Alert>
+        <Alert severity="info" sx={{ w: "20rem", h: "5rem" }}>
+          <AlertTitle>Token Inválido</AlertTitle>
+          Token inválido. Por favor, faça login novamente.
+        </Alert>
       )}
 
+      {/* Formulário de Login */}
       <LoginForm onSubmit={handleLogin} loading={loading} error={error} />
     </div>
   );
