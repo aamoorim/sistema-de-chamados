@@ -22,7 +22,7 @@ api.interceptors.request.use((config) => {
       if (isExpired) {
         localStorage.removeItem("user");
         localStorage.removeItem("token");
-        window.location.href = "/login"; // Redireciona pro login
+        window.location.href = "/login?reason=expired"; // Redireciona pro login
         return Promise.reject(new Error("Token expirado"));
       }
 
@@ -31,7 +31,7 @@ api.interceptors.request.use((config) => {
       // Token inválido ou malformado
       localStorage.removeItem("user");
       localStorage.removeItem("token");
-      window.location.href = "/login";
+      window.location.href = "/login?reason=invalid"; // Redireciona pro login
       return Promise.reject(err);
     }
   }

@@ -1,14 +1,34 @@
 import { useAuth } from "../../context/auth-context";
-import { Navigate, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { Navigate, useNavigate, useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
 import LoginForm from "../../components/forms/LoginForm";
 import authService from "../../services/authService";
+import { Alert } from "@mui/material";
+
 
 export default function Login() {
   const { user, login } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const reason = queryParams.get("reason");
+
+  // Seta um timer para remover o parâmetro "reason" da URL após alguns segundos
+  useEffect(() => {
+    if (reason==="expired" || reason === "invalid") {
+      const timer = setTimeout(() => {
+        const url = new URL(window.location.href);
+        url.searchParams.delete ("reason");
+        window.history.replaceState({}, document.title, url.toString());
+      }, 5000); // Remove o parâmetro após 5 segundos
+      return () => clearTimeout(timer);
+    }
+  }, [reason]);
+
+
 
   // Redireciona se já estiver logado
   if (user) {
@@ -48,6 +68,14 @@ export default function Login() {
 
   return (
     <div className="login-container">
+
+      {reason === "expired" && (
+        <Alert variant="outlined" severity="info">Sua sessão expirou. Por favor, faça login novamente.</Alert>
+      )}
+      {reason === "invalid" && (
+        <Alert variant="outlined" severity="info">Token inválido. Por favor, faça login novamente.</Alert>
+      )}
+
       <LoginForm onSubmit={handleLogin} loading={loading} error={error} />
     </div>
   );
