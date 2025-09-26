@@ -122,8 +122,35 @@ export default function ListTable() {
   };
 
   useEffect(() => {
-    fetchChamados();
-  }, []);
+  // Carregamento inicial com spinner
+  const fetchInitialData = async () => {
+    try {
+      setLoading(true);
+      const response = await api.get("/chamados");
+      setRows(response.data);
+      setError(null);
+    } catch (err) {
+      console.error("Erro ao buscar chamados:", err);
+      setError("Erro ao carregar chamados");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchInitialData();
+
+  // Atualizações a cada 2 segundos 
+  const interval = setInterval(async () => {
+    try {
+      const response = await api.get("/chamados");
+      setRows(response.data);
+    } catch (err) {
+      console.error("Erro ao atualizar chamados:", err);
+    }
+  }, 2000);
+
+  return () => clearInterval(interval);
+}, []);
 
   const handleOpenDelete = (chamado) => {
     setSelectedChamado(chamado);
@@ -454,7 +481,7 @@ export default function ListTable() {
                     onClick={() => handleRowClick(row)}
                     sx={{ cursor: "pointer" }}
                   >
-                    <TableCell sx={{ display: "flex", alignItems: "center" }}>
+                    <TableCell sx={{ alignItems: "center" }}>
                       {new Date(row.data_criacao).toLocaleDateString("pt-BR")}
                     </TableCell>
                     <TableCell sx={{ whiteSpace: "nowrap" }}>

@@ -12,7 +12,7 @@ import Paper from "@mui/material/Paper";
 import IconButton from "@mui/material/IconButton";
 import { Pencil, Trash2 } from "lucide-react";
 import { DeletarPerfil } from "./Modals/DeletarPerfil";
-import { ModalEditarTecnico } from "./Modals/EditarTecnico";  
+import { ModalEditarTecnico } from "./Modals/EditarTecnico";
 import "../styles/tables/listTable.scss";
 
 // Avatar com iniciais
@@ -73,86 +73,116 @@ const LoadingSpinner = () => (
   </div>
 );
 
-export default function TechnicianTable() {
+export default function TableAdminTec() {
   const isMobile = useIsMobile(1200);
   const { search } = useSearch();
-  const { tecnicos, deleteTecnico } = useTecnicos();
+  const { tecnicos, deleteTecnico, fetchTecnicos } = useTecnicos();
 
   const [loading, setLoading] = useState(true);
+
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
-  const [selectedRow, setSelectedRow] = useState(null);
+  const [selectedTecnico, setSelectedTecnico] = useState(null);
+
   const [openEditModal, setOpenEditModal] = useState(false);
   const [selectedTecnicoEdit, setSelectedTecnicoEdit] = useState(null);
 
   useEffect(() => {
-    const timeout = setTimeout(() => setLoading(false), 500);
-    return () => clearTimeout(timeout);
-  }, [tecnicos]);
+  const loadTecnicos = async () => {
+    setLoading(true);
+    try {
+      await fetchTecnicos();
+    } catch (error) {
+      console.error("Erro ao carregar técnicos:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  const handleOpenDelete = (row) => {
-    setSelectedRow(row);
+  loadTecnicos();
+  }, []); // Executa uma vez ao montar
+
+
+  const filteredTecnicos = tecnicos.filter((tec) => {
+    if (!tec) return false;
+    const term = search.toLowerCase();
+    return (
+      search === "" ||
+      (tec.nome && tec.nome.toLowerCase().includes(term)) ||
+      (tec.cargo && tec.cargo.toLowerCase().includes(term)) ||
+      (tec.email && tec.email.toLowerCase().includes(term))
+    );
+  });
+
+  const handleOpenDelete = (tecnico) => {
+    setSelectedTecnico(tecnico);
     setOpenDeleteModal(true);
   };
 
   const handleCloseDelete = () => {
-    setSelectedRow(null);
+    setSelectedTecnico(null);
     setOpenDeleteModal(false);
   };
 
   const handleDeleteConfirmed = async () => {
-    if (!selectedRow) return;
-    try {
-      await deleteTecnico(selectedRow.id);
-    } catch (error) {
-      console.error("Erro ao deletar técnico:", error);
-      alert("Não foi possível deletar técnico.");
-    } finally {
-      handleCloseDelete();
-    }
-  };
+  if (!selectedTecnico) return;
+
+  setLoading(true); // Mostra o spinner
+
+  try {
+    await deleteTecnico(selectedTecnico.id); // Deleta o técnico
+    await fetchTecnicos(); // Recarrega os dados
+  } catch (error) {
+    console.error("Erro ao deletar técnico:", error);
+    alert("Não foi possível deletar técnico.");
+  } finally {
+    handleCloseDelete(); // Fecha o modal
+    setLoading(false);   // Esconde o spinner
+  }
+};
+
 
   const handleOpenEdit = (tecnico) => {
     setSelectedTecnicoEdit(tecnico);
     setOpenEditModal(true);
   };
 
-  const handleCloseEdit = () => {
+  // Aqui, após fechar a edição, recarregamos os técnicos
+  const handleCloseEdit = async () => {
     setSelectedTecnicoEdit(null);
     setOpenEditModal(false);
+
+    setLoading(true); // Mostra o spinner antes de atualizar
+    try {
+      await fetchTecnicos(); // Recarrega os dados
+    } catch (error) {
+      console.error("Erro ao recarregar técnicos após edição:", error);
+    } finally {
+      setLoading(false); // Esconde o spinner depois
+    }
   };
 
-  const filteredRows = tecnicos.filter((row) => {
-    if (!row) return false;
-    const term = search.toLowerCase();
-    return (
-      search === "" ||
-      (row.nome && row.nome.toLowerCase().includes(term)) ||
-      (row.cargo && row.cargo.toLowerCase().includes(term)) ||
-      (row.email && row.email.toLowerCase().includes(term))
-    );
-  });
 
   if (loading) return <LoadingSpinner />;
 
   return (
     <div style={{ fontFamily: "Lato" }}>
       <div style={{ marginBottom: 16, color: "#666", fontSize: 14 }}>
-        Mostrando {filteredRows.length} de {tecnicos.length} técnicos
+        Mostrando {filteredTecnicos.length} de {tecnicos.length} técnicos
       </div>
 
       {isMobile ? (
         <div className="client-table-mobile">
-          {filteredRows.length > 0 ? (
-            filteredRows.map((row) => (
-              <div key={row.id} className="client-card">
-                <div><b>Nome:</b> {row.nome}</div>
-                <div><b>Cargo:</b> {row.cargo}</div>
-                <div><b>Email:</b> {row.email}</div>
+          {filteredTecnicos.length > 0 ? (
+            filteredTecnicos.map((tec) => (
+              <div key={tec.id} className="client-card">
+                <div><b>Nome:</b> {tec.nome || "-"}</div>
+                <div><b>Cargo:</b> {tec.cargo || "-"}</div>
+                <div><b>Email:</b> {tec.email || "-"}</div>
                 <div className="actions">
-                  <IconButton onClick={() => handleOpenEdit(row)}>
+                  <IconButton onClick={() => handleOpenEdit(tec)}>
                     <Pencil size={18} />
                   </IconButton>
-                  <IconButton color="error" onClick={() => handleOpenDelete(row)}>
+                  <IconButton color="error" onClick={() => handleOpenDelete(tec)}>
                     <Trash2 size={18} />
                   </IconButton>
                 </div>
@@ -177,7 +207,7 @@ export default function TechnicianTable() {
             },
           }}
         >
-          <Table aria-label="tabela de técnicos">
+          <Table aria-label="Tabela de técnicos">
             <TableHead>
               <TableRow>
                 <TableCell sx={{ color: "#858B99", fontWeight: 600 }}>Nome</TableCell>
@@ -187,28 +217,29 @@ export default function TechnicianTable() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {filteredRows.length > 0 ? (
-                filteredRows.map((row) => {
-                  const initials = row.nome
-                    ? row.nome
+              {filteredTecnicos.length > 0 ? (
+                filteredTecnicos.map((tec) => {
+                  const initials = tec.nome
+                    ? tec.nome
                         .split(" ")
                         .map((n) => (n && n.length > 0 ? n[0] : ""))
                         .join("")
                         .slice(0, 2)
+                        .toUpperCase()
                     : "??";
                   return (
-                    <TableRow key={row.id} hover>
+                    <TableRow key={tec.id} hover>
                       <TableCell>
                         <Avatar initials={initials} />
-                        {row.nome || "-"}
+                        {tec.nome || "-"}
                       </TableCell>
-                      <TableCell>{row.cargo || "-"}</TableCell>
-                      <TableCell>{row.email || "-"}</TableCell>
+                      <TableCell>{tec.cargo || "-"}</TableCell>
+                      <TableCell>{tec.email || "-"}</TableCell>
                       <TableCell>
-                        <IconButton onClick={() => handleOpenEdit(row)}>
+                        <IconButton onClick={() => handleOpenEdit(tec)}>
                           <Pencil size={18} />
                         </IconButton>
-                        <IconButton color="error" onClick={() => handleOpenDelete(row)}>
+                        <IconButton color="error" onClick={() => handleOpenDelete(tec)}>
                           <Trash2 size={18} />
                         </IconButton>
                       </TableCell>
@@ -234,7 +265,7 @@ export default function TechnicianTable() {
         isOpen={openDeleteModal}
         onClose={handleCloseDelete}
         onDelete={handleDeleteConfirmed}
-        usuario={selectedRow}
+        usuario={selectedTecnico}
       />
 
       <ModalEditarTecnico
@@ -245,3 +276,4 @@ export default function TechnicianTable() {
     </div>
   );
 }
+
