@@ -14,7 +14,7 @@ export function ClientesProvider({ children }) {
       return;
     }
 
-    fetch("https://api-sdc.onrender.com/clientes", {
+    fetch("https://teste-api-vm4v.onrender.com/clientes", {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
