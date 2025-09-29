@@ -3,7 +3,7 @@ import { Navigate, useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import LoginForm from "../../components/forms/LoginForm";
 import authService from "../../services/authService";
-import { Alert } from "@mui/material";
+import { Snackbar, Alert, AlertTitle} from "@mui/material";
 
 
 export default function Login() {
@@ -69,18 +69,24 @@ export default function Login() {
   return (
     <div className="login-container">
       {/* Alertas ao redirecionar para login */}
-      {reason === "expired" && (
-        <Alert severity="info" sx={{ w: "20rem", h: "5rem" }}>
-          <AlertTitle>Token Expirado</AlertTitle>
-          Sua sessão expirou. Por favor, faça login novamente.
-        </Alert>
-      )}
-      {reason === "invalid" && (
-        <Alert severity="info" sx={{ w: "20rem", h: "5rem" }}>
-          <AlertTitle>Token Inválido</AlertTitle>
-          Token inválido. Por favor, faça login novamente.
-        </Alert>
-      )}
+      <Snackbar
+        open={reason === "expired" || reason === "invalid"}
+        autoHideDuration={5000}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        {reason === "expired" && (
+          <Alert severity="info" variant="filled" sx={{ width: '100%' }}>
+            <AlertTitle>Token Expirado</AlertTitle>
+            Sua sessão expirou. Por favor, faça login novamente.
+          </Alert>
+        )}
+        {reason === "invalid" && (
+          <Alert severity="error" variant="filled" sx={{ width: '100%' }}>
+            <AlertTitle>Token Inválido</AlertTitle>
+            Token inválido. Por favor, faça login novamente.
+          </Alert>
+        )}
+      </Snackbar>
 
       {/* Formulário de Login */}
       <LoginForm onSubmit={handleLogin} loading={loading} error={error} />
