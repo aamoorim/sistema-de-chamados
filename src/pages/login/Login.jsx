@@ -74,13 +74,35 @@ export default function Login() {
 
   return (
     <div className="login-container">
+      <style>
+        {`
+          @keyframes slideIn {
+            from {
+              transform: translateX(100%);
+              opacity: 0;
+            }
+            to {
+              transform: translateX(0);
+              opacity: 1;
+            }
+          }
+        `}
+      </style>
       <Snackbar
         open={!!alert}
         autoHideDuration={5000}
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
       >
         {alert && (
-          <Alert severity={alert.severity} variant="filled" sx={{ width: "100%", backgroundColor: alert.bgColor,}}>
+          <Alert
+            severity={alert.severity}
+            variant="filled"
+            sx={{
+              width: "100%",
+              backgroundColor: alert.bgColor,
+              animation: "slideIn 0.3s ease-out"
+            }}
+          >
             <AlertTitle>{alert.title}</AlertTitle>
             {alert.message}
           </Alert>
