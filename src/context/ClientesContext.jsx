@@ -1,50 +1,82 @@
-import { createContext, useState, useContext, useEffect } from "react";
-import { useAuth } from "./auth-context";
+import { createContext, useContext, useEffect, useState } from "react";
+import clienteService from "../services/clienteService";
 
 const ClientesContext = createContext();
 
-export function ClientesProvider({ children }) {
-  const [clientes, setClientes] = useState([]);
-  const { token, user } = useAuth(); // pega token e dados do usuário
+// Hook para usar o contexto facilmente
+export const useClientes = () => {
+  return useContext(ClientesContext);
+};
 
-  useEffect(() => {
-    // Só busca clientes se for admin e tiver token
-    if (!token || user?.role !== "admin") {
-      setClientes([]); // limpa lista se não for admin
-      return;
+export const ClientesProvider = ({ children }) => {
+  const [clientes, setClientes] = useState([]); // Lista de clientes
+  const [loading, setLoading] = useState(true); // Estado de carregamento
+  const [erro, setErro] = useState(null); // Armazena erro, se houver
+
+  // Busca todos os clientes na API
+  const fetchClientes = async () => {
+    setLoading(true);
+    try {
+      const data = await clienteService.getAllClientes();
+      setClientes(data);
+    } catch (error) {
+      console.error("[ClientesContext] Erro ao carregar clientes:", error);
+      setErro("Erro ao carregar clientes");
+    } finally {
+      setLoading(false);
     }
-
-    fetch("https://api-sdc.onrender.com/clientes", {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error(`Erro ao buscar clientes: HTTP ${res.status}`);
-        }
-        return res.json();
-      })
-      .then((dados) => {
-        setClientes(dados);
-      })
-      .catch((err) => {
-        console.error("Falha ao carregar clientes:", err);
-      });
-  }, [token, user]);
-
-  const addCliente = (cliente) => {
-    setClientes((prev) => [...prev, cliente]);
   };
 
+  // Adiciona cliente e recarrega lista do backend
+  const addCliente = async (novoCliente) => {
+    try {
+      await clienteService.criarCliente(novoCliente); // só cria
+      await fetchClientes(); // recarrega com dados reais
+    } catch (error) {
+      console.error("[ClientesContext] Erro ao criar cliente:", error);
+      throw error;
+    }
+  };
+
+  // Atualiza cliente localmente
+  const updateCliente = (id, dados) => {
+    setClientes((prevClientes) =>
+      prevClientes.map((cliente) =>
+        cliente.id === id ? { ...cliente, ...dados } : cliente
+      )
+    );
+  };
+
+  // Remove cliente do backend e atualiza estado local
+  const deleteCliente = async (id) => {
+    try {
+      await clienteService.excluirCliente(id);
+      setClientes((prev) => prev.filter((cliente) => cliente.id !== id));
+    } catch (error) {
+      console.error("[ClientesContext] Erro ao excluir cliente:", error);
+      throw error;
+    }
+  };
+
+  // Busca clientes ao montar componente
+  useEffect(() => {
+    fetchClientes();
+  }, []);
+
   return (
-    <ClientesContext.Provider value={{ clientes, setClientes, addCliente }}>
+    <ClientesContext.Provider
+      value={{
+        clientes,
+        loading,
+        erro,
+        fetchClientes,
+        addCliente,
+        updateCliente,
+        deleteCliente,
+        setLoading,
+      }}
+    >
       {children}
     </ClientesContext.Provider>
   );
-}
-
-export function useClientes() {
-  return useContext(ClientesContext);
-}
+};

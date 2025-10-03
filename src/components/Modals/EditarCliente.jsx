@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Modal,
@@ -5,31 +6,18 @@ import {
   TextField,
   Button,
   IconButton,
-  InputAdornment
+  InputAdornment,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
-import { useState, useEffect } from "react";
 import { useClientes } from "../../context/ClientesContext";
 import { useAuth } from "../../context/auth-context";
-import api from "../../services/api"; 
+import clienteService from "../../services/clienteService";
 
-export function ModalEditarCliente({ isOpen, onClose, cliente }) {
-  const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: 500,
-    bgcolor: '#fafafa',
-    borderRadius: '12px',
-    boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)',
-    p: 3,
-  };
-
-  const { setClientes } = useClientes();
+export function ModalEditarCliente({ isOpen, onClose, cliente, onSuccess }) {
   const { token } = useAuth();
+  const { updateCliente } = useClientes();
 
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
@@ -41,7 +29,10 @@ export function ModalEditarCliente({ isOpen, onClose, cliente }) {
   const [mostrarSenha, setMostrarSenha] = useState(false);
   const [mostrarConfirmar, setMostrarConfirmar] = useState(false);
 
-  const [erroConfirmacao, setErroConfirmacao] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const senhasNaoConferem = senha && confirmarSenha && senha !== confirmarSenha;
 
   useEffect(() => {
     if (cliente) {
@@ -51,19 +42,21 @@ export function ModalEditarCliente({ isOpen, onClose, cliente }) {
       setEmpresa(cliente.empresa || "");
       setSenha("");
       setConfirmarSenha("");
-      setErroConfirmacao(false);
+      setError(null);
     }
   }, [cliente]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(null);
 
-    if (senha.trim() && senha !== confirmarSenha) {
-      setErroConfirmacao(true);
+    if (senhasNaoConferem) {
+      setError("As senhas não coincidem");
       return;
     }
 
-    const clienteAtualizado = {
+    // Construção do payload
+    const dadosAtualizados = {
       nome,
       email,
       setor,
@@ -71,46 +64,76 @@ export function ModalEditarCliente({ isOpen, onClose, cliente }) {
       ...(senha.trim() ? { senha } : {}),
     };
 
+    // Depuração: log do payload
+    console.log("[ModalEditarCliente] Payload a ser enviado:", dadosAtualizados);
+
+    setLoading(true);
     try {
-      const response = await api.put(
-        `/clientes/${cliente.id}`,
-        clienteAtualizado,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      // Você pode fazer uso do clienteService diretamente
+      const updated = await clienteService.atualizarCliente(cliente.id, dadosAtualizados);
+      console.log("[ModalEditarCliente] Resposta da API:", updated);
 
-      const data = response.data;
+      // Atualiza no contexto local
+      if (updateCliente) {
+        updateCliente(cliente.id, updated);
+      }
 
-      setClientes((prev) =>
-        prev.map((c) => (c.id === data.id ? data : c))
-      );
+      // Callback de sucesso para recarregar no componente pai
+      if (onSuccess) {
+        await onSuccess();
+      }
 
+      // Fecha o modal
       onClose();
-    } catch (error) {
-      console.error(error);
-      alert("Erro ao atualizar cliente");
+    } catch (err) {
+      console.error("[ModalEditarCliente] Erro ao atualizar cliente:", err);
+
+      // Se for erro vindo do axios/resposta do servidor, tente extrair mensagem
+      let msg = "Erro ao atualizar cliente";
+      if (err.response && err.response.data) {
+        // Pode conter erro de validação no back-end
+        msg = err.response.data.message || JSON.stringify(err.response.data);
+      } else if (err.message) {
+        msg = err.message;
+      }
+      setError(msg);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const senhasNaoConferem = senha && confirmarSenha && senha !== confirmarSenha;
-
   return (
     <Modal open={isOpen} onClose={onClose}>
-      <Box sx={style}>
+      <Box
+        sx={{
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          width: 500,
+          bgcolor: "#fafafa",
+          borderRadius: "12px",
+          boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)",
+          p: 3,
+        }}
+      >
         <IconButton
           onClick={onClose}
           sx={{ position: "absolute", right: 12, top: 12 }}
+          disabled={loading}
         >
           <CloseIcon />
         </IconButton>
 
-        <Typography variant="h6" fontWeight="bold">
+        <Typography variant="h6" fontWeight="bold" mb={1}>
           Editar Cliente
         </Typography>
-        <Typography variant="caption" color="text.secondary" fontSize={14} mb={2}>
+        <Typography
+          variant="caption"
+          color="text.secondary"
+          fontSize={14}
+          mb={2}
+        >
           Atualize as informações do cliente
         </Typography>
 
@@ -127,11 +150,12 @@ export function ModalEditarCliente({ isOpen, onClose, cliente }) {
             required
             value={nome}
             onChange={(e) => setNome(e.target.value)}
+            disabled={loading}
           />
 
           {/* Email */}
           <Typography variant="caption" fontWeight="bold" color="text.secondary">
-            E-MAIL
+            E‑MAIL
           </Typography>
           <TextField
             fullWidth
@@ -142,6 +166,7 @@ export function ModalEditarCliente({ isOpen, onClose, cliente }) {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            disabled={loading}
           />
 
           {/* Setor */}
@@ -150,13 +175,13 @@ export function ModalEditarCliente({ isOpen, onClose, cliente }) {
           </Typography>
           <TextField
             fullWidth
-            type="text"
             variant="standard"
-            placeholder="Nome do Setor"
+            placeholder="Setor"
             sx={{ mb: 2 }}
             required
             value={setor}
             onChange={(e) => setSetor(e.target.value)}
+            disabled={loading}
           />
 
           {/* Empresa */}
@@ -165,18 +190,18 @@ export function ModalEditarCliente({ isOpen, onClose, cliente }) {
           </Typography>
           <TextField
             fullWidth
-            type="text"
             variant="standard"
-            placeholder="Nome da Empresa"
+            placeholder="Empresa"
             sx={{ mb: 2 }}
             required
             value={empresa}
             onChange={(e) => setEmpresa(e.target.value)}
+            disabled={loading}
           />
 
           {/* Senha */}
           <Typography variant="caption" fontWeight="bold" color="text.secondary">
-            SENHA (DEIXE VAZIO CASO NÃO QUEIRA ALTERAR)
+            SENHA (deixe vazia se não quiser alterar)
           </Typography>
           <TextField
             fullWidth
@@ -186,10 +211,14 @@ export function ModalEditarCliente({ isOpen, onClose, cliente }) {
             sx={{ mb: 2 }}
             value={senha}
             onChange={(e) => setSenha(e.target.value)}
+            disabled={loading}
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
-                  <IconButton onClick={() => setMostrarSenha(!mostrarSenha)}>
+                  <IconButton
+                    onClick={() => setMostrarSenha(!mostrarSenha)}
+                    disabled={loading}
+                  >
                     {mostrarSenha ? <VisibilityOff /> : <Visibility />}
                   </IconButton>
                 </InputAdornment>
@@ -205,34 +234,38 @@ export function ModalEditarCliente({ isOpen, onClose, cliente }) {
             fullWidth
             type={mostrarConfirmar ? "text" : "password"}
             variant="standard"
-            placeholder="Confirme a Senha"
-            sx={{ mb: 2 }}
+            placeholder="Confirme a senha"
+            sx={{ mb: 3 }}
             value={confirmarSenha}
-            onChange={(e) => {
-              setConfirmarSenha(e.target.value);
-              setErroConfirmacao(false);
-            }}
-            error={senhasNaoConferem || erroConfirmacao}
+            onChange={(e) => setConfirmarSenha(e.target.value)}
+            disabled={loading}
+            error={senhasNaoConferem}
             helperText={senhasNaoConferem ? "As senhas não coincidem" : ""}
-            slotProps={{
-              input: {
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton onClick={() => setMostrarConfirmar(!mostrarConfirmar)}>
-                      {mostrarConfirmar ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    onClick={() => setMostrarConfirmar(!mostrarConfirmar)}
+                    disabled={loading}
+                  >
+                    {mostrarConfirmar ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
             }}
           />
 
-          {/* Botão */}
+          {error && (
+            <Typography color="error" sx={{ mb: 2 }}>
+              {error}
+            </Typography>
+          )}
+
           <Box display="flex" justifyContent="center">
             <Button
               type="submit"
               variant="contained"
-              disabled={senhasNaoConferem}
+              disabled={loading || senhasNaoConferem}
               sx={{
                 bgcolor: "#111",
                 px: 6,
@@ -245,7 +278,7 @@ export function ModalEditarCliente({ isOpen, onClose, cliente }) {
                 },
               }}
             >
-              Salvar Alterações
+              {loading ? "Salvando..." : "Salvar Alterações"}
             </Button>
           </Box>
         </form>

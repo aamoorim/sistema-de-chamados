@@ -12,8 +12,10 @@ const getClienteById = async (id) => {
 
 const criarCliente = async (dados) => {
   const res = await api.post("/clientes", dados);
+  console.log("Resposta da API ao criar cliente:", res.data); // 👈 Adicione isso
   return res.data;
 };
+
 
 const atualizarCliente = async (id, dados) => {
   const res = await api.put(`/clientes/${id}`, dados);
