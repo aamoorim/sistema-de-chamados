@@ -15,6 +15,7 @@ import { ClipboardList } from "lucide-react";
 import { ChamadosAbertosTecnicosContext } from "../context/ChamadosAbertosTecnicosContext";
 import ModalAtenderChamado from "./Modals/AtenderChamado";
 import useIsMobile from "../hooks/useIsMobile";
+import Botao from "./Button.jsx"
 import "../styles/tables/listTable.scss";
 
 const LoadingSpinner = () => (

@@ -1,6 +1,13 @@
 import { useState, useEffect } from "react";
-import { Box, Modal, Typography, TextField, Button, IconButton } from "@mui/material";
+import {
+  Box,
+  Modal,
+  Typography,
+  TextField,
+  IconButton,
+} from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import Botao from "../Button.jsx"; // ✅ Usando seu componente personalizado
 
 export function ModalCriarChamado({ isOpen, onClose, onSalvar }) {
   const [titulo, setTitulo] = useState("");
@@ -31,14 +38,14 @@ export function ModalCriarChamado({ isOpen, onClose, onSalvar }) {
   };
 
   const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
     width: 500,
-    bgcolor: '#fafafa',
-    borderRadius: '12px',
-    boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)',
+    bgcolor: "#fafafa",
+    borderRadius: "12px",
+    boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)",
     p: 4,
   };
 
@@ -47,7 +54,7 @@ export function ModalCriarChamado({ isOpen, onClose, onSalvar }) {
       <Box sx={style}>
         <IconButton
           onClick={onClose}
-          sx={{ position: 'absolute', right: 12, top: 12 }}
+          sx={{ position: "absolute", right: 12, top: 12 }}
         >
           <CloseIcon />
         </IconButton>
@@ -56,7 +63,12 @@ export function ModalCriarChamado({ isOpen, onClose, onSalvar }) {
           Novo Chamado
         </Typography>
 
-        <Typography variant="caption" fontWeight="bold" color="text.secondary" sx={{ letterSpacing: 1 }}>
+        <Typography
+          variant="caption"
+          fontWeight="bold"
+          color="text.secondary"
+          sx={{ letterSpacing: 1 }}
+        >
           TÍTULO
         </Typography>
         <TextField
@@ -69,7 +81,12 @@ export function ModalCriarChamado({ isOpen, onClose, onSalvar }) {
           onChange={(e) => setTitulo(e.target.value)}
         />
 
-        <Typography variant="caption" fontWeight="bold" color="text.secondary" sx={{ letterSpacing: 1 }}>
+        <Typography
+          variant="caption"
+          fontWeight="bold"
+          color="text.secondary"
+          sx={{ letterSpacing: 1 }}
+        >
           DESCRIÇÃO
         </Typography>
         <TextField
@@ -84,23 +101,7 @@ export function ModalCriarChamado({ isOpen, onClose, onSalvar }) {
         />
 
         <Box display="flex" justifyContent="center">
-          <Button
-            variant="contained"
-            onClick={handleSalvar}
-            sx={{
-              bgcolor: "#111",
-              px: 6,
-              py: 1.5,
-              borderRadius: "8px",
-              textTransform: "none",
-              fontWeight: "bold",
-              '&:hover': {
-                bgcolor: "#000",
-              }
-            }}
-          >
-            Salvar
-          </Button>
+          <Botao text="Salvar Chamado" onClick={handleSalvar} />
         </Box>
       </Box>
     </Modal>

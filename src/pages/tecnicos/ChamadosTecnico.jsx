@@ -5,6 +5,7 @@ import ModalChamadoDetalhes from "../../components/Modals/DetalhesChamados";
 import chamadoService from "../../services/chamadosService";
 import { useAuth } from "../../context/auth-context";
 import api from "../../services/api";
+import Botao from "../../components/Button.jsx"
 
 export default function ChamadosTecnico() {
   const { token } = useAuth();
@@ -201,13 +202,20 @@ export default function ChamadosTecnico() {
                         <div className="chamado-descricao">{chamado.descricao}</div>
                         <div className="chamado-data">{chamado.data_criacao || chamado.data}</div>
                       </div>
-                      <button
-                        className="btn-encerrar"
+                      <Botao
                         onClick={(e) => handleEncerrar(e, chamado.id)}
-                      >
-                        <CircleCheckBig size={15} style={{ marginRight: "4px" }} />
-                        Encerrar
-                      </button>
+
+                        text="Encerrar"
+                        icon={CircleCheckBig}
+                        sx={{
+                          height: 35,
+                          fontSize: '1rem',
+                          '& svg': {
+                            fontSize: 18,
+                          },
+                          borderRadius: "0.5rem",
+                        }}
+                        />                      
                     </div>
                     <div className="card-footer">
                       <div className="user-info">

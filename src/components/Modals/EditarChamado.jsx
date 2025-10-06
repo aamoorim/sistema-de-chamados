@@ -5,14 +5,15 @@ import {
   DialogContent,
   DialogActions,
   TextField,
-  Button,
   IconButton,
   Box,
   Typography,
   Stack,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import StatusChip from '../StatusChip'; 
+import EditIcon from '@mui/icons-material/Edit';
+import StatusChip from '../StatusChip';
+import Botao from '../Button.jsx'; 
 
 const EditTicketModal = ({ open = false, onClose, ticket, onSave }) => {
   const [ticketData, setTicketData] = useState({
@@ -127,42 +128,17 @@ const EditTicketModal = ({ open = false, onClose, ticket, onSave }) => {
 
       {/* Ações */}
       <DialogActions sx={{ px: 3, py: 2.5, borderTop: '1px solid #eee' }}>
-        <Button
+        <Botao
+          text="Cancelar"
+          icon={CloseIcon}
           onClick={onClose}
-          variant="outlined"
-          size="small"
-          sx={{
-            textTransform: 'none',
-            borderRadius: 2,
-            px: 3,
-            backgroundColor: '#000',
-            color: '#fff',
-            borderColor: '#000',
-            '&:hover': {
-              backgroundColor: '#333',
-              borderColor: '#333',
-            },
-          }}
-        >
-          Cancelar
-        </Button>
-        <Button
+        />
+
+        <Botao
+          text="Salvar"
+          icon={EditIcon}
           onClick={handleSave}
-          variant="contained"
-          size="small"
-          sx={{
-            textTransform: 'none',
-            borderRadius: 2,
-            px: 3,
-            background: '#000',
-            '&:hover': {
-              backgroundColor: '#333',
-              borderColor: '#333',
-            },
-          }}
-        >
-          Salvar
-        </Button>
+        />
       </DialogActions>
     </Dialog>
   );
