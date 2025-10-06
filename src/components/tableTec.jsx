@@ -15,7 +15,7 @@ import { ClipboardList } from "lucide-react";
 import { ChamadosAbertosTecnicosContext } from "../context/ChamadosAbertosTecnicosContext";
 import ModalAtenderChamado from "./Modals/AtenderChamado";
 import useIsMobile from "../hooks/useIsMobile";
-import Botao from "./Button.jsx"
+import Botao from "./Button.jsx";
 import "../styles/tables/listTable.scss";
 
 const LoadingSpinner = () => (
@@ -66,6 +66,7 @@ export default function ListTableTec() {
       descricao: chamado.descricao,
       criado: new Date(chamado.data_criacao).toLocaleDateString("pt-BR"),
       cliente: chamado.cliente_nome,
+      status: chamado.status, // <<< adiciona o status aqui
     };
     setSelectedChamado(chamadoFormatado);
     setOpen(true);
