@@ -231,18 +231,20 @@ const ChamadosCliente = () => {
                             </div>
 
                             {/* Ícone para abrir modal editar */}
-                            <IconButton
-                              size="small"
-                              onClick={(e) => {
-                                e.stopPropagation(); // evita abrir modal de detalhes
-                                setChamadoSelecionado(chamado);
-                                setOpenModalEditar(true);
-                              }}
-                              sx={{ marginLeft: 1 }}
-                              aria-label="Editar chamado"
-                            >
-                              <EditIcon fontSize="small" />
-                            </IconButton>
+                            {!["em_andamento", "encerrado"].includes(chamado.status?.toLowerCase()) && (
+                              <IconButton
+                                size="small"
+                                onClick={(e) => {
+                                  e.stopPropagation(); // evita abrir modal de detalhes
+                                  setChamadoSelecionado(chamado);
+                                  setOpenModalEditar(true);
+                                }}
+                                sx={{ marginLeft: 1 }}
+                                aria-label="Editar chamado"
+                              >
+                                <EditIcon fontSize="small" />
+                              </IconButton>
+                            )}
                           </div>
                         </div>
                       </div>

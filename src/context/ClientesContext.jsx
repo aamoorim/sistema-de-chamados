@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import clienteService from "../services/clienteService";
+import { useAuth } from "../context/auth-context.jsx"; 
 
 const ClientesContext = createContext();
 
@@ -12,6 +13,8 @@ export const ClientesProvider = ({ children }) => {
   const [clientes, setClientes] = useState([]); // Lista de clientes
   const [loading, setLoading] = useState(true); // Estado de carregamento
   const [erro, setErro] = useState(null); // Armazena erro, se houver
+
+  const { usuario } = useAuth(); // Obtém usuário logado e verifica se é admin
 
   // Busca todos os clientes na API
   const fetchClientes = async () => {
@@ -58,10 +61,12 @@ export const ClientesProvider = ({ children }) => {
     }
   };
 
-  // Busca clientes ao montar componente
+  // Só busca clientes se o usuário for admin
   useEffect(() => {
-    fetchClientes();
-  }, []);
+    if (usuario?.tipo === "admin") {
+      fetchClientes();
+    }
+  }, [usuario]); // Executa quando o usuário estiver disponível
 
   return (
     <ClientesContext.Provider
