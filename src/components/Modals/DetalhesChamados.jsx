@@ -1,6 +1,9 @@
 import { Modal, Box, Typography, IconButton, Avatar, Divider } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import StatusChip from "../StatusChip";
+import { MessageCircle } from "lucide-react";
+import { useState } from "react";
+import DraggableChatDialog from "./Chat";
 
 export default function ModalChamadoDetalhes({ isOpen, onClose, chamado, tecnicos = [] }) {
   if (!chamado) return null;
@@ -10,24 +13,22 @@ export default function ModalChamadoDetalhes({ isOpen, onClose, chamado, tecnico
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    width: "90%",           // ocupa 90% da tela por padrão
-    maxWidth: 500,          // limite em telas grandes
+    width: "90%",
+    maxWidth: 500,
     bgcolor: "background.paper",
     boxShadow: 24,
     borderRadius: 3,
-    p: { xs: 2, sm: 3 },    // padding menor no celular
+    p: { xs: 2, sm: 3 },
     outline: "none",
     fontFamily: "Lato",
-    maxHeight: "90vh",      // não passa da altura da tela
-    overflowY: "auto", 
+    maxHeight: "90vh",
+    overflowY: "auto",
   };
 
   const getInitials = (name) => {
     if (!name) return "??";
     const parts = name.trim().split(" ");
-    if (parts.length === 1) {
-      return parts[0][0].toUpperCase();
-    }
+    if (parts.length === 1) return parts[0][0].toUpperCase();
     return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
   };
 
@@ -53,16 +54,27 @@ export default function ModalChamadoDetalhes({ isOpen, onClose, chamado, tecnico
     }
   }
 
+  const [openChat, setOpenChat] = useState(false);
   return (
     <Modal open={isOpen} onClose={onClose}>
       <Box sx={style}>
-        <IconButton onClick={onClose} sx={{ position: "absolute", top: 10, right: 10 }}>
-          <CloseIcon />
-        </IconButton>
+        {/* Header alinhado */}
+        <Box display="flex" alignItems="center" justifyContent="space-between" mb={1}>
+          <Typography variant="body2" color="text.secondary">
+            {chamado.codigo || `#${chamado.id}`}
+          </Typography>
 
-        <Typography variant="body2" color="text.secondary" mb={1}>
-          {chamado.codigo || `#${chamado.id}`}
-        </Typography>
+          <Box display="flex" alignItems="center" gap={1}>
+            <IconButton size="small" onClick={() => { onClose(); setOpenChat(true) }}>
+              <MessageCircle  color= "#35353B" />
+            </IconButton>
+            <IconButton onClick={onClose} size="small">
+              <CloseIcon />
+            </IconButton>
+          </Box>
+        </Box>
+
+        <Divider sx={{ mb: 2 }} />
 
         <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
           <Typography variant="h6" fontWeight="bold">
@@ -165,6 +177,10 @@ export default function ModalChamadoDetalhes({ isOpen, onClose, chamado, tecnico
             </Typography>
           )}
         </Box>
+        <DraggableChatDialog
+        isOpen={openChat}
+        onClose={() => setOpenChat(false)}
+        chamado={chamado} />
       </Box>
     </Modal>
   );
