@@ -8,6 +8,7 @@ import { ModalCriarTecnico } from "../components/Modals/CriarTecnico";
 import { useState } from "react";
 import { ModalCriarCliente } from "../components/Modals/CriarCliente";
 import { useClientes } from "../context/ClientesContext";
+import { Plus } from "lucide-react";
 
 // Spinner simples
 const LoadingSpinner = () => (
@@ -99,7 +100,7 @@ export default function AdminLayout() {
           <div className="header-admin">
             <SearchBar />
             {config && (
-              <Botao text={config.text} onClick={() => setOpen(true)} />
+              <Botao icon={Plus} text={config.text} onClick={() => setOpen(true)} />
             )}
           </div>
           <Outlet />

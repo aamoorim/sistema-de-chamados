@@ -7,7 +7,8 @@ import {
   IconButton,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import Botao from "../Button.jsx"; // ✅ Usando seu componente personalizado
+import Botao from "../Button.jsx";
+import { Check } from "@mui/icons-material";
 
 export function ModalCriarChamado({ isOpen, onClose, onSalvar }) {
   const [titulo, setTitulo] = useState("");
@@ -101,7 +102,7 @@ export function ModalCriarChamado({ isOpen, onClose, onSalvar }) {
         />
 
         <Box display="flex" justifyContent="center">
-          <Botao text="Salvar Chamado" onClick={handleSalvar} />
+          <Botao icon={Check} text="Salvar Chamado" onClick={handleSalvar} />
         </Box>
       </Box>
     </Modal>

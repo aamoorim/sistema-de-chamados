@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Check, Clock2 } from "lucide-react";
+import { Plus, Check, Clock2 } from "lucide-react";
 import SideBar from "../../components/SideBar";
 import "../clientes/clientes.scss";
 import Botao from "../../components/Button";
@@ -159,7 +159,7 @@ const ChamadosCliente = () => {
       <div className="main-content-wrapper">
         <div className="header">
           <h1>Meus chamados</h1>
-          <Botao onClick={() => setOpenModalCalls(true)}>Novo Chamado</Botao>
+          <Botao icon={Plus} onClick={() => setOpenModalCalls(true)}>Novo Chamado</Botao>
           <ModalCriarChamado
             isOpen={openModalCalls}
             onClose={() => setOpenModalCalls(false)}
