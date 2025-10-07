@@ -14,6 +14,8 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { useClientes } from "../../context/ClientesContext";
 import { useAuth } from "../../context/auth-context";
 import clienteService from "../../services/clienteService";
+import EditIcon from "@mui/icons-material/Edit"
+import Botao from "../Button.jsx"
 
 export function ModalEditarCliente({ isOpen, onClose, cliente, onSuccess }) {
   const { token } = useAuth();
@@ -262,24 +264,13 @@ export function ModalEditarCliente({ isOpen, onClose, cliente, onSuccess }) {
           )}
 
           <Box display="flex" justifyContent="center">
-            <Button
+            <Botao
               type="submit"
-              variant="contained"
               disabled={loading || senhasNaoConferem}
-              sx={{
-                bgcolor: "#111",
-                px: 6,
-                py: 1.5,
-                borderRadius: "8px",
-                textTransform: "none",
-                fontWeight: "bold",
-                "&:hover": {
-                  bgcolor: "#000",
-                },
-              }}
+              icon={EditIcon}
             >
               {loading ? "Salvando..." : "Salvar Alterações"}
-            </Button>
+            </Botao>
           </Box>
         </form>
       </Box>

@@ -14,6 +14,8 @@ import { useState } from "react";
 import { useClientes } from "../../context/ClientesContext";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import Botao from "../Button.jsx"
+import { Plus } from "lucide-react";
 
 export function ModalCriarCliente({ isOpen, onClose, onCreateSuccess }) {
   const style = {
@@ -229,8 +231,9 @@ export function ModalCriarCliente({ isOpen, onClose, onCreateSuccess }) {
               disabled={loadingLocal}
               error={senhasNaoConferem}
               helperText={senhasNaoConferem ? "As senhas não coincidem" : ""}
-              InputProps={{
-                endAdornment: (
+              slotProps={{
+                input:{
+                  endAdornment: (
                   <InputAdornment position="end">
                     <IconButton
                       onClick={() => setShowConfirmarSenha(!showConfirmarSenha)}
@@ -242,6 +245,7 @@ export function ModalCriarCliente({ isOpen, onClose, onCreateSuccess }) {
                     </IconButton>
                   </InputAdornment>
                 ),
+                }
               }}
             />
 
@@ -252,24 +256,13 @@ export function ModalCriarCliente({ isOpen, onClose, onCreateSuccess }) {
             )}
 
             <Box display="flex" justifyContent="center">
-              <Button
+              <Botao
                 type="submit"
-                variant="contained"
                 disabled={loadingLocal || senhasNaoConferem}
-                sx={{
-                  bgcolor: "#111",
-                  px: 6,
-                  py: 1.5,
-                  borderRadius: "8px",
-                  textTransform: "none",
-                  fontWeight: "bold",
-                  "&:hover": {
-                    bgcolor: "#000",
-                  },
-                }}
+                icon={Plus}
               >
-                {loadingLocal ? "Salvando..." : "Salvar"}
-              </Button>
+                {loadingLocal ? "Criando...." : "Criar Cliente"}
+              </Botao>
             </Box>
           </form>
         </Box>

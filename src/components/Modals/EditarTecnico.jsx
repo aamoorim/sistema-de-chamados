@@ -13,10 +13,12 @@ import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { useTecnicos } from "../../context/TecnicosContext";
 import { useAuth } from "../../context/auth-context";
-import api from "../../services/api"; // ✅ Importação do api.js
+import EditIcon from "@mui/icons-material/Edit"
+import Botao from "../Button.jsx"
+import api from "../../services/api"; 
 
 export function ModalEditarTecnico({ isOpen, onClose, tecnico }) {
-  const { setTecnicos } = useTecnicos(); // ✅ Troca de updateTecnico por setTecnicos
+  const { setTecnicos } = useTecnicos(); 
   const { token } = useAuth();
 
   const [nome, setNome] = useState("");
@@ -239,24 +241,13 @@ export function ModalEditarTecnico({ isOpen, onClose, tecnico }) {
           )}
 
           <Box display="flex" justifyContent="center">
-            <Button
+            <Botao
               type="submit"
-              variant="contained"
               disabled={loading || senhasNaoConferem}
-              sx={{
-                bgcolor: "#111",
-                px: 6,
-                py: 1.5,
-                borderRadius: "8px",
-                textTransform: "none",
-                fontWeight: "bold",
-                "&:hover": {
-                  bgcolor: "#000",
-                },
-              }}
+              icon={EditIcon}
             >
               {loading ? "Salvando..." : "Salvar Alterações"}
-            </Button>
+            </Botao>
           </Box>
         </form>
       </Box>
