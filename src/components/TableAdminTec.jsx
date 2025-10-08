@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
-import { useTecnicos } from "../context/TecnicosContext";
+import React, { useEffect, useState } from "react";
 import { useSearch } from "../context/search-context";
-import useIsMobile from "../hooks/useIsMobile";
+import { useTecnicos } from "../context/TecnicosContext";
+import { useAuth } from "../context/auth-context"
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -10,11 +10,12 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import IconButton from "@mui/material/IconButton";
-import Snackbar from "@mui/material/Snackbar";
-import MuiAlert from "@mui/material/Alert";
 import { Pencil, Trash2 } from "lucide-react";
 import { DeletarPerfil } from "./Modals/DeletarPerfil";
 import { ModalEditarTecnico } from "./Modals/EditarTecnico";
+import useIsMobile from "../hooks/useIsMobile";
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
 import "../styles/tables/listTable.scss";
 
 // Avatar com iniciais
@@ -98,12 +99,13 @@ export default function TableAdminTec() {
   const isMobile = useIsMobile(1200);
   const { search } = useSearch();
   const { tecnicos, deleteTecnico, fetchTecnicos, createTecnico } = useTecnicos();
+  const { token } = useAuth(); // Token de autenticação
 
   const [loading, setLoading] = useState(true);
-
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
-  const [selectedTecnico, setSelectedTecnico] = useState(null);
-
+  const [selectedRow, setSelectedRow] = useState(null); // Linha selecionada para exclusão
+  
+  // const [selectedTecnico, setSelectedTecnico] = useState(null);
   const [openEditModal, setOpenEditModal] = useState(false);
   const [selectedTecnicoEdit, setSelectedTecnicoEdit] = useState(null);
 
@@ -112,20 +114,34 @@ export default function TableAdminTec() {
   const [toastMessage, setToastMessage] = useState("");
   const [toastSeverity, setToastSeverity] = useState("success"); // "success", "error", "warning", "info"
 
-  useEffect(() => {
-    const loadTecnicos = async () => {
-      setLoading(true);
-      try {
-        await fetchTecnicos();
-      } catch (error) {
-        console.error("Erro ao carregar técnicos:", error);
-      } finally {
-        setLoading(false);
-      }
+    // Carrega tecnicos assim que o token estiver disponível
+    useEffect(() => {
+      const load = async () => {
+        setLoading(true);
+        try {
+          await fetchTecnicos();
+        } catch (err) {
+          console.error("Erro ao carregar tecnicos:", err);
+          showToast("error", "Erro ao carregar tecnicos");
+        } finally {
+          setLoading(false);
+        }
+      };
+      if (token) load();
+    }, [token]);
+  
+    // Função para abrir toast
+    const showToast = (severity, message) => {
+      setToastSeverity(severity);
+      setToastMessage(message);
+      setToastOpen(true);
     };
 
-    loadTecnicos();
-  }, []);
+    // Fecha o toast
+    const handleToastClose = (event, reason) => {
+      if (reason === "clickaway") return;
+      setToastOpen(false);
+    };
 
   const filteredTecnicos = tecnicos.filter((tec) => {
     if (!tec) return false;
@@ -138,86 +154,64 @@ export default function TableAdminTec() {
     );
   });
 
-  const handleOpenDelete = (tecnico) => {
-    setSelectedTecnico(tecnico);
+  // Abre modal de excluir para a linha selecionada
+  const handleOpenDelete = (row) => {
+    setSelectedRow(row);
     setOpenDeleteModal(true);
   };
 
+  // Fecha modal de exclusão e limpa seleção
   const handleCloseDelete = () => {
-    setSelectedTecnico(null);
+    setSelectedRow(null);
     setOpenDeleteModal(false);
   };
 
+  // Confirma exclusão, remove do backend e recarrega lista
   const handleDeleteConfirmed = async () => {
-    if (!selectedTecnico) return;
-
+    if (!selectedRow) return;
     setLoading(true);
-
     try {
-      await deleteTecnico(selectedTecnico.id);
+      await deleteTecnico(selectedRow.id);
       await fetchTecnicos();
-      setToastMessage(`Técnico "${selectedTecnico.nome}" deletado com sucesso!`);
-      setToastSeverity("success");
-      setToastOpen(true);
+      setOpenDeleteModal(false);
+      showToast("success", `Tecnico "${selectedRow.nome}" deletado com sucesso!`);
+      setSelectedRow(null);
     } catch (error) {
-      console.error("Erro ao deletar técnico:", error);
-      setToastMessage("Não foi possível deletar técnico.");
-      setToastSeverity("error");
-      setToastOpen(true);
+      console.error("Erro ao deletar tecnico:", error);
+      showToast("error", `Não foi possível deletar o tecnico "${selectedRow?.nome || ''}".`);
     } finally {
-      handleCloseDelete();
       setLoading(false);
     }
   };
 
+  // Abre modal de edição com tecnico selecionado
   const handleOpenEdit = (tecnico) => {
     setSelectedTecnicoEdit(tecnico);
     setOpenEditModal(true);
   };
 
-  // Depois de editar, fecha modal, recarrega e mostra toast
-  const handleCloseEdit = async (wasEdited = false) => {
+  // Fecha modal de edição e limpa seleção
+  const handleCloseEdit = () => {
     setSelectedTecnicoEdit(null);
     setOpenEditModal(false);
-
-    if (wasEdited) {
-      setLoading(true);
-      try {
-        await fetchTecnicos();
-        setToastMessage("Técnico editado com sucesso!");
-        setToastSeverity("success");
-        setToastOpen(true);
-      } catch (error) {
-        console.error("Erro ao recarregar técnicos após edição:", error);
-        setToastMessage("Erro ao atualizar técnicos após edição.");
-        setToastSeverity("error");
-        setToastOpen(true);
-      } finally {
-        setLoading(false);
-      }
-    }
   };
 
-  // Exemplo função para criar técnico (você pode adaptar seu modal/criação)
-  const handleCreateTecnico = async (novoTecnicoData) => {
+  // Recarrega tecnicos após edição bem-sucedida e mostra toast
+    const handleEditSuccess = async () => {
     setLoading(true);
     try {
-      await createTecnico(novoTecnicoData);
-      await fetchTecnicos();
-      setToastMessage(`Técnico "${novoTecnicoData.nome}" criado com sucesso!`);
-      setToastSeverity("success");
-      setToastOpen(true);
+      await fetchTecnicos(); 
+      showToast("success", `Técnico "${selectedTecnicoEdit?.nome}" editado com sucesso!`);
     } catch (error) {
-      console.error("Erro ao criar técnico:", error);
-      setToastMessage("Não foi possível criar técnico.");
-      setToastSeverity("error");
-      setToastOpen(true);
+      console.error("Erro ao recarregar técnico:", error);
+      showToast("error", `Erro ao atualizar o técnico "${selectedTecnicoEdit?.nome}".`);
     } finally {
       setLoading(false);
     }
   };
 
-  if (loading) return <LoadingSpinner />;
+
+  if (loading) return <LoadingSpinner />; // Mostra spinner enquanto carrega
 
   return (
     <div style={{ fontFamily: "Lato" }}>
@@ -316,29 +310,37 @@ export default function TableAdminTec() {
         </TableContainer>
       )}
 
-      <DeletarPerfil
-        isOpen={openDeleteModal}
-        onClose={handleCloseDelete}
-        onDelete={handleDeleteConfirmed}
-        usuario={selectedTecnico}
-      />
-
-      <ModalEditarTecnico
-        isOpen={openEditModal}
-        onClose={() => handleCloseEdit(true)}
-        tecnico={selectedTecnicoEdit}
-      />
-
-      <Snackbar
-        open={toastOpen}
-        autoHideDuration={4000}
-        onClose={() => setToastOpen(false)}
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
-      >
-        <Alert onClose={() => setToastOpen(false)} severity={toastSeverity}>
-          {toastMessage}
-        </Alert>
-      </Snackbar>
+      {/* Modal para confirmação de exclusão */}
+            <DeletarPerfil
+              isOpen={openDeleteModal}
+              onClose={handleCloseDelete}
+              onDelete={handleDeleteConfirmed}
+              usuario={selectedRow}
+            />
+      
+            {/* Modal para editar tecnico */}
+            <ModalEditarTecnico
+              isOpen={openEditModal}
+              onClose={handleCloseEdit}
+              tecnico={selectedTecnicoEdit}
+              onSuccess={handleEditSuccess} // Atualiza lista após edição
+            />
+      
+            {/* Snackbar para toasts */}
+            <Snackbar
+              open={toastOpen}
+              autoHideDuration={4000}
+              onClose={handleToastClose}
+              anchorOrigin={{ vertical: "top", horizontal: "right" }}
+            >
+              <Alert
+                onClose={handleToastClose}
+                severity={toastSeverity}
+                sx={{ width: "100%", bgcolor: "#604FEB", color: "#fff" }}
+              >
+                {toastMessage}
+              </Alert>
+            </Snackbar>
     </div>
   );
 }
