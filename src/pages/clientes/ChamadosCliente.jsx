@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, forwardRef } from "react";
 import { Plus, Check, Clock2 } from "lucide-react";
 import SideBar from "../../components/SideBar";
 import "../clientes/clientes.scss";
@@ -13,6 +13,12 @@ import chamadosService from "../../services/chamadosService";
 
 import EditIcon from "@mui/icons-material/Edit";
 import { IconButton } from "@mui/material";
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
+
+const Alert = forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 
 const ChamadosCliente = () => {
   const { user } = useAuth();
@@ -23,41 +29,101 @@ const ChamadosCliente = () => {
   const [openModalCalls, setOpenModalCalls] = useState(false);
   const [openModalDetails, setOpenModalDetails] = useState(false);
   const [openModalEditar, setOpenModalEditar] = useState(false);
-
   const [chamadoSelecionado, setChamadoSelecionado] = useState(null);
 
+  const [toastOpen, setToastOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+
+  // Polling inteligente + detectar atribuição de técnico
   useEffect(() => {
     if (!user || !user.id) {
       setChamados([]);
       return;
     }
 
-    const fetchChamados = async () => {
-      setLoading(true);
+    let intervalId;
+
+    const fetchChamados = async (showSpinner = false) => {
+      if (showSpinner) setLoading(true);
       try {
         const data = await chamadosService.getChamadosDoCliente();
-        setChamados(data);
-      } catch {
+
+        // Detectar alterações comparando cada campo relevante
+        const changed = data.filter((novo) => {
+          const antigo = chamados.find((c) => c.id === novo.id);
+          if (!antigo) return false;
+          // mudança de status
+          if (antigo.status !== novo.status) return true;
+          // mudança de técnico atribuído (supondo que campo seja 'tecnico' ou algo parecido)
+          if (antigo.tecnico !== novo.tecnico) return true;
+          // se tiver outros campos que importam, adiciona aqui
+          return false;
+        });
+
+        const dataString = JSON.stringify(data);
+        const currentString = JSON.stringify(chamados);
+
+        if (dataString !== currentString) {
+          setChamados(data);
+
+          // para cada que mudou, exibir toast
+          changed.forEach((c) => {
+            // se técnico atribuído (novo.tecnico existe) e antigo não tinha
+            const antigo = chamados.find((x) => x.id === c.id);
+            if (antigo) {
+              // status mudou para atendimento
+              if (c.status?.toLowerCase() === "em_andamento" && antigo.status !== c.status) {
+                showToast(`Chamado #${c.id} foi atendido por um técnico!`);
+              }
+              // status virou encerrado
+              if (c.status?.toLowerCase() === "encerrado" && antigo.status !== c.status) {
+                showToast(`Chamado #${c.id} finalizado!`);
+              }
+            }
+          });
+
+          if (!showSpinner) setLoading(true);
+          setTimeout(() => setLoading(false), 1000);
+        } else {
+          setLoading(false);
+        }
+      } catch (err) {
         setChamados([]);
-      } finally {
         setLoading(false);
       }
     };
 
-    fetchChamados();
-  }, [user]);
+    // fetch inicial
+    fetchChamados(true);
+
+    intervalId = setInterval(() => {
+      fetchChamados(false);
+    }, 10000);
+
+    return () => clearInterval(intervalId);
+  }, [user, chamados]);
+
+  const showToast = (message) => {
+    setToastMessage(message);
+    setToastOpen(true);
+  };
+
+  const handleToastClose = (_, reason) => {
+    if (reason === "clickaway") return;
+    setToastOpen(false);
+  };
 
   const criarChamadoHandler = async (dadosChamado) => {
     if (!dadosChamado.titulo || !dadosChamado.descricao) {
       alert("Título e descrição são obrigatórios.");
       return;
     }
-
     try {
       const novoChamado = await chamadosService.criarChamado(dadosChamado);
       if (novoChamado && novoChamado.id) {
         setChamados((prev) => [novoChamado, ...prev]);
         setOpenModalCalls(false);
+        showToast("Chamado criado com sucesso!");
       } else {
         alert("Não foi possível criar o chamado. Tente novamente.");
       }
@@ -75,15 +141,21 @@ const ChamadosCliente = () => {
           descricao: dadosAtualizados.description,
         }
       );
-
       setChamados((prev) =>
         prev.map((chamado) =>
           chamado.id === atualizado.id ? atualizado : chamado
         )
       );
-
       setOpenModalEditar(false);
-    } catch (error) {
+
+      if (["em_andamento", "encerrado"].includes(atualizado.status?.toLowerCase())) {
+        const mensagem =
+          atualizado.status.toLowerCase() === "em_andamento"
+            ? "Chamado atendido!"
+            : "Chamado finalizado!";
+        showToast(mensagem);
+      }
+    } catch {
       alert("Erro ao atualizar chamado.");
     }
   };
@@ -133,7 +205,7 @@ const ChamadosCliente = () => {
         position: "fixed",
         top: 0,
         left: 0,
-        backgroundColor: "rgba(255, 255, 255, 0.7)",
+        backgroundColor: "rgba(255,255,255,0.7)",
         zIndex: 9999,
       }}
     >
@@ -149,8 +221,8 @@ const ChamadosCliente = () => {
       />
       <style>{`
         @keyframes spin {
-          0% { transform: rotate(0deg);}
-          100% { transform: rotate(360deg);}
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
         }
       `}</style>
     </div>
@@ -158,6 +230,21 @@ const ChamadosCliente = () => {
 
   return (
     <div className="tecnico-chamados">
+      <Snackbar
+        open={toastOpen}
+        autoHideDuration={4000}
+        onClose={handleToastClose}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Alert
+          onClose={handleToastClose}
+          severity="success"
+          sx={{ bgcolor: "#604FEB", color: "#fff" }}
+        >
+          {toastMessage}
+        </Alert>
+      </Snackbar>
+
       <div className="main-content-wrapper">
         <div className="header">
           <h1>Meus chamados</h1>
@@ -238,11 +325,12 @@ const ChamadosCliente = () => {
                             <span className="user-name">
                               {user?.nome || "Usuário"}
                             </span>
-                            <div className={`status-icon ${secao.classe}`}>
+                            <div
+                              className={`status-icon ${secao.classe}`}
+                            >
                               {secao.icone}
                             </div>
 
-                            {/* Só mostra botão de edição se NÃO estiver encerrado */}
                             {chamado.status?.toLowerCase() !== "encerrado" && (
                               <IconButton
                                 size="small"
@@ -260,7 +348,12 @@ const ChamadosCliente = () => {
                       </div>
                     ))
                   ) : (
-                    <p style={{ color: "#64748b", paddingLeft: "8px" }}>
+                    <p
+                      style={{
+                        color: "#64748b",
+                        paddingLeft: "8px",
+                      }}
+                    >
                       Nenhum chamado nesta seção.
                     </p>
                   )}
@@ -291,4 +384,4 @@ const ChamadosCliente = () => {
   );
 };
 
-export default ChamadosCliente; 
+export default ChamadosCliente;
