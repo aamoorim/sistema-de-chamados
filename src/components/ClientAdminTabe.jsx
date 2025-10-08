@@ -14,6 +14,8 @@ import { Pencil, Trash2 } from "lucide-react";
 import { DeletarPerfil } from "./Modals/DeletarPerfil";
 import { ModalEditarCliente } from "./Modals/EditarCliente";
 import useIsMobile from "../hooks/useIsMobile";
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
 import "../styles/tables/clientTable.scss";
 
 // Componente simples que mostra as iniciais do nome no avatar
@@ -27,7 +29,7 @@ function Avatar({ initials }) {
         width: 28,
         height: 28,
         borderRadius: "50%",
-        background: "#2E3DA3",
+        background: "#604FEB", // tom roxo
         color: "#fff",
         fontWeight: 600,
         fontSize: 14,
@@ -74,6 +76,10 @@ const LoadingSpinner = () => (
   </div>
 );
 
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
+
 export default function ClientAdminTabe() {
   const isMobile = useIsMobile(1200); // Verifica se é dispositivo móvel (largura menor que 1200px)
   const { search } = useSearch(); // Texto da busca do contexto global
@@ -87,6 +93,11 @@ export default function ClientAdminTabe() {
   const [openEditModal, setOpenEditModal] = useState(false); // Modal editar aberto?
   const [selectedClienteEdit, setSelectedClienteEdit] = useState(null); // Cliente selecionado para editar
 
+  // Toast state
+  const [toastOpen, setToastOpen] = useState(false);
+  const [toastSeverity, setToastSeverity] = useState("success"); // success, error, info, warning
+  const [toastMessage, setToastMessage] = useState("");
+
   // Carrega clientes assim que o token estiver disponível
   useEffect(() => {
     const load = async () => {
@@ -95,12 +106,26 @@ export default function ClientAdminTabe() {
         await fetchClientes();
       } catch (err) {
         console.error("Erro ao carregar clientes:", err);
+        showToast("error", "Erro ao carregar clientes");
       } finally {
         setLoading(false);
       }
     };
     if (token) load();
   }, [token]);
+
+  // Função para abrir toast
+  const showToast = (severity, message) => {
+    setToastSeverity(severity);
+    setToastMessage(message);
+    setToastOpen(true);
+  };
+
+  // Fecha o toast
+  const handleToastClose = (event, reason) => {
+    if (reason === "clickaway") return;
+    setToastOpen(false);
+  };
 
   // Filtra os clientes conforme o termo de busca
   const filteredRows = clientes.filter((row) => {
@@ -135,10 +160,11 @@ export default function ClientAdminTabe() {
       await deleteCliente(selectedRow.id);
       await fetchClientes();
       setOpenDeleteModal(false);
+      showToast("success", `Cliente "${selectedRow.nome}" deletado com sucesso!`);
       setSelectedRow(null);
     } catch (error) {
       console.error("Erro ao deletar cliente:", error);
-      alert("Não foi possível deletar cliente.");
+      showToast("error", `Não foi possível deletar o cliente "${selectedRow?.nome || ''}".`);
     } finally {
       setLoading(false);
     }
@@ -154,16 +180,17 @@ export default function ClientAdminTabe() {
   const handleCloseEdit = () => {
     setSelectedClienteEdit(null);
     setOpenEditModal(false);
-    // Não recarregar lista aqui para evitar spinner desnecessário
   };
 
-  // Recarrega clientes após edição bem-sucedida
+  // Recarrega clientes após edição bem-sucedida e mostra toast
   const handleEditSuccess = async () => {
     setLoading(true);
     try {
       await fetchClientes();
+      showToast("success", `Cliente "${selectedClienteEdit?.nome}" editado com sucesso!`);
     } catch (error) {
       console.error("Erro ao recarregar clientes:", error);
+      showToast("error", `Erro ao atualizar o cliente "${selectedClienteEdit?.nome}".`);
     } finally {
       setLoading(false);
     }
@@ -292,6 +319,22 @@ export default function ClientAdminTabe() {
         cliente={selectedClienteEdit}
         onSuccess={handleEditSuccess} // Atualiza lista após edição
       />
+
+      {/* Snackbar para toasts */}
+      <Snackbar
+        open={toastOpen}
+        autoHideDuration={4000}
+        onClose={handleToastClose}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Alert
+          onClose={handleToastClose}
+          severity={toastSeverity}
+          sx={{ width: "100%", bgcolor: "#604FEB", color: "#fff" }}
+        >
+          {toastMessage}
+        </Alert>
+      </Snackbar>
     </div>
   );
 }
