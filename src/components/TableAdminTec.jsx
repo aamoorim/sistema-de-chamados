@@ -10,6 +10,8 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import IconButton from "@mui/material/IconButton";
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
 import { Pencil, Trash2 } from "lucide-react";
 import { DeletarPerfil } from "./Modals/DeletarPerfil";
 import { ModalEditarTecnico } from "./Modals/EditarTecnico";
@@ -73,10 +75,29 @@ const LoadingSpinner = () => (
   </div>
 );
 
+// Alert personalizado com cor 604FEB
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return (
+    <MuiAlert
+      elevation={6}
+      ref={ref}
+      variant="filled"
+      {...props}
+      sx={{
+        backgroundColor: "#604FEB",
+        color: "#fff",
+        "& .MuiAlert-icon": {
+          color: "#fff",
+        },
+      }}
+    />
+  );
+});
+
 export default function TableAdminTec() {
   const isMobile = useIsMobile(1200);
   const { search } = useSearch();
-  const { tecnicos, deleteTecnico, fetchTecnicos } = useTecnicos();
+  const { tecnicos, deleteTecnico, fetchTecnicos, createTecnico } = useTecnicos();
 
   const [loading, setLoading] = useState(true);
 
@@ -86,21 +107,25 @@ export default function TableAdminTec() {
   const [openEditModal, setOpenEditModal] = useState(false);
   const [selectedTecnicoEdit, setSelectedTecnicoEdit] = useState(null);
 
+  // Estados para toast
+  const [toastOpen, setToastOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastSeverity, setToastSeverity] = useState("success"); // "success", "error", "warning", "info"
+
   useEffect(() => {
-  const loadTecnicos = async () => {
-    setLoading(true);
-    try {
-      await fetchTecnicos();
-    } catch (error) {
-      console.error("Erro ao carregar técnicos:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    const loadTecnicos = async () => {
+      setLoading(true);
+      try {
+        await fetchTecnicos();
+      } catch (error) {
+        console.error("Erro ao carregar técnicos:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  loadTecnicos();
-  }, []); // Executa uma vez ao montar
-
+    loadTecnicos();
+  }, []);
 
   const filteredTecnicos = tecnicos.filter((tec) => {
     if (!tec) return false;
@@ -124,43 +149,73 @@ export default function TableAdminTec() {
   };
 
   const handleDeleteConfirmed = async () => {
-  if (!selectedTecnico) return;
+    if (!selectedTecnico) return;
 
-  setLoading(true); // Mostra o spinner
+    setLoading(true);
 
-  try {
-    await deleteTecnico(selectedTecnico.id); // Deleta o técnico
-    await fetchTecnicos(); // Recarrega os dados
-  } catch (error) {
-    console.error("Erro ao deletar técnico:", error);
-    alert("Não foi possível deletar técnico.");
-  } finally {
-    handleCloseDelete(); // Fecha o modal
-    setLoading(false);   // Esconde o spinner
-  }
-};
-
+    try {
+      await deleteTecnico(selectedTecnico.id);
+      await fetchTecnicos();
+      setToastMessage(`Técnico "${selectedTecnico.nome}" deletado com sucesso!`);
+      setToastSeverity("success");
+      setToastOpen(true);
+    } catch (error) {
+      console.error("Erro ao deletar técnico:", error);
+      setToastMessage("Não foi possível deletar técnico.");
+      setToastSeverity("error");
+      setToastOpen(true);
+    } finally {
+      handleCloseDelete();
+      setLoading(false);
+    }
+  };
 
   const handleOpenEdit = (tecnico) => {
     setSelectedTecnicoEdit(tecnico);
     setOpenEditModal(true);
   };
 
-  // Aqui, após fechar a edição, recarregamos os técnicos
-  const handleCloseEdit = async () => {
+  // Depois de editar, fecha modal, recarrega e mostra toast
+  const handleCloseEdit = async (wasEdited = false) => {
     setSelectedTecnicoEdit(null);
     setOpenEditModal(false);
 
-    setLoading(true); // Mostra o spinner antes de atualizar
-    try {
-      await fetchTecnicos(); // Recarrega os dados
-    } catch (error) {
-      console.error("Erro ao recarregar técnicos após edição:", error);
-    } finally {
-      setLoading(false); // Esconde o spinner depois
+    if (wasEdited) {
+      setLoading(true);
+      try {
+        await fetchTecnicos();
+        setToastMessage("Técnico editado com sucesso!");
+        setToastSeverity("success");
+        setToastOpen(true);
+      } catch (error) {
+        console.error("Erro ao recarregar técnicos após edição:", error);
+        setToastMessage("Erro ao atualizar técnicos após edição.");
+        setToastSeverity("error");
+        setToastOpen(true);
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
+  // Exemplo função para criar técnico (você pode adaptar seu modal/criação)
+  const handleCreateTecnico = async (novoTecnicoData) => {
+    setLoading(true);
+    try {
+      await createTecnico(novoTecnicoData);
+      await fetchTecnicos();
+      setToastMessage(`Técnico "${novoTecnicoData.nome}" criado com sucesso!`);
+      setToastSeverity("success");
+      setToastOpen(true);
+    } catch (error) {
+      console.error("Erro ao criar técnico:", error);
+      setToastMessage("Não foi possível criar técnico.");
+      setToastSeverity("error");
+      setToastOpen(true);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (loading) return <LoadingSpinner />;
 
@@ -270,10 +325,20 @@ export default function TableAdminTec() {
 
       <ModalEditarTecnico
         isOpen={openEditModal}
-        onClose={handleCloseEdit}
+        onClose={() => handleCloseEdit(true)}
         tecnico={selectedTecnicoEdit}
       />
+
+      <Snackbar
+        open={toastOpen}
+        autoHideDuration={4000}
+        onClose={() => setToastOpen(false)}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Alert onClose={() => setToastOpen(false)} severity={toastSeverity}>
+          {toastMessage}
+        </Alert>
+      </Snackbar>
     </div>
   );
 }
-
