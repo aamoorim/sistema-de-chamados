@@ -5,13 +5,13 @@ import "../clientes/clientes.scss";
 import Botao from "../../components/Button";
 import { ModalCriarChamado } from "../../components/Modals/CriarChamado";
 import ModalChamadoDetalhes from "../../components/Modals/DetalhesChamados";
-import EditTicketModal from "../../components/Modals/EditarChamado"; 
+import EditTicketModal from "../../components/Modals/EditarChamado";
 import { SearchProvider } from "../../context/search-context";
 import SearchBar from "../../components/search-bar";
 import { useAuth } from "../../context/auth-context";
 import chamadosService from "../../services/chamadosService";
 
-import EditIcon from '@mui/icons-material/Edit';
+import EditIcon from "@mui/icons-material/Edit";
 import { IconButton } from "@mui/material";
 
 const ChamadosCliente = () => {
@@ -68,11 +68,13 @@ const ChamadosCliente = () => {
 
   const handleAtualizarChamado = async (dadosAtualizados) => {
     try {
-      // Envia só título e descrição para atualizar
-      const atualizado = await chamadosService.atualizarChamado(chamadoSelecionado.id, {
-        titulo: dadosAtualizados.title,
-        descricao: dadosAtualizados.description,
-      });
+      const atualizado = await chamadosService.atualizarChamado(
+        chamadoSelecionado.id,
+        {
+          titulo: dadosAtualizados.title,
+          descricao: dadosAtualizados.description,
+        }
+      );
 
       setChamados((prev) =>
         prev.map((chamado) =>
@@ -102,7 +104,7 @@ const ChamadosCliente = () => {
   };
 
   const handleOpenModalEditar = (chamado, e) => {
-    e.stopPropagation(); // pra não abrir modal detalhes ao clicar no botão
+    e.stopPropagation();
     setChamadoSelecionado(chamado);
     setOpenModalEditar(true);
   };
@@ -124,15 +126,15 @@ const ChamadosCliente = () => {
     <div
       style={{
         display: "flex",
-        justifyContent: "center",  
-        alignItems: "center",      
-        height: "100vh",           
-        width: "100vw",           
-        position: "fixed",        
+        justifyContent: "center",
+        alignItems: "center",
+        height: "100vh",
+        width: "100vw",
+        position: "fixed",
         top: 0,
         left: 0,
         backgroundColor: "rgba(255, 255, 255, 0.7)",
-        zIndex: 9999,              
+        zIndex: 9999,
       }}
     >
       <div
@@ -159,7 +161,9 @@ const ChamadosCliente = () => {
       <div className="main-content-wrapper">
         <div className="header">
           <h1>Meus chamados</h1>
-          <Botao icon={Plus} onClick={() => setOpenModalCalls(true)}>Novo Chamado</Botao>
+          <Botao icon={Plus} onClick={() => setOpenModalCalls(true)}>
+            Novo Chamado
+          </Botao>
           <ModalCriarChamado
             isOpen={openModalCalls}
             onClose={() => setOpenModalCalls(false)}
@@ -213,36 +217,44 @@ const ChamadosCliente = () => {
                         <div className="card-main">
                           <div className="chamado-info">
                             <div className="chamado-codigo">#{chamado.id}</div>
-                            <div className="chamado-titulo">{chamado.titulo}</div>
+                            <div className="chamado-titulo">
+                              {chamado.titulo}
+                            </div>
                             <div className="chamado-descricao">
                               {chamado.descricao}
                             </div>
                             <div className="chamado-data">
-                              {new Date(chamado.data_criacao).toLocaleDateString()}
+                              {new Date(
+                                chamado.data_criacao
+                              ).toLocaleDateString()}
                             </div>
                           </div>
                         </div>
                         <div className="card-footer">
                           <div className="user-info">
-                            <div className="user-avatar">{user?.nome?.[0] || "U"}</div>
-                            <span className="user-name">{user?.nome || "Usuário"}</span>
+                            <div className="user-avatar">
+                              {user?.nome?.[0] || "U"}
+                            </div>
+                            <span className="user-name">
+                              {user?.nome || "Usuário"}
+                            </span>
                             <div className={`status-icon ${secao.classe}`}>
                               {secao.icone}
                             </div>
 
-                            {/* Ícone para abrir modal editar */}
-                            <IconButton
-                              size="small"
-                              onClick={(e) => {
-                                e.stopPropagation(); // evita abrir modal de detalhes
-                                setChamadoSelecionado(chamado);
-                                setOpenModalEditar(true);
-                              }}
-                              sx={{ marginLeft: 1 }}
-                              aria-label="Editar chamado"
-                            >
-                              <EditIcon fontSize="small" />
-                            </IconButton>
+                            {/* Só mostra botão de edição se NÃO estiver encerrado */}
+                            {chamado.status?.toLowerCase() !== "encerrado" && (
+                              <IconButton
+                                size="small"
+                                onClick={(e) =>
+                                  handleOpenModalEditar(chamado, e)
+                                }
+                                sx={{ marginLeft: 1 }}
+                                aria-label="Editar chamado"
+                              >
+                                <EditIcon fontSize="small" />
+                              </IconButton>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -279,4 +291,4 @@ const ChamadosCliente = () => {
   );
 };
 
-export default ChamadosCliente;
+export default ChamadosCliente; 
