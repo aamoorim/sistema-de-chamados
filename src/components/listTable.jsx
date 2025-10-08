@@ -171,8 +171,14 @@ export default function ListTable() {
   };
 
   const handleDeleteConfirmed = async () => {
+    if (!selectedChamado) return;
+    if (["em_andamento"].includes(selectedChamado.status)) {
+      showToast("Não é permitido deletar chamados em andamento.", "error");
+      handleCloseDelete();
+      return;
+    }    
+
     try {
-      if (!selectedChamado) return;
       await api.delete(`/chamados/${selectedChamado.id}`);
       await fetchChamados();
       showToast(`Chamado #${selectedChamado.id} deletado com sucesso`, "success");
@@ -182,6 +188,7 @@ export default function ListTable() {
     }
     handleCloseDelete();
   };
+
 
   const handleRowClick = (row) => {
     setSelectedChamadoDetalhes(row);
@@ -280,7 +287,7 @@ export default function ListTable() {
     >
       <Snackbar
         open={toastOpen}
-        autoHideDuration={4000}
+        autoHideDuration={2000} // Tempo de expiração do toast
         onClose={handleToastClose}
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
       >
