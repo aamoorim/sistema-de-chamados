@@ -178,7 +178,13 @@ export default function TableAdminTec() {
       setSelectedRow(null);
     } catch (error) {
       console.error("Erro ao deletar tecnico:", error);
-      showToast("error", `Não foi possível deletar o tecnico "${selectedRow?.nome || ''}".`);
+      showToast(
+        "error",
+        <>
+          Não foi possível deletar o técnico "{selectedRow?.nome || ''}".<br />
+          Certifique-se de que ele não possui chamados atribuídos.
+        </>
+      );
     } finally {
       setLoading(false);
     }

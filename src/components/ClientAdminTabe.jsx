@@ -152,23 +152,29 @@ export default function ClientAdminTabe() {
     setOpenDeleteModal(false);
   };
 
-  // Confirma exclusão, remove do backend e recarrega lista
-  const handleDeleteConfirmed = async () => {
-    if (!selectedRow) return;
-    setLoading(true);
-    try {
-      await deleteCliente(selectedRow.id);
-      await fetchClientes();
-      setOpenDeleteModal(false);
-      showToast("success", `Cliente "${selectedRow.nome}" deletado com sucesso!`);
-      setSelectedRow(null);
-    } catch (error) {
-      console.error("Erro ao deletar cliente:", error);
-      showToast("error", `Não foi possível deletar o cliente "${selectedRow?.nome || ''}".`);
-    } finally {
-      setLoading(false);
-    }
-  };
+    // Confirma exclusão, remove do backend e recarrega lista
+    const handleDeleteConfirmed = async () => {
+      if (!selectedRow) return;
+      setLoading(true);
+      try {
+        await deleteCliente(selectedRow.id);
+        await fetchClientes();
+        setOpenDeleteModal(false);
+        showToast("success", `Cliente "${selectedRow.nome}" deletado com sucesso!`);
+        setSelectedRow(null);
+      } catch (error) {
+        console.error("Erro ao deletar cliente:", error);
+        showToast(
+          "error",
+          <>
+            Não foi possível deletar o cliente "{selectedRow?.nome || ''}".<br />
+            Certifique-se de que ele não possui chamados criados.
+          </>
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
 
   // Abre modal de edição com cliente selecionado
   const handleOpenEdit = (cliente) => {
