@@ -1,4 +1,4 @@
-import { Modal, Box, Typography, IconButton, Avatar, Divider } from "@mui/material";
+import { Modal, Box, Typography, IconButton, Avatar, Divider, Portal } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import StatusChip from "../StatusChip";
 import { MessageCircle } from "lucide-react";
@@ -56,7 +56,9 @@ export default function ModalChamadoDetalhes({ isOpen, onClose, chamado, tecnico
 
   const [openChat, setOpenChat] = useState(false);
   return (
-    <Modal open={isOpen} onClose={onClose}>
+    <>
+    
+      <Modal open={isOpen} onClose={onClose}>
       <Box sx={style}>
         {/* Header alinhado */}
         <Box display="flex" alignItems="center" justifyContent="space-between" mb={1}>
@@ -177,11 +179,16 @@ export default function ModalChamadoDetalhes({ isOpen, onClose, chamado, tecnico
             </Typography>
           )}
         </Box>
-        <DraggableChatDialog
-        isOpen={openChat}
-        onClose={() => setOpenChat(false)}
-        chamado={chamado} />
       </Box>
     </Modal>
+    <Portal>
+      <DraggableChatDialog
+        isOpen={openChat}
+        onClose={() => setOpenChat(false)}
+        chamado={chamado}
+      />
+    </Portal>
+    
+    </>
   );
 }
