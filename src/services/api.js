@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://teste-token.onrender.com",
+  baseURL: "http://localhost:8000/",
 });
 
 api.interceptors.request.use((config) => {

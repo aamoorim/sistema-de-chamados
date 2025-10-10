@@ -9,64 +9,23 @@ import {
   Divider,
 } from "@mui/material";
 import { X, Minus, Maximize2, MessageCircle, Send } from "lucide-react";
+import { connectWebSocket, sendMessage, disconnectWebSocket } from "../../services/chatSocket";
+import chamadosService from "../../services/chamadosService";
+import { useAuth } from "../../context/auth-context";
 
 const DraggableChatDialog = ({ isOpen, onClose, chamado }) => {
-  const [messages, setMessages] = useState([
-    { id: 1, text: "Olá, estou com problema no pagamento.", type: "received", time: "14:30" },
-    { id: 2, text: "Olá João! Vou verificar isso para você.", type: "sent", time: "14:32" },
-  ]);
+  const { user } = useAuth();
+  const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState("");
   const [isConnected, setIsConnected] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const messagesEndRef = useRef(null);
 
-  // Posição e drag
+  // ======== DRAG =========
   const [position, setPosition] = useState({ x: 50, y: 100 });
   const [dragging, setDragging] = useState(false);
   const dragStart = useRef({ x: 0, y: 0 });
 
-  // Simula conexão
-  useEffect(() => {
-    if (isOpen) setTimeout(() => setIsConnected(true), 500);
-  }, [isOpen]);
-
-  // Scroll automático
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
-
-  const sendMessage = () => {
-    if (inputMessage.trim() === "") return;
-
-    const newMessage = {
-      id: messages.length + 1,
-      text: inputMessage,
-      type: "sent",
-      time: new Date().toLocaleTimeString("pt-BR", {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-    };
-    setMessages((prev) => [...prev, newMessage]);
-    setInputMessage("");
-
-    setTimeout(() => {
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: prev.length + 1,
-          text: "Entendi, vou verificar isso.",
-          type: "received",
-          time: new Date().toLocaleTimeString("pt-BR", {
-            hour: "2-digit",
-            minute: "2-digit",
-          }),
-        },
-      ]);
-    }, 2000);
-  };
-
-  // ======== DRAG MANUAL =========
   const handleMouseDown = (e) => {
     setDragging(true);
     dragStart.current = {
@@ -99,6 +58,66 @@ const DraggableChatDialog = ({ isOpen, onClose, chamado }) => {
     };
   }, [dragging]);
   // ==================================
+
+  // ======== CONEXÃO WEBSOCKET + MENSAGENS =========
+  useEffect(() => {
+    if (!isOpen || !chamado?.id) return;
+
+    async function initChat() {
+      try {
+        // 1️⃣ Buscar histórico via REST
+        const historico = await chamadosService.getMensagensDoChamado(chamado.id);
+        setMessages(historico);
+
+        // 2️⃣ Conectar WebSocket
+        const socket = connectWebSocket(chamado.id, (msg) => {
+          if (msg.type === "msg") {
+            setMessages((prev) => [...prev, msg]);
+          } else if (msg.type === "auth_ok") {
+            setIsConnected(true);
+          }
+        });
+
+        return () => {
+          disconnectWebSocket();
+          setIsConnected(false);
+        };
+      } catch (err) {
+        console.error("Erro ao iniciar chat:", err);
+      }
+    }
+
+    initChat();
+  }, [isOpen, chamado?.id]);
+  // ==================================
+
+  // Scroll automático para o final
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  const handleSendMessage = async () => {
+    if (!inputMessage.trim()) return;
+
+    // Envia via WebSocket
+    sendMessage(inputMessage);
+
+    // Mostra localmente (feedback instantâneo)
+    const novaMsg = {
+      id: Date.now(),
+      usuario_id: user?.id,
+      mensagem: inputMessage,
+      nome: user?.name || user?.nome || "Você",
+      type: "sent",
+      time: new Date().toLocaleTimeString("pt-BR", {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+    };
+
+    setMessages((prev) => [...prev, novaMsg]);
+    setInputMessage("");
+  };
 
   if (!isOpen) return null;
 
@@ -135,7 +154,7 @@ const DraggableChatDialog = ({ isOpen, onClose, chamado }) => {
           <MessageCircle size={18} />
           <Box>
             <Typography variant="body2" fontWeight="bold">
-              Chat - {chamado?.cliente_nome || chamado?.cliente}
+              Chat - {chamado?.cliente_nome || chamado?.cliente || "Cliente"}
             </Typography>
             <Box display="flex" alignItems="center" gap={1}>
               <Box
@@ -189,17 +208,27 @@ const DraggableChatDialog = ({ isOpen, onClose, chamado }) => {
             </Box>
             <Divider sx={{ mb: 1 }} />
 
-            {messages.map((msg) => (
+            {messages.map((msg, idx) => (
               <Box
-                key={msg.id}
+                key={msg.id || idx}
                 display="flex"
-                justifyContent={msg.type === "sent" ? "flex-end" : "flex-start"}
+                justifyContent={
+                  msg.usuario_id === user?.id || msg.type === "sent"
+                    ? "flex-end"
+                    : "flex-start"
+                }
                 mb={1}
               >
                 <Box
                   sx={{
-                    bgcolor: msg.type === "sent" ? "primary.main" : "white",
-                    color: msg.type === "sent" ? "white" : "black",
+                    bgcolor:
+                      msg.usuario_id === user?.id || msg.type === "sent"
+                        ? "primary.main"
+                        : "white",
+                    color:
+                      msg.usuario_id === user?.id || msg.type === "sent"
+                        ? "white"
+                        : "black",
                     px: 2,
                     py: 1,
                     borderRadius: 3,
@@ -207,17 +236,26 @@ const DraggableChatDialog = ({ isOpen, onClose, chamado }) => {
                     boxShadow: 1,
                   }}
                 >
-                  <Typography variant="body2">{msg.text}</Typography>
+                  <Typography variant="body2">
+                    {msg.mensagem || msg.text}
+                  </Typography>
                   <Typography
                     variant="caption"
                     sx={{
                       display: "block",
-                      textAlign: msg.type === "sent" ? "right" : "left",
+                      textAlign:
+                        msg.usuario_id === user?.id || msg.type === "sent"
+                          ? "right"
+                          : "left",
                       opacity: 0.7,
                       mt: 0.3,
                     }}
                   >
-                    {msg.time}
+                    {msg.time ||
+                      new Date(msg.created_at).toLocaleTimeString("pt-BR", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
                   </Typography>
                 </Box>
               </Box>
@@ -242,12 +280,12 @@ const DraggableChatDialog = ({ isOpen, onClose, chamado }) => {
               placeholder="Digite sua mensagem..."
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
-              onKeyPress={(e) => e.key === "Enter" && sendMessage()}
+              onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
             />
             <Button
               variant="contained"
               color="primary"
-              onClick={sendMessage}
+              onClick={handleSendMessage}
               endIcon={<Send size={16} />}
               sx={{ ml: 1 }}
             >
