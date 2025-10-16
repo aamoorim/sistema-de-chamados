@@ -1,74 +1,106 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import { useAuth } from "./auth-context";
 import clienteService from "../services/clienteService";
 
 const ClientesContext = createContext();
 
-// Hook para usar o contexto facilmente
+// Hook para facilitar o uso do contexto
 export const useClientes = () => {
-  return useContext(ClientesContext);
+  const context = useContext(ClientesContext);
+  if (!context) {
+    throw new Error("useClientes deve ser usado dentro de um ClientesProvider");
+  }
+  return context;
 };
 
 export const ClientesProvider = ({ children }) => {
-  const [clientes, setClientes] = useState([]); // Lista de clientes
-  const [loading, setLoading] = useState(true); // Estado de carregamento
-  const [erro, setErro] = useState(null); // Armazena erro, se houver
+  const { token, user } = useAuth();
+  const [clientes, setClientes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Busca todos os clientes na API
+  // Função utilitária para checar permissão de admin
+  const checkAdmin = () => {
+    if (!user || user.role !== "admin") {
+      throw new Error("Acesso negado: apenas administradores podem realizar esta ação.");
+    }
+  };
+
+  // Busca todos os clientes da API (apenas se admin)
   const fetchClientes = async () => {
+    if (!token || user?.role !== "admin") {
+      setClientes([]);
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
+    setError(null);
     try {
-      const data = await clienteService.getAllClientes();
+      const data = await clienteService.getAllClientes(token);
       setClientes(data);
-    } catch (error) {
-      console.error("[ClientesContext] Erro ao carregar clientes:", error);
-      setErro("Erro ao carregar clientes");
+    } catch (err) {
+      console.error("[ClientesContext] Erro ao carregar clientes:", err);
+      setError(err?.message || "Erro ao carregar clientes");
     } finally {
       setLoading(false);
     }
   };
 
-  // Adiciona cliente e recarrega lista do backend
+  // Adiciona cliente no backend e recarrega lista
   const addCliente = async (novoCliente) => {
     try {
-      await clienteService.criarCliente(novoCliente); // só cria
-      await fetchClientes(); // recarrega com dados reais
-    } catch (error) {
-      console.error("[ClientesContext] Erro ao criar cliente:", error);
-      throw error;
+      checkAdmin();
+      await clienteService.criarCliente(novoCliente, token);
+      await fetchClientes();
+    } catch (err) {
+      console.error("[ClientesContext] Erro ao criar cliente:", err);
+      setError(err?.message || "Erro ao criar cliente");
+      throw err;
     }
   };
 
-  // Atualiza cliente localmente
-  const updateCliente = (id, dados) => {
-    setClientes((prevClientes) =>
-      prevClientes.map((cliente) =>
-        cliente.id === id ? { ...cliente, ...dados } : cliente
-      )
-    );
+  // Atualiza cliente via backend e no estado local
+  const updateCliente = async (id, dados) => {
+    try {
+      checkAdmin();
+      const atualizado = await clienteService.atualizarCliente(id, dados, token);
+      setClientes((prevClientes) =>
+        prevClientes.map((cliente) =>
+          cliente.id === id ? { ...cliente, ...atualizado } : cliente
+        )
+      );
+    } catch (err) {
+      console.error("[ClientesContext] Erro ao atualizar cliente:", err);
+      setError(err?.message || "Erro ao atualizar cliente");
+      throw err;
+    }
   };
 
-  // Remove cliente do backend e atualiza estado local
+  // Remove cliente no backend e atualiza estado local
   const deleteCliente = async (id) => {
     try {
-      await clienteService.excluirCliente(id);
+      checkAdmin();
+      await clienteService.excluirCliente(id, token);
       setClientes((prev) => prev.filter((cliente) => cliente.id !== id));
-    } catch (error) {
-      console.error("[ClientesContext] Erro ao excluir cliente:", error);
-      throw error;
+    } catch (err) {
+      console.error("[ClientesContext] Erro ao excluir cliente:", err);
+      setError(err?.message || "Erro ao excluir cliente");
+      throw err;
     }
   };
 
-  // Busca clientes ao montar componente
+  // Busca clientes ao montar componente, se admin
   useEffect(() => {
     fetchClientes();
-  }, []);
+  }, [token, user]);
 
   return (
     <ClientesContext.Provider
       value={{
         clientes,
         loading,
-        erro,
+        error,
         fetchClientes,
         addCliente,
         updateCliente,
