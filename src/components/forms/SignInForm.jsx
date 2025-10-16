@@ -11,7 +11,7 @@ const SignInForm = ({ formData, handleInputChange, handleSubmit, loading, error 
 
   return (
     <Box component="form" className="form form-login" onSubmit={handleSubmit('signin')}>
-      <img src="/logo_squad.png" alt="Logo da empresa SquadBi" className='form-logo' />
+      <img src="/logo_squad.png" alt="Logo da empresa SquadBi" className='form-logo form-logo-signin' />
 
       <Typography variant="h4" component="h1" className="form-title" mt={5}>
         Login

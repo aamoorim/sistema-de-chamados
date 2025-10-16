@@ -9,7 +9,6 @@ import {
   AccordionSummary,
   AccordionDetails,
 } from "@mui/material";
-import SupportAgentIcon from "@mui/icons-material/SupportAgent";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 const SignUpForm = () => {
@@ -27,32 +26,7 @@ const SignUpForm = () => {
         width: "100%",
       }}
     >
-      {/* CARD */}
-      <Card
-        className="card"
-        sx={{
-          width: "100%",
-          maxWidth: "40rem",
-          height: "72vh", // altura fixa
-          borderRadius: "1rem",
-          boxShadow: 3,
-          display: "flex",
-          flexDirection: "column",
-          overflow: "hidden", // impede o conteúdo de "sair"
-          flexShrink: 0,
-        }}
-      >
-        <CardContent
-          sx={{
-            textAlign: "center",
-            padding: "1rem",
-            flex: "1 1 auto",
-            overflowY: "auto", // scroll interno no conteúdo
-            WebkitOverflowScrolling: "touch",
-          }}
-        >
-          <Box component="img" className="form-logo-signup" src="/logo_squad.png" alt="Logo da empresa SquadBi" />
-          <SupportAgentIcon sx={{ fontSize: "3rem", color: "primary.main" }} />
+          <Box component="img" className="form-logo form-logo-signup" src="/logo_squad.png" alt="Logo da empresa SquadBi" />
 
          <Typography
           variant="h3"
@@ -242,9 +216,6 @@ const SignUpForm = () => {
           >
             Falar com suporte
           </Button>
-
-        </CardContent>
-      </Card>
     </Box>
   );
 };

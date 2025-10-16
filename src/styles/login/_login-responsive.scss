@@ -1,61 +1,68 @@
 .login-page {
-  .form-logo-signup{
+  // logo padrão desktop
+  .form-logo {
     display: block;
-    margin: 0 auto 1rem auto; // ← centraliza horizontalmente
-    max-width: 12vw;
-    min-width: 10vw;
+    margin: 0 auto 1rem auto;
+    max-width: 15vw;
+    min-width: 13vw;
     height: auto;
-    
-    @media (max-width: 768px) {
+  }
+
+  @media (max-width: 1024px) {
+    .form-logo {
+      max-width: 20vw;
+      min-width: 15vw;
+    }
+  }
+
+  // logo mobile / tablet
+  @media (max-width: 768px) {
+    .form-logo-signin {
       display: block;
-      margin: 0 auto 1rem auto; // ← centraliza horizontalmente
-      max-width: 38vw;
-      min-width: 30vw;
+      margin: 0 auto 1rem auto;
+      max-width: 25vw;
+      min-width: 20vw;
       height: auto;
     }
-    
-    @media (max-width: 480px) {
+
+    .form-logo-signup {
       display: block;
-      margin: 0 auto 1rem auto; // ← centraliza horizontalmente
+      margin: 0 auto 1rem auto;
       max-width: 40vw;
       min-width: 20vw;
       height: auto;
     }
   }
 
-  .card{
-    max-height: 50vh !important;
-    min-height: 40vh !important;
-    min-width: 35vw;
-  }
-
-  // Desktop médio
-  @media (max-width: 1024px) {
-    .login-container {
-      width: 100%; 
-      max-width: 100vw;
-      min-height: 100vh;
+  @media (max-width: 576px) {
+    .form-logo-signin {
+      top: 2rem;
+      max-width: 38vw;
+      min-width: 25vw;
     }
 
-    .card{
-       min-width: 40vw !important;
-       min-height: 30vh;
+    .form-logo-signup {
+      top: -3rem;
+      max-width: 40vw;
+      min-width: 20vw;
     }
-
   }
 
-
-  // Tablet
+  // tablet
   @media (max-width: 768px) {
     .login-container {
-      width: 100%;
-      min-height: 100vh;
-      flex-direction: column;
+      background-color: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25),
+        0 10px 10px rgba(0, 0, 0, 0.22);
+      position: relative;
+      overflow: hidden;
+      width: 100vw;
     }
 
-    .mobile-sign-up .form-title{
+    .mobile-sign-up .form-title {
       margin-top: 1rem !important;
-    } 
+    }
 
     .overlay-container {
       position: absolute;
@@ -72,7 +79,7 @@
     }
 
     .overlay {
-      background: url('../../bglogin.svg') no-repeat;
+      background: url("../../bglogin.svg") no-repeat;
       background-size: cover;
       color: #ffffff;
       position: relative;
@@ -117,7 +124,7 @@
     }
 
     .form {
-      padding: 12vh 20px 2vh; 
+      padding: 12vh 20px 2vh;
     }
 
     .form-input input {
@@ -141,34 +148,34 @@
       line-height: 20px !important;
       margin: 15px 0 20px !important;
     }
-
-    .card{
-      max-height: 60vh !important;
-      min-height: 50vh !important;
-    }
   }
 
-  // Mobile
-  @media (max-width: 480px) {
+  // === MOBILE ===
+  @media (max-width: 576px) {
+    .login-container {
+      background-color: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25),
+        0 10px 10px rgba(0, 0, 0, 0.22);
+      position: relative;
+      overflow: hidden;
+      width: 100vw;
+    }
+
     .overlay-panel {
       padding: 15px 30px;
     }
-  
+
     .form {
-      padding: 0; 
+      padding: 0;
     }
-    
-    .form-login{
+
+    .form-login {
       padding: 5rem 2rem 2rem;
     }
 
-    .form-signup{
+    .form-signup {
       padding: 0rem 1rem 1rem;
-    }
-
-    .card{
-      max-height: 50vh !important;
-      min-height: 30vh !important;
     }
   }
 }
