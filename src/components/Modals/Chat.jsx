@@ -9,7 +9,6 @@ import {
   Divider,
 } from "@mui/material";
 import { X, Minus, Maximize2, MessageCircle, Send } from "lucide-react";
-import { connectWebSocket, sendMessage, disconnectWebSocket } from "../../services/chatSocket";
 import chamadosService from "../../services/chamadosService";
 import { useAuth } from "../../context/auth-context";
 
@@ -63,33 +62,65 @@ const DraggableChatDialog = ({ isOpen, onClose, chamado }) => {
   useEffect(() => {
     if (!isOpen || !chamado?.id) return;
 
+    let socket;
+
     async function initChat() {
       try {
-        // 1️⃣ Buscar histórico via REST
         const historico = await chamadosService.getMensagensDoChamado(chamado.id);
         setMessages(historico);
 
-        // 2️⃣ Conectar WebSocket
-        const socket = connectWebSocket(chamado.id, (msg) => {
-          if (msg.type === "msg") {
-            setMessages((prev) => [...prev, msg]);
-          } else if (msg.type === "auth_ok") {
-            setIsConnected(true);
-          }
-        });
+        // ===== Conectar WebSocket =====
+        socket = new WebSocket(`ws://127.0.0.1:9000`);
 
-        return () => {
-          disconnectWebSocket();
+        socket.onopen = () => {
+          console.log("Conectado ao servidor WS");
+          socket.send(JSON.stringify({ type: "auth", token: user?.token }));
+        };
+
+        socket.onmessage = (event) => {
+          const msg = JSON.parse(event.data);
+          console.log("📨 Recebido:", msg);
+
+          if (msg.success === "Autenticado com sucesso" || msg.type === "auth_ok") {
+            socket.send(JSON.stringify({ type: "join", chamado_id: chamado.id }));
+          } else if (msg.success?.includes("Entrou no chamado")) {
+            setIsConnected(true);
+          } else if (msg.type === "msg") {
+            // Evitar duplicação usando timestamp e texto
+            setMessages((prev) => {
+              const exists = prev.some(
+                (m) =>
+                  m.usuario_id === msg.usuario_id &&
+                  m.mensagem === msg.mensagem &&
+                  m.criado_em === msg.criado_em
+              );
+              if (exists) return prev;
+              return [...prev, msg];
+            });
+          } else if (msg.erro) {
+            console.error("Erro WS:", msg.erro);
+          }
+        };
+
+        socket.onclose = () => {
+          console.warn("Conexão WS encerrada");
           setIsConnected(false);
         };
+
+        socket.onerror = (err) => console.error("Erro WS:", err);
+
+        window.chatSocket = socket;
       } catch (err) {
         console.error("Erro ao iniciar chat:", err);
       }
     }
 
     initChat();
+
+    return () => {
+      socket?.close();
+    };
   }, [isOpen, chamado?.id]);
-  // ==================================
 
   // Scroll automático para o final
   useEffect(() => {
@@ -99,24 +130,39 @@ const DraggableChatDialog = ({ isOpen, onClose, chamado }) => {
   const handleSendMessage = async () => {
     if (!inputMessage.trim()) return;
 
-    // Envia via WebSocket
-    sendMessage(inputMessage);
+    const texto = inputMessage.trim();
+    const agora = new Date();
 
-    // Mostra localmente (feedback instantâneo)
+    // Feedback instantâneo
     const novaMsg = {
-      id: Date.now(),
+      type: "msg",
+      chamado_id: chamado.id,
       usuario_id: user?.id,
-      mensagem: inputMessage,
-      nome: user?.name || user?.nome || "Você",
-      type: "sent",
-      time: new Date().toLocaleTimeString("pt-BR", {
+      mensagem: texto,
+      criado_em: agora.toISOString(),
+      time: agora.toLocaleTimeString("pt-BR", {
         hour: "2-digit",
         minute: "2-digit",
       }),
     };
 
-    setMessages((prev) => [...prev, novaMsg]);
+    setMessages((prev) => {
+      const exists = prev.some(
+        (m) =>
+          m.usuario_id === novaMsg.usuario_id &&
+          m.mensagem === novaMsg.mensagem &&
+          m.criado_em === novaMsg.criado_em
+      );
+      if (exists) return prev;
+      return [...prev, novaMsg];
+    });
+
     setInputMessage("");
+
+    // Envia via WebSocket
+    if (window.chatSocket && window.chatSocket.readyState === WebSocket.OPEN) {
+      window.chatSocket.send(JSON.stringify({ type: "msg", message: texto }));
+    }
   };
 
   if (!isOpen) return null;
@@ -154,7 +200,9 @@ const DraggableChatDialog = ({ isOpen, onClose, chamado }) => {
           <MessageCircle size={18} />
           <Box>
             <Typography variant="body2" fontWeight="bold">
-              Chat - {chamado?.cliente_nome || chamado?.cliente || "Cliente"}
+              Chat - {user?.id === chamado.tecnico_id
+        ? chamado.cliente_nome
+        : chamado.tecnico_nome || "Cliente"}
             </Typography>
             <Box display="flex" alignItems="center" gap={1}>
               <Box
@@ -252,7 +300,7 @@ const DraggableChatDialog = ({ isOpen, onClose, chamado }) => {
                     }}
                   >
                     {msg.time ||
-                      new Date(msg.created_at).toLocaleTimeString("pt-BR", {
+                      new Date(msg.criado_em).toLocaleTimeString("pt-BR", {
                         hour: "2-digit",
                         minute: "2-digit",
                       })}
