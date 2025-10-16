@@ -5,6 +5,7 @@ import ModalChamadoDetalhes from "../../components/Modals/DetalhesChamados";
 import chamadoService from "../../services/chamadosService";
 import { useAuth } from "../../context/auth-context";
 import api from "../../services/api";
+import Botao from "../../components/Button.jsx";
 
 export default function ChamadosTecnico() {
   const { token } = useAuth();
@@ -12,28 +13,23 @@ export default function ChamadosTecnico() {
   const [tecnicos, setTecnicos] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const [chamadoSelecionado, setChamadoSelecionado] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [encerrandoId, setEncerrandoId] = useState(null);
 
-  // Função para buscar TODOS os chamados (incluindo encerrados)
   const recarregarChamados = async () => {
     if (!token) return;
     setLoading(true);
-    
+
     try {
-      // Primeiro tenta o endpoint que retorna todos os chamados
       let data;
       try {
         const response = await api.get("/chamados/todos");
         data = response.data;
-        console.log(`✅ Buscou todos os chamados: ${data.length} encontrados`);
-      } catch (error) {
-        // Fallback para o endpoint original se /todos não existir
-        console.log("⚠️ Endpoint /todos não disponível, usando /chamados");
+      } catch {
         data = await chamadoService.getChamadosDoCliente();
       }
-      
+
       setChamados(data);
-      
     } catch (error) {
       console.error("Erro ao buscar chamados:", error);
       setChamados([]);
@@ -49,7 +45,6 @@ export default function ChamadosTecnico() {
   useEffect(() => {
     const fetchUsuarioAtual = async () => {
       if (!token) return;
-
       try {
         const response = await chamadoService.getUsuarioAtual();
         if (response && response.id) setTecnicos([response]);
@@ -62,7 +57,7 @@ export default function ChamadosTecnico() {
       try {
         const response = await chamadoService.getTecnicos();
         setTecnicos(response);
-      } catch (error) {
+      } catch {
         setTecnicos([]);
       }
     };
@@ -70,64 +65,47 @@ export default function ChamadosTecnico() {
     fetchUsuarioAtual();
   }, [token]);
 
-  // Filtros para os chamados
   const andamentoChamados = chamados.filter((c) => {
     const status = c.status?.toLowerCase()?.trim();
-    return status === "em_andamento" || 
-           status === "em andamento" ||
-           status === "andamento" ||
-           status?.includes("andamento");
+    return (
+      status === "em_andamento" ||
+      status === "em andamento" ||
+      status === "andamento" ||
+      status?.includes("andamento")
+    );
   });
 
   const finalizadosChamados = chamados.filter((c) => {
     const status = c.status?.toLowerCase()?.trim();
-    return status === "encerrado" || 
-           status === "finalizado" || 
-           status === "concluido" || 
-           status === "concluído" ||
-           status === "fechado" ||
-           status?.includes("encerr") ||
-           status?.includes("finaliz") ||
-           status?.includes("conclu");
+    return (
+      status === "encerrado" ||
+      status === "finalizado" ||
+      status === "concluido" ||
+      status === "concluído" ||
+      status === "fechado" ||
+      status?.includes("encerr") ||
+      status?.includes("finaliz") ||
+      status?.includes("conclu")
+    );
   });
 
   const handleEncerrar = async (event, chamadoId) => {
     event.stopPropagation();
-
-    const button = event.currentTarget;
-    const ripple = document.createElement("span");
-    ripple.classList.add("ripple");
-    const rect = button.getBoundingClientRect();
-    ripple.style.left = `${event.clientX - rect.left}px`;
-    ripple.style.top = `${event.clientY - rect.top}px`;
-    button.appendChild(ripple);
-    setTimeout(() => ripple.remove(), 800);
+    setEncerrandoId(chamadoId);
 
     try {
-      console.log(`Encerrando chamado ${chamadoId}...`);
-      
-      // Atualiza no backend
       await chamadoService.atualizarChamado(chamadoId, { status: "encerrado" });
-      
-      // Atualiza o estado local
+
       setChamados((prev) =>
         prev.map((chamado) =>
-          chamado.id === chamadoId
-            ? { ...chamado, status: "encerrado" }
-            : chamado
+          chamado.id === chamadoId ? { ...chamado, status: "encerrado" } : chamado
         )
       );
-      
-      console.log(`✅ Chamado ${chamadoId} encerrado com sucesso`);
-      
-      // Recarrega dados para garantir sincronização
-      setTimeout(() => {
-        recarregarChamados();
-      }, 500);
-      
     } catch (error) {
       console.error("Erro ao encerrar chamado:", error);
       alert("Erro ao encerrar chamado. Tente novamente.");
+    } finally {
+      setEncerrandoId(null);
     }
   };
 
@@ -136,38 +114,18 @@ export default function ChamadosTecnico() {
     setOpenModal(true);
   };
 
-  const LoadingSpinner = () => (
+  const ButtonSpinner = () => (
     <div
       style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "100vh",
-        width: "100vw",
-        position: "fixed",
-        top: 0,
-        left: 0,
-        backgroundColor: "rgba(255, 255, 255, 0.7)",
-        zIndex: 9999,
+        border: "3px solid #f3f3f3",
+        borderTop: "3px solid #604FEB",
+        borderRadius: "50%",
+        width: "18px",
+        height: "18px",
+        animation: "spin 1s linear infinite",
+        margin: "0 auto",
       }}
-    >
-      <div
-        style={{
-          border: "6px solid #f3f3f3",
-          borderTop: "6px solid #604FEB",
-          borderRadius: "50%",
-          width: "40px",
-          height: "40px",
-          animation: "spin 1s linear infinite",
-        }}
-      />
-      <style>{`
-        @keyframes spin {
-          0% { transform: rotate(0deg);}
-          100% { transform: rotate(360deg);}
-        }
-      `}</style>
-    </div>
+    />
   );
 
   return (
@@ -176,9 +134,13 @@ export default function ChamadosTecnico() {
         <h1>Meus chamados</h1>
       </div>
 
-      {loading ? (
-        <LoadingSpinner />
-      ) : (
+      {loading && (
+        <p style={{ paddingLeft: 8, color: "#64748b" }}>
+          Carregando chamados...
+        </p>
+      )}
+
+      {!loading && (
         <>
           {/* Em Atendimento */}
           <div className="section">
@@ -201,13 +163,25 @@ export default function ChamadosTecnico() {
                         <div className="chamado-descricao">{chamado.descricao}</div>
                         <div className="chamado-data">{chamado.data_criacao || chamado.data}</div>
                       </div>
-                      <button
-                        className="btn-encerrar"
+                      <Botao
                         onClick={(e) => handleEncerrar(e, chamado.id)}
+                        text={encerrandoId === chamado.id ? "" : "Encerrar"}
+                        icon={encerrandoId === chamado.id ? null : CircleCheckBig}
+                        sx={{
+                          height: 35,
+                          fontSize: "1rem",
+                          "& svg": {
+                            fontSize: 18,
+                          },
+                          borderRadius: "0.5rem",
+                          position: "relative",
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                        }}
                       >
-                        <CircleCheckBig size={15} style={{ marginRight: "4px" }} />
-                        Encerrar
-                      </button>
+                        {encerrandoId === chamado.id && <ButtonSpinner />}
+                      </Botao>
                     </div>
                     <div className="card-footer">
                       <div className="user-info">
@@ -221,9 +195,7 @@ export default function ChamadosTecnico() {
                   </div>
                 ))
               ) : (
-                <p style={{ color: "#64748b", paddingLeft: "8px" }}>
-                  Nenhum chamado em andamento
-                </p>
+                <p style={{ color: "#64748b", paddingLeft: 8 }}>Nenhum chamado em andamento</p>
               )}
             </div>
           </div>
@@ -262,9 +234,7 @@ export default function ChamadosTecnico() {
                   </div>
                 ))
               ) : (
-                <p style={{ color: "#64748b", paddingLeft: "8px" }}>
-                  Nenhum chamado encerrado
-                </p>
+                <p style={{ color: "#64748b", paddingLeft: 8 }}>Nenhum chamado encerrado</p>
               )}
             </div>
           </div>
@@ -277,6 +247,12 @@ export default function ChamadosTecnico() {
         chamado={chamadoSelecionado}
         tecnicos={tecnicos.length > 0 ? tecnicos : []}
       />
+      <style>{`
+        @keyframes spin {
+          0% { transform: rotate(0deg);}
+          100% { transform: rotate(360deg);}
+        }
+      `}</style>
     </div>
   );
 }

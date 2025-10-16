@@ -1,18 +1,24 @@
-import React, { useState, useEffect } from "react";
-import { Check, Clock2 } from "lucide-react";
+import React, { useState, useEffect, forwardRef } from "react";
+import { Plus, Check, Clock2 } from "lucide-react";
 import SideBar from "../../components/SideBar";
 import "../clientes/clientes.scss";
 import Botao from "../../components/Button";
 import { ModalCriarChamado } from "../../components/Modals/CriarChamado";
 import ModalChamadoDetalhes from "../../components/Modals/DetalhesChamados";
-import EditTicketModal from "../../components/Modals/EditarChamado"; 
+import EditTicketModal from "../../components/Modals/EditarChamado";
 import { SearchProvider } from "../../context/search-context";
 import SearchBar from "../../components/search-bar";
 import { useAuth } from "../../context/auth-context";
 import chamadosService from "../../services/chamadosService";
 
-import EditIcon from '@mui/icons-material/Edit';
+import EditIcon from "@mui/icons-material/Edit";
 import { IconButton } from "@mui/material";
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
+
+const Alert = forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 
 const ChamadosCliente = () => {
   const { user } = useAuth();
@@ -23,41 +29,101 @@ const ChamadosCliente = () => {
   const [openModalCalls, setOpenModalCalls] = useState(false);
   const [openModalDetails, setOpenModalDetails] = useState(false);
   const [openModalEditar, setOpenModalEditar] = useState(false);
-
   const [chamadoSelecionado, setChamadoSelecionado] = useState(null);
 
+  const [toastOpen, setToastOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+
+  // Polling inteligente + detectar atribuição de técnico
   useEffect(() => {
     if (!user || !user.id) {
       setChamados([]);
       return;
     }
 
-    const fetchChamados = async () => {
-      setLoading(true);
+    let intervalId;
+
+    const fetchChamados = async (showSpinner = false) => {
+      if (showSpinner) setLoading(true);
       try {
         const data = await chamadosService.getChamadosDoCliente();
-        setChamados(data);
-      } catch {
+
+        // Detectar alterações comparando cada campo relevante
+        const changed = data.filter((novo) => {
+          const antigo = chamados.find((c) => c.id === novo.id);
+          if (!antigo) return false;
+          // mudança de status
+          if (antigo.status !== novo.status) return true;
+          // mudança de técnico atribuído (supondo que campo seja 'tecnico' ou algo parecido)
+          if (antigo.tecnico !== novo.tecnico) return true;
+          // se tiver outros campos que importam, adiciona aqui
+          return false;
+        });
+
+        const dataString = JSON.stringify(data);
+        const currentString = JSON.stringify(chamados);
+
+        if (dataString !== currentString) {
+          setChamados(data);
+
+          // para cada que mudou, exibir toast
+          changed.forEach((c) => {
+            // se técnico atribuído (novo.tecnico existe) e antigo não tinha
+            const antigo = chamados.find((x) => x.id === c.id);
+            if (antigo) {
+              // status mudou para atendimento
+              if (c.status?.toLowerCase() === "em_andamento" && antigo.status !== c.status) {
+                showToast(`Chamado #${c.id} foi atendido por um técnico!`);
+              }
+              // status virou encerrado
+              if (c.status?.toLowerCase() === "encerrado" && antigo.status !== c.status) {
+                showToast(`Chamado #${c.id} finalizado!`);
+              }
+            }
+          });
+
+          if (!showSpinner) setLoading(true);
+          setTimeout(() => setLoading(false), 1000);
+        } else {
+          setLoading(false);
+        }
+      } catch (err) {
         setChamados([]);
-      } finally {
         setLoading(false);
       }
     };
 
-    fetchChamados();
-  }, [user]);
+    // fetch inicial
+    fetchChamados(true);
+
+    intervalId = setInterval(() => {
+      fetchChamados(false);
+    }, 10000);
+
+    return () => clearInterval(intervalId);
+  }, [user, chamados]);
+
+  const showToast = (message) => {
+    setToastMessage(message);
+    setToastOpen(true);
+  };
+
+  const handleToastClose = (_, reason) => {
+    if (reason === "clickaway") return;
+    setToastOpen(false);
+  };
 
   const criarChamadoHandler = async (dadosChamado) => {
     if (!dadosChamado.titulo || !dadosChamado.descricao) {
       alert("Título e descrição são obrigatórios.");
       return;
     }
-
     try {
       const novoChamado = await chamadosService.criarChamado(dadosChamado);
       if (novoChamado && novoChamado.id) {
         setChamados((prev) => [novoChamado, ...prev]);
         setOpenModalCalls(false);
+        showToast("Chamado criado com sucesso!");
       } else {
         alert("Não foi possível criar o chamado. Tente novamente.");
       }
@@ -68,20 +134,28 @@ const ChamadosCliente = () => {
 
   const handleAtualizarChamado = async (dadosAtualizados) => {
     try {
-      // Envia só título e descrição para atualizar
-      const atualizado = await chamadosService.atualizarChamado(chamadoSelecionado.id, {
-        titulo: dadosAtualizados.title,
-        descricao: dadosAtualizados.description,
-      });
-
+      const atualizado = await chamadosService.atualizarChamado(
+        chamadoSelecionado.id,
+        {
+          titulo: dadosAtualizados.title,
+          descricao: dadosAtualizados.description,
+        }
+      );
       setChamados((prev) =>
         prev.map((chamado) =>
           chamado.id === atualizado.id ? atualizado : chamado
         )
       );
-
       setOpenModalEditar(false);
-    } catch (error) {
+
+      if (["em_andamento", "encerrado"].includes(atualizado.status?.toLowerCase())) {
+        const mensagem =
+          atualizado.status.toLowerCase() === "em_andamento"
+            ? "Chamado atendido!"
+            : "Chamado finalizado!";
+        showToast(mensagem);
+      }
+    } catch {
       alert("Erro ao atualizar chamado.");
     }
   };
@@ -102,7 +176,7 @@ const ChamadosCliente = () => {
   };
 
   const handleOpenModalEditar = (chamado, e) => {
-    e.stopPropagation(); // pra não abrir modal detalhes ao clicar no botão
+    e.stopPropagation();
     setChamadoSelecionado(chamado);
     setOpenModalEditar(true);
   };
@@ -124,15 +198,15 @@ const ChamadosCliente = () => {
     <div
       style={{
         display: "flex",
-        justifyContent: "center",  
-        alignItems: "center",      
-        height: "100vh",           
-        width: "100vw",           
-        position: "fixed",        
+        justifyContent: "center",
+        alignItems: "center",
+        height: "100vh",
+        width: "100vw",
+        position: "fixed",
         top: 0,
         left: 0,
-        backgroundColor: "rgba(255, 255, 255, 0.7)",
-        zIndex: 9999,              
+        backgroundColor: "rgba(255,255,255,0.7)",
+        zIndex: 9999,
       }}
     >
       <div
@@ -147,8 +221,8 @@ const ChamadosCliente = () => {
       />
       <style>{`
         @keyframes spin {
-          0% { transform: rotate(0deg);}
-          100% { transform: rotate(360deg);}
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
         }
       `}</style>
     </div>
@@ -156,10 +230,27 @@ const ChamadosCliente = () => {
 
   return (
     <div className="tecnico-chamados">
+      <Snackbar
+        open={toastOpen}
+        autoHideDuration={4000}
+        onClose={handleToastClose}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Alert
+          onClose={handleToastClose}
+          severity="success"
+          sx={{ bgcolor: "#604FEB", color: "#fff" }}
+        >
+          {toastMessage}
+        </Alert>
+      </Snackbar>
+
       <div className="main-content-wrapper">
         <div className="header">
           <h1>Meus chamados</h1>
-          <Botao onClick={() => setOpenModalCalls(true)}>Novo Chamado</Botao>
+          <Botao icon={Plus} onClick={() => setOpenModalCalls(true)}>
+            Novo Chamado
+          </Botao>
           <ModalCriarChamado
             isOpen={openModalCalls}
             onClose={() => setOpenModalCalls(false)}
@@ -213,42 +304,56 @@ const ChamadosCliente = () => {
                         <div className="card-main">
                           <div className="chamado-info">
                             <div className="chamado-codigo">#{chamado.id}</div>
-                            <div className="chamado-titulo">{chamado.titulo}</div>
+                            <div className="chamado-titulo">
+                              {chamado.titulo}
+                            </div>
                             <div className="chamado-descricao">
                               {chamado.descricao}
                             </div>
                             <div className="chamado-data">
-                              {new Date(chamado.data_criacao).toLocaleDateString()}
+                              {new Date(
+                                chamado.data_criacao
+                              ).toLocaleDateString()}
                             </div>
                           </div>
                         </div>
                         <div className="card-footer">
                           <div className="user-info">
-                            <div className="user-avatar">{user?.nome?.[0] || "U"}</div>
-                            <span className="user-name">{user?.nome || "Usuário"}</span>
-                            <div className={`status-icon ${secao.classe}`}>
+                            <div className="user-avatar">
+                              {user?.nome?.[0] || "U"}
+                            </div>
+                            <span className="user-name">
+                              {user?.nome || "Usuário"}
+                            </span>
+                            <div
+                              className={`status-icon ${secao.classe}`}
+                            >
                               {secao.icone}
                             </div>
 
-                            {/* Ícone para abrir modal editar */}
-                            <IconButton
-                              size="small"
-                              onClick={(e) => {
-                                e.stopPropagation(); // evita abrir modal de detalhes
-                                setChamadoSelecionado(chamado);
-                                setOpenModalEditar(true);
-                              }}
-                              sx={{ marginLeft: 1 }}
-                              aria-label="Editar chamado"
-                            >
-                              <EditIcon fontSize="small" />
-                            </IconButton>
+                            {chamado.status?.toLowerCase() !== "encerrado" && (
+                              <IconButton
+                                size="small"
+                                onClick={(e) =>
+                                  handleOpenModalEditar(chamado, e)
+                                }
+                                sx={{ marginLeft: 1 }}
+                                aria-label="Editar chamado"
+                              >
+                                <EditIcon fontSize="small" />
+                              </IconButton>
+                            )}
                           </div>
                         </div>
                       </div>
                     ))
                   ) : (
-                    <p style={{ color: "#64748b", paddingLeft: "8px" }}>
+                    <p
+                      style={{
+                        color: "#64748b",
+                        paddingLeft: "8px",
+                      }}
+                    >
                       Nenhum chamado nesta seção.
                     </p>
                   )}

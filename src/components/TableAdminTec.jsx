@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
-import { useTecnicos } from "../context/TecnicosContext";
+import React, { useEffect, useState } from "react";
 import { useSearch } from "../context/search-context";
-import useIsMobile from "../hooks/useIsMobile";
+import { useTecnicos } from "../context/TecnicosContext";
+import { useAuth } from "../context/auth-context"
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -12,7 +12,10 @@ import Paper from "@mui/material/Paper";
 import IconButton from "@mui/material/IconButton";
 import { Pencil, Trash2 } from "lucide-react";
 import { DeletarPerfil } from "./Modals/DeletarPerfil";
-import { ModalEditarTecnico } from "./Modals/EditarTecnico";  
+import { ModalEditarTecnico } from "./Modals/EditarTecnico";
+import useIsMobile from "../hooks/useIsMobile";
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
 import "../styles/tables/listTable.scss";
 
 // Avatar com iniciais
@@ -73,86 +76,168 @@ const LoadingSpinner = () => (
   </div>
 );
 
-export default function TechnicianTable() {
+// Alert personalizado com cor 604FEB
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return (
+    <MuiAlert
+      elevation={6}
+      ref={ref}
+      variant="filled"
+      {...props}
+      sx={{
+        backgroundColor: "#604FEB",
+        color: "#fff",
+        "& .MuiAlert-icon": {
+          color: "#fff",
+        },
+      }}
+    />
+  );
+});
+
+export default function TableAdminTec() {
   const isMobile = useIsMobile(1200);
   const { search } = useSearch();
-  const { tecnicos, deleteTecnico } = useTecnicos();
+  const { tecnicos, deleteTecnico, fetchTecnicos, createTecnico } = useTecnicos();
+  const { token } = useAuth(); // Token de autenticação
 
   const [loading, setLoading] = useState(true);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
-  const [selectedRow, setSelectedRow] = useState(null);
+  const [selectedRow, setSelectedRow] = useState(null); // Linha selecionada para exclusão
+  
+  // const [selectedTecnico, setSelectedTecnico] = useState(null);
   const [openEditModal, setOpenEditModal] = useState(false);
   const [selectedTecnicoEdit, setSelectedTecnicoEdit] = useState(null);
 
-  useEffect(() => {
-    const timeout = setTimeout(() => setLoading(false), 500);
-    return () => clearTimeout(timeout);
-  }, [tecnicos]);
+  // Estados para toast
+  const [toastOpen, setToastOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastSeverity, setToastSeverity] = useState("success"); // "success", "error", "warning", "info"
 
+    // Carrega tecnicos assim que o token estiver disponível
+    useEffect(() => {
+      const load = async () => {
+        setLoading(true);
+        try {
+          await fetchTecnicos();
+        } catch (err) {
+          console.error("Erro ao carregar tecnicos:", err);
+          showToast("error", "Erro ao carregar tecnicos");
+        } finally {
+          setLoading(false);
+        }
+      };
+      if (token) load();
+    }, [token]);
+  
+    // Função para abrir toast
+    const showToast = (severity, message) => {
+      setToastSeverity(severity);
+      setToastMessage(message);
+      setToastOpen(true);
+    };
+
+    // Fecha o toast
+    const handleToastClose = (event, reason) => {
+      if (reason === "clickaway") return;
+      setToastOpen(false);
+    };
+
+  const filteredTecnicos = tecnicos.filter((tec) => {
+    if (!tec) return false;
+    const term = search.toLowerCase();
+    return (
+      search === "" ||
+      (tec.nome && tec.nome.toLowerCase().includes(term)) ||
+      (tec.cargo && tec.cargo.toLowerCase().includes(term)) ||
+      (tec.email && tec.email.toLowerCase().includes(term))
+    );
+  });
+
+  // Abre modal de excluir para a linha selecionada
   const handleOpenDelete = (row) => {
     setSelectedRow(row);
     setOpenDeleteModal(true);
   };
 
+  // Fecha modal de exclusão e limpa seleção
   const handleCloseDelete = () => {
     setSelectedRow(null);
     setOpenDeleteModal(false);
   };
 
+  // Confirma exclusão, remove do backend e recarrega lista
   const handleDeleteConfirmed = async () => {
     if (!selectedRow) return;
+    setLoading(true);
     try {
       await deleteTecnico(selectedRow.id);
+      await fetchTecnicos();
+      setOpenDeleteModal(false);
+      showToast("success", `Tecnico "${selectedRow.nome}" deletado com sucesso!`);
+      setSelectedRow(null);
     } catch (error) {
-      console.error("Erro ao deletar técnico:", error);
-      alert("Não foi possível deletar técnico.");
+      console.error("Erro ao deletar tecnico:", error);
+      showToast(
+        "error",
+        <>
+          Não foi possível deletar o técnico "{selectedRow?.nome || ''}".<br />
+          Certifique-se de que ele não possui chamados atribuídos.
+        </>
+      );
     } finally {
-      handleCloseDelete();
+      setLoading(false);
     }
   };
 
+  // Abre modal de edição com tecnico selecionado
   const handleOpenEdit = (tecnico) => {
     setSelectedTecnicoEdit(tecnico);
     setOpenEditModal(true);
   };
 
+  // Fecha modal de edição e limpa seleção
   const handleCloseEdit = () => {
     setSelectedTecnicoEdit(null);
     setOpenEditModal(false);
   };
 
-  const filteredRows = tecnicos.filter((row) => {
-    if (!row) return false;
-    const term = search.toLowerCase();
-    return (
-      search === "" ||
-      (row.nome && row.nome.toLowerCase().includes(term)) ||
-      (row.cargo && row.cargo.toLowerCase().includes(term)) ||
-      (row.email && row.email.toLowerCase().includes(term))
-    );
-  });
+  // Recarrega tecnicos após edição bem-sucedida e mostra toast
+    const handleEditSuccess = async () => {
+    setLoading(true);
+    try {
+      await fetchTecnicos(); 
+      showToast("success", `Técnico "${selectedTecnicoEdit?.nome}" editado com sucesso!`);
+    } catch (error) {
+      console.error("Erro ao recarregar técnico:", error);
+      showToast("error", `Erro ao atualizar o técnico "${selectedTecnicoEdit?.nome}".`);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  if (loading) return <LoadingSpinner />;
+
+  if (loading) return <LoadingSpinner />; // Mostra spinner enquanto carrega
 
   return (
     <div style={{ fontFamily: "Lato" }}>
       <div style={{ marginBottom: 16, color: "#666", fontSize: 14 }}>
-        Mostrando {filteredRows.length} de {tecnicos.length} técnicos
+        Mostrando {filteredTecnicos.length} de {tecnicos.length} técnicos
       </div>
 
       {isMobile ? (
         <div className="client-table-mobile">
-          {filteredRows.length > 0 ? (
-            filteredRows.map((row) => (
-              <div key={row.id} className="client-card">
-                <div><b>Nome:</b> {row.nome}</div>
-                <div><b>Cargo:</b> {row.cargo}</div>
-                <div><b>Email:</b> {row.email}</div>
+          {filteredTecnicos.length > 0 ? (
+            filteredTecnicos.map((tec) => (
+              <div key={tec.id} className="client-card">
+                <div><b>Nome:</b> {tec.nome || "-"}</div>
+                <div><b>Cargo:</b> {tec.cargo || "-"}</div>
+                <div><b>Email:</b> {tec.email || "-"}</div>
                 <div className="actions">
-                  <IconButton onClick={() => handleOpenEdit(row)}>
+                  <IconButton onClick={() => handleOpenEdit(tec)}>
                     <Pencil size={18} />
                   </IconButton>
-                  <IconButton color="error" onClick={() => handleOpenDelete(row)}>
+                  <IconButton color="error" onClick={() => handleOpenDelete(tec)}>
                     <Trash2 size={18} />
                   </IconButton>
                 </div>
@@ -177,7 +262,7 @@ export default function TechnicianTable() {
             },
           }}
         >
-          <Table aria-label="tabela de técnicos">
+          <Table aria-label="Tabela de técnicos">
             <TableHead>
               <TableRow>
                 <TableCell sx={{ color: "#858B99", fontWeight: 600 }}>Nome</TableCell>
@@ -187,28 +272,29 @@ export default function TechnicianTable() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {filteredRows.length > 0 ? (
-                filteredRows.map((row) => {
-                  const initials = row.nome
-                    ? row.nome
+              {filteredTecnicos.length > 0 ? (
+                filteredTecnicos.map((tec) => {
+                  const initials = tec.nome
+                    ? tec.nome
                         .split(" ")
                         .map((n) => (n && n.length > 0 ? n[0] : ""))
                         .join("")
                         .slice(0, 2)
+                        .toUpperCase()
                     : "??";
                   return (
-                    <TableRow key={row.id} hover>
+                    <TableRow key={tec.id} hover>
                       <TableCell>
                         <Avatar initials={initials} />
-                        {row.nome || "-"}
+                        {tec.nome || "-"}
                       </TableCell>
-                      <TableCell>{row.cargo || "-"}</TableCell>
-                      <TableCell>{row.email || "-"}</TableCell>
+                      <TableCell>{tec.cargo || "-"}</TableCell>
+                      <TableCell>{tec.email || "-"}</TableCell>
                       <TableCell>
-                        <IconButton onClick={() => handleOpenEdit(row)}>
+                        <IconButton onClick={() => handleOpenEdit(tec)}>
                           <Pencil size={18} />
                         </IconButton>
-                        <IconButton color="error" onClick={() => handleOpenDelete(row)}>
+                        <IconButton color="error" onClick={() => handleOpenDelete(tec)}>
                           <Trash2 size={18} />
                         </IconButton>
                       </TableCell>
@@ -230,18 +316,37 @@ export default function TechnicianTable() {
         </TableContainer>
       )}
 
-      <DeletarPerfil
-        isOpen={openDeleteModal}
-        onClose={handleCloseDelete}
-        onDelete={handleDeleteConfirmed}
-        usuario={selectedRow}
-      />
-
-      <ModalEditarTecnico
-        isOpen={openEditModal}
-        onClose={handleCloseEdit}
-        tecnico={selectedTecnicoEdit}
-      />
+      {/* Modal para confirmação de exclusão */}
+            <DeletarPerfil
+              isOpen={openDeleteModal}
+              onClose={handleCloseDelete}
+              onDelete={handleDeleteConfirmed}
+              usuario={selectedRow}
+            />
+      
+            {/* Modal para editar tecnico */}
+            <ModalEditarTecnico
+              isOpen={openEditModal}
+              onClose={handleCloseEdit}
+              tecnico={selectedTecnicoEdit}
+              onSuccess={handleEditSuccess} // Atualiza lista após edição
+            />
+      
+            {/* Snackbar para toasts */}
+            <Snackbar
+              open={toastOpen}
+              autoHideDuration={4000}
+              onClose={handleToastClose}
+              anchorOrigin={{ vertical: "top", horizontal: "right" }}
+            >
+              <Alert
+                onClose={handleToastClose}
+                severity={toastSeverity}
+                sx={{ width: "100%", bgcolor: "#604FEB", color: "#fff" }}
+              >
+                {toastMessage}
+              </Alert>
+            </Snackbar>
     </div>
   );
 }

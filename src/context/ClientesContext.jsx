@@ -1,96 +1,82 @@
-import { createContext, useContext, useState, useEffect } from "react";
-import { useAuth } from "./auth-context";
-import clienteService from "../services/clienteService"; // Importa as funções da API
+import { createContext, useContext, useEffect, useState } from "react";
+import clienteService from "../services/clienteService";
 
 const ClientesContext = createContext();
 
-export function ClientesProvider({ children }) {
-  const { token, user } = useAuth(); // Dados do usuário autenticado
-  const [clientes, setClientes] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+// Hook para usar o contexto facilmente
+export const useClientes = () => {
+  return useContext(ClientesContext);
+};
 
-  // Carrega clientes ao iniciar, se o usuário for admin
-  useEffect(() => {
-    if (!token || user?.role !== "admin") {
-      setClientes([]);
-      return;
-    }
-    fetchClientes();
-  }, [token, user]);
+export const ClientesProvider = ({ children }) => {
+  const [clientes, setClientes] = useState([]); // Lista de clientes
+  const [loading, setLoading] = useState(true); // Estado de carregamento
+  const [erro, setErro] = useState(null); // Armazena erro, se houver
 
-  // Busca todos os clientes da API
-  async function fetchClientes() {
+  // Busca todos os clientes na API
+  const fetchClientes = async () => {
     setLoading(true);
-    setError(null);
     try {
-      const data = await clienteService.getAllClientes(token);
+      const data = await clienteService.getAllClientes();
       setClientes(data);
-    } catch (err) {
-      console.error("Erro ao buscar clientes:", err);
-      setError(err.message);
+    } catch (error) {
+      console.error("[ClientesContext] Erro ao carregar clientes:", error);
+      setErro("Erro ao carregar clientes");
     } finally {
       setLoading(false);
     }
-  }
+  };
 
-  // Adiciona novo cliente via API e atualiza a lista
-  async function addCliente(dados) {
-    if (user?.role !== "admin") throw new Error("Sem permissão");
+  // Adiciona cliente e recarrega lista do backend
+  const addCliente = async (novoCliente) => {
     try {
-      const novoCliente = await clienteService.criarCliente(dados, token);
-      setClientes((prev) => [...prev, novoCliente]);
-    } catch (err) {
-      throw err;
+      await clienteService.criarCliente(novoCliente); // só cria
+      await fetchClientes(); // recarrega com dados reais
+    } catch (error) {
+      console.error("[ClientesContext] Erro ao criar cliente:", error);
+      throw error;
     }
-  }
+  };
 
-  // Atualiza cliente via API e atualiza no estado
-  async function updateCliente(id, dados) {
-    if (user?.role !== "admin") throw new Error("Sem permissão");
-    try {
-      const atualizado = await clienteService.atualizarCliente(id, dados, token);
-      setClientes((prev) =>
-        prev.map((cliente) => (cliente.id === id ? atualizado : cliente))
-      );
-    } catch (err) {
-      throw err;
-    }
-  }
+  // Atualiza cliente localmente
+  const updateCliente = (id, dados) => {
+    setClientes((prevClientes) =>
+      prevClientes.map((cliente) =>
+        cliente.id === id ? { ...cliente, ...dados } : cliente
+      )
+    );
+  };
 
-  // Remove cliente via API e atualiza o estado
-  async function deleteCliente(id) {
-    if (user?.role !== "admin") throw new Error("Sem permissão");
+  // Remove cliente do backend e atualiza estado local
+  const deleteCliente = async (id) => {
     try {
-      await clienteService.excluirCliente(id, token);
+      await clienteService.excluirCliente(id);
       setClientes((prev) => prev.filter((cliente) => cliente.id !== id));
-    } catch (err) {
-      throw err;
+    } catch (error) {
+      console.error("[ClientesContext] Erro ao excluir cliente:", error);
+      throw error;
     }
-  }
+  };
+
+  // Busca clientes ao montar componente
+  useEffect(() => {
+    fetchClientes();
+  }, []);
 
   return (
     <ClientesContext.Provider
       value={{
         clientes,
         loading,
-        error,
+        erro,
         fetchClientes,
         addCliente,
         updateCliente,
         deleteCliente,
-        setClientes, // Disponível para uso interno se necessário
+        setLoading,
       }}
     >
       {children}
     </ClientesContext.Provider>
   );
-}
-
-export function useClientes() {
-  const context = useContext(ClientesContext);
-  if (!context) {
-    throw new Error("useClientes deve ser usado dentro de um ClientesProvider");
-  }
-  return context;
-}
+};
