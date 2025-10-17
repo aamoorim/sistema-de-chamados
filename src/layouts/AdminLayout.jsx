@@ -9,6 +9,7 @@ import { useState } from "react";
 import { ModalCriarCliente } from "../components/Modals/CriarCliente";
 import { useClientes } from "../context/ClientesContext";
 import { Plus } from "lucide-react";
+import "../pages/admins/styles.scss"; 
 
 // Spinner simples
 const LoadingSpinner = () => (
@@ -98,10 +99,12 @@ export default function AdminLayout() {
         <SideBar />
         <main className="calls-admin-main">
           <div className="header-admin">
-            <SearchBar />
+            <div className="search-bar">
+              <SearchBar />
             {config && (
               <Botao icon={Plus} text={config.text} onClick={() => setOpen(true)} />
             )}
+            </div>
           </div>
           <Outlet />
           {open && config?.modal}

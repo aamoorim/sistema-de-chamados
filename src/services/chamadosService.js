@@ -33,6 +33,16 @@ const getChamadosAbertosDisponiveis = async () => {
   return res.data;
 };
 
+const getMensagensDoChamado = async (id) => {
+  const res = await api.get(`/chamados/mensagens/${id}`);
+  return res.data.mensagens || [];
+}
+
+const enviarMensagemNoChamado = async (id, mensagem) => {
+  const res = await api.post(`/chamados/mensagens/${id}`, { mensagem });
+  return res.data;
+}
+
 export default {
   getChamadosDoCliente,
   criarChamado,
@@ -40,4 +50,6 @@ export default {
   atribuirChamado,
   excluirChamado,
   getChamadosAbertosDisponiveis,
+  getMensagensDoChamado,
+  enviarMensagemNoChamado,
 };

@@ -6,6 +6,11 @@
   display: block;
 }
 
+.table {
+  width: 960px;
+  border-collapse: collapse;
+}
+
 @media (max-width: 1115px) {
   .calls-admin-table-desktop {
     display: none;
