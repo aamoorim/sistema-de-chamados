@@ -163,7 +163,7 @@ export default function ChamadosTecnico() {
                         <div className="chamado-descricao">{chamado.descricao}</div>
                         <div className="chamado-data">{chamado.data_criacao || chamado.data}</div>
                       </div>
-                      <Botao
+                      <Botao className="btn-encerrar"
                         onClick={(e) => handleEncerrar(e, chamado.id)}
                         text={encerrandoId === chamado.id ? "" : "Encerrar"}
                         icon={encerrandoId === chamado.id ? null : CircleCheckBig}
