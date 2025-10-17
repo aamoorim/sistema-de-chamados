@@ -8,8 +8,6 @@ import {
   TableRow,
   Paper,
   IconButton,
-  Typography,
-  useMediaQuery,
   Snackbar,
 } from "@mui/material";
 import { Trash2, Pencil } from "lucide-react";
@@ -60,7 +58,7 @@ function AvatarInitials({ name }) {
   );
 }
 
-// Spinner
+// Spinner de carregamento
 const LoadingSpinner = () => (
   <div
     style={{
@@ -97,7 +95,7 @@ const LoadingSpinner = () => (
 
 export default function ListTable() {
   const theme = useTheme();
-  const isMobile = useIsMobile(1200);
+  const isMobile = useIsMobile(768);
 
   const { search, filters } = useSearch();
   const [rows, setRows] = useState([]);
@@ -113,10 +111,9 @@ export default function ListTable() {
   const [openEditModal, setOpenEditModal] = useState(false);
   const [selectedChamadoEdit, setSelectedChamadoEdit] = useState(null);
 
-  // Toast states
   const [toastOpen, setToastOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
-  const [toastSeverity, setToastSeverity] = useState("success"); // "success", "error", etc.
+  const [toastSeverity, setToastSeverity] = useState("success");
 
   const showToast = (message, severity = "success") => {
     setToastMessage(message);
@@ -144,10 +141,7 @@ export default function ListTable() {
   };
 
   useEffect(() => {
-    // Carregamento inicial
     fetchChamados();
-
-    // Polling ou atualização periódica
     const interval = setInterval(async () => {
       try {
         const response = await api.get("/chamados");
@@ -176,7 +170,7 @@ export default function ListTable() {
       showToast("Não é permitido deletar chamados em andamento.", "error");
       handleCloseDelete();
       return;
-    }    
+    }
 
     try {
       await api.delete(`/chamados/${selectedChamado.id}`);
@@ -188,7 +182,6 @@ export default function ListTable() {
     }
     handleCloseDelete();
   };
-
 
   const handleRowClick = (row) => {
     setSelectedChamadoDetalhes(row);
@@ -227,7 +220,6 @@ export default function ListTable() {
     } catch (error) {
       console.error("Erro ao atualizar chamado:", error);
       showToast("Erro ao atualizar chamado", "error");
-      alert("Erro ao atualizar chamado. Verifique os dados e tente novamente.");
     }
   };
 
@@ -237,12 +229,9 @@ export default function ListTable() {
       const matchesSearch =
         !textToSearch ||
         item.titulo.toLowerCase().includes(textToSearch) ||
-        (item.descricao &&
-          item.descricao.toLowerCase().includes(textToSearch)) ||
-        (item.cliente_nome &&
-          item.cliente_nome.toLowerCase().includes(textToSearch)) ||
-        (item.tecnico_nome &&
-          item.tecnico_nome.toLowerCase().includes(textToSearch));
+        (item.descricao && item.descricao.toLowerCase().includes(textToSearch)) ||
+        (item.cliente_nome && item.cliente_nome.toLowerCase().includes(textToSearch)) ||
+        (item.tecnico_nome && item.tecnico_nome.toLowerCase().includes(textToSearch));
 
       if (!matchesSearch) return false;
 
@@ -270,8 +259,7 @@ export default function ListTable() {
   const filteredRows = applySearchAndFilters(rows);
 
   if (loading) return <LoadingSpinner />;
-  if (error)
-    return <div style={{ color: "red", fontFamily: "Lato" }}>{error}</div>;
+  if (error) return <div style={{ color: "red", fontFamily: "Lato" }}>{error}</div>;
 
   return (
     <div
@@ -283,19 +271,17 @@ export default function ListTable() {
         boxSizing: "border-box",
         overflowX: "auto",
         fontFamily: "Lato",
+        marginLeft: isMobile ? 0 : "230px", // 👈 ajustado para ficar ao lado da sidebar fixa
+        transition: "margin-left 0.3s ease",
       }}
     >
       <Snackbar
         open={toastOpen}
-        autoHideDuration={2000} // Tempo de expiração do toast
+        autoHideDuration={2000}
         onClose={handleToastClose}
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
       >
-        <Alert
-          onClose={handleToastClose}
-          severity={toastSeverity}
-          sx={{ bgcolor: "#604FEB", color: "#fff" }}
-        >
+        <Alert onClose={handleToastClose} severity={toastSeverity} sx={{ bgcolor: "#604FEB", color: "#fff" }}>
           {toastMessage}
         </Alert>
       </Snackbar>
@@ -325,95 +311,41 @@ export default function ListTable() {
                 }}
                 onClick={() => handleRowClick(row)}
               >
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                  }}
-                >
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                   <span style={{ color: "#858B99", fontSize: 13 }}>
                     {new Date(row.data_criacao).toLocaleDateString("pt-BR")}
                   </span>
                   <StatusChip label={row.status} />
                 </div>
-                <div
-                  style={{
-                    fontWeight: 600,
-                    fontSize: 16,
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap",
-                  }}
-                >
+                <div style={{ fontWeight: 600, fontSize: 16, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                   {row.titulo}
                 </div>
-                <div
-                  style={{
-                    color: "#888",
-                    fontSize: 13,
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap",
-                  }}
-                >
+                <div style={{ color: "#888", fontSize: 13, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                   {row.descricao}
                 </div>
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 8,
-                    marginTop: 4,
-                  }}
-                >
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 4 }}>
                   <AvatarInitials name={row.cliente_nome} />
-                  <span
-                    style={{
-                      fontSize: 14,
-                      fontWeight: 500,
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
+                  <span style={{ fontSize: 14, fontWeight: 500, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                     {row.cliente_nome || "Sem cliente"}
                   </span>
                   <span style={{ color: "#aaa", fontSize: 12 }}>|</span>
                   <AvatarInitials name={row.tecnico_nome} />
-                  <span
-                    style={{
-                      fontSize: 14,
-                      fontWeight: 500,
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
+                  <span style={{ fontSize: 14, fontWeight: 500, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                     {row.tecnico_nome || "Sem técnico"}
                   </span>
                 </div>
-                <div
-                  style={{ display: "flex", gap: 8, marginTop: 8 }}
-                  onClick={(e) => e.stopPropagation()}
-                >
+                <div style={{ display: "flex", gap: 8, marginTop: 8 }} onClick={(e) => e.stopPropagation()}>
                   <IconButton size="small">
                     <Pencil size={18} onClick={() => handleOpenEdit(row)} />
                   </IconButton>
-                  <IconButton
-                    color="error"
-                    size="small"
-                    onClick={() => handleOpenDelete(row)}
-                  >
+                  <IconButton color="error" size="small" onClick={() => handleOpenDelete(row)}>
                     <Trash2 size={18} />
                   </IconButton>
                 </div>
               </div>
             ))
           ) : (
-            <div style={{ textAlign: "center", color: "#999", padding: 32 }}>
-              Nenhum chamado encontrado
-            </div>
+            <div style={{ textAlign: "center", color: "#999", padding: 32 }}>Nenhum chamado encontrado</div>
           )}
         </div>
       ) : (
@@ -422,43 +354,38 @@ export default function ListTable() {
           sx={{
             borderRadius: 2,
             boxShadow: "0 2px 8px rgba(44,62,80,0.04)",
+            width: "clamp(800px, 85vw, 1100px)",  
+            maxWidth: "1200px",
             overflowX: "auto",
+            margin: "0 auto",
           }}
         >
-          <Table aria-label="tabela de chamados" size="medium" sx={{ minWidth: 650 }}>
+          <Table
+            aria-label="tabela de chamados"
+            size="small"
+            sx={{
+              width: "100%",
+              tableLayout: "auto",
+            }}
+          >
             <TableHead>
               <TableRow>
-                <TableCell sx={{ color: "#858B99", fontWeight: 600, whiteSpace: "nowrap" }}>
-                  Criado em
-                </TableCell>
-                <TableCell sx={{ color: "#858B99", fontWeight: 600, whiteSpace: "nowrap" }}>
-                  ID
-                </TableCell>
-                <TableCell sx={{ color: "#858B99", fontWeight: 600, whiteSpace: "nowrap" }}>
-                  Cliente
-                </TableCell>
-                <TableCell sx={{ color: "#858B99", fontWeight: 600, whiteSpace: "nowrap" }}>
-                  Técnico
-                </TableCell>
-                <TableCell
-                  sx={{
-                    color: "#858B99",
-                    fontWeight: 600,
-                    maxWidth: 150,
-                    whiteSpace: "nowrap",
-                    wordWrap: "break-word",
-                  }}
-                >
-                  Título / Descrição
-                </TableCell>
-                <TableCell sx={{ color: "#858B99", fontWeight: 600, whiteSpace: "nowrap" }}>
-                  Status
-                </TableCell>
-                <TableCell sx={{ color: "#858B99", fontWeight: 600, whiteSpace: "nowrap" }}>
-                  Ações
-                </TableCell>
+                {["Criado em", "ID", "Cliente", "Técnico", "Título / Descrição", "Status", "Ações"].map((header, i) => (
+                  <TableCell
+                    key={i}
+                    sx={{
+                      color: "#858B99",
+                      fontWeight: 600,
+                      padding: { xs: "6px 8px", md: "12px 16px" }, // 👈 menor no mobile, maior no desktop
+                      fontSize: { xs: "0.75rem", md: "0.9rem" },   // 👈 ajusta fonte também
+                    }}
+                  >
+                    {header}
+                  </TableCell>
+                ))}
               </TableRow>
             </TableHead>
+
             <TableBody>
               {filteredRows.length > 0 ? (
                 filteredRows.map((row) => (
@@ -468,95 +395,135 @@ export default function ListTable() {
                     onClick={() => handleRowClick(row)}
                     sx={{ cursor: "pointer" }}
                   >
-                    <TableCell>{new Date(row.data_criacao).toLocaleDateString("pt-BR")}</TableCell>
-                    <TableCell>{row.id}</TableCell>
+                    {/* Data */}
                     <TableCell
                       sx={{
-                        whiteSpace: "nowrap",
-                        display: "table-cell",
-                        verticalAlign: "middle",
-                        maxWidth: 180,
-                        paddingY: 1,
-                        paddingX: 1,
+                        whiteSpace: "normal",
+                        wordBreak: "break-word",
+                        padding: { xs: "6px 8px", md: "12px 16px" },
+                        fontSize: { xs: "0.75rem", md: "0.9rem" },
                       }}
                     >
-                      <div style={{ display: "flex", alignItems: "center", minWidth: 0 }}>
+                      {new Date(row.data_criacao).toLocaleDateString("pt-BR")}
+                    </TableCell>
+
+                    {/* ID */}
+                    <TableCell
+                      sx={{
+                        whiteSpace: "normal",
+                        padding: { xs: "6px 8px", md: "12px 16px" },
+                        fontSize: { xs: "0.75rem", md: "0.9rem" },
+                      }}
+                    >
+                      {row.id}
+                    </TableCell>
+
+                    {/* Cliente */}
+                    <TableCell
+                      sx={{
+                        whiteSpace: "normal",
+                        wordBreak: "break-word",
+                        padding: { xs: "6px 8px", md: "12px 16px" },
+                        fontSize: { xs: "0.75rem", md: "0.9rem" },
+                      }}
+                    >
+                      <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
                         <AvatarInitials name={row.cliente_nome} />
                         <span
                           style={{
                             overflow: "hidden",
                             textOverflow: "ellipsis",
-                            whiteSpace: "nowrap",
-                            display: "inline-block",
-                            maxWidth: 120,
-                            verticalAlign: "middle",
+                            wordBreak: "break-word",
+                            whiteSpace: "normal",
                           }}
                         >
                           {row.cliente_nome || "Sem cliente"}
                         </span>
                       </div>
                     </TableCell>
+
+                    {/* Técnico */}
                     <TableCell
                       sx={{
-                        whiteSpace: "nowrap",
-                        display: "table-cell",
-                        verticalAlign: "middle",
-                        maxWidth: 180,
-                        paddingY: 1,
-                        paddingX: 1,
+                        whiteSpace: "normal",
+                        wordBreak: "break-word",
+                        padding: { xs: "6px 8px", md: "12px 16px" },
+                        fontSize: { xs: "0.75rem", md: "0.9rem" },
                       }}
                     >
-                      <div style={{ display: "flex", alignItems: "center", minWidth: 0 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
                         <AvatarInitials name={row.tecnico_nome} />
                         <span
                           style={{
                             overflow: "hidden",
                             textOverflow: "ellipsis",
-                            whiteSpace: "nowrap",
-                            display: "inline-block",
-                            maxWidth: 120,
-                            verticalAlign: "middle",
+                            wordBreak: "break-word",
+                            whiteSpace: "normal",
                           }}
                         >
                           {row.tecnico_nome || "Sem técnico"}
                         </span>
                       </div>
                     </TableCell>
+
+                    {/* Título / Descrição */}
                     <TableCell
                       sx={{
-                        maxWidth: 220,
-                        minWidth: 120,
-                        whiteSpace: "nowrap",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        verticalAlign: "middle",
-                        paddingY: 1,
-                        paddingX: 1,
+                        whiteSpace: "normal",
+                        wordBreak: "break-word",
+                        overflowWrap: "break-word",
+                        padding: { xs: "6px 8px", md: "12px 16px" },
+                        fontSize: { xs: "0.75rem", md: "0.9rem" },
                       }}
                     >
-                      <span style={{ fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", display: "block", maxWidth: 210 }}>
-                        {row.titulo}
-                      </span>
-                      <span style={{ color: "#888", fontSize: 13, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", display: "block", maxWidth: 210 }}>
+                      <span style={{ fontWeight: 600 }}>{row.titulo}</span>
+                      <br />
+                      <span style={{ color: "#888", fontSize: "0.75rem" }}>
                         {row.descricao}
                       </span>
                     </TableCell>
-                    <TableCell>
+
+                    {/* Status */}
+                    <TableCell
+                      sx={{
+                        padding: { xs: "6px 8px", md: "12px 16px" },
+                      }}
+                    >
                       <StatusChip label={row.status} />
                     </TableCell>
-                    <TableCell onClick={(e) => e.stopPropagation()}>
-                      <IconButton size="medium" onClick={() => handleOpenEdit(row)}>
-                        <Pencil size={18} />
+
+                    {/* Ações */}
+                    <TableCell
+                      onClick={(e) => e.stopPropagation()}
+                      sx={{
+                        whiteSpace: "nowrap",
+                        padding: { xs: "6px 8px", md: "12px 16px" },
+                      }}
+                    >
+                      <IconButton
+                        size="small"
+                        sx={{ fontSize: { xs: "0.75rem", md: "1rem" } }}
+                        onClick={() => handleOpenEdit(row)}
+                      >
+                        <Pencil size={16} />
                       </IconButton>
-                      <IconButton color="error" size="medium" onClick={() => handleOpenDelete(row)}>
-                        <Trash2 size={18} />
+                      <IconButton
+                        color="error"
+                        size="small"
+                        sx={{ fontSize: { xs: "0.75rem", md: "1rem" } }}
+                        onClick={() => handleOpenDelete(row)}
+                      >
+                        <Trash2 size={16} />
                       </IconButton>
                     </TableCell>
                   </TableRow>
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={7} sx={{ textAlign: "center", padding: 4, color: "#999" }}>
+                  <TableCell
+                    colSpan={7}
+                    sx={{ textAlign: "center", padding: "1rem", color: "#999" }}
+                  >
                     Nenhum chamado encontrado
                   </TableCell>
                 </TableRow>
@@ -566,7 +533,6 @@ export default function ListTable() {
         </TableContainer>
       )}
 
-      {/* Modais */}
       <DeletarChamado
         isOpen={openDeleteModal}
         onClose={handleCloseDelete}
