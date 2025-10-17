@@ -6,6 +6,11 @@
   display: block;
 }
 
+.table {
+  width: 960px;
+  border-collapse: collapse;
+}
+
 @media (max-width: 900px) {
   .client-table-desktop {
     display: none;

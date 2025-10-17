@@ -97,7 +97,8 @@ export default function ListTableTec() {
           border: "1px solid #e5e7eb",
           boxShadow: "0 1px 3px 0 rgb(0 0 0 / 0.1)",
         }}>
-          <Table>
+          <div className="table">
+            <Table>
             <TableHead>
               <TableRow sx={{ bgcolor: "#f9fafb" }}>
                 <TableCell sx={{ fontWeight: 600 }}>Criado em</TableCell>
@@ -159,6 +160,7 @@ export default function ListTableTec() {
               )}
             </TableBody>
           </Table>
+          </div>
         </TableContainer>
       )}
     </Box>

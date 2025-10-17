@@ -5,6 +5,7 @@
   display: flex;
   min-height: 100vh;
   background: #f5f6fa;
+  
 }
 
 .calls-admin-main {
@@ -88,11 +89,20 @@
 }
 }
 
+.tabela-admin-container {
+  width: 1340px;
+  margin-left: -50px;       /* Espaçamento superior e inferior */
+}
+
+.search-bar {
+  padding-bottom: -20px;
+}
+
 .header-admin {
   display: flex;
   align-items: center; /* Garante alinhamento vertical */
-  width: 100%;
-  margin-bottom: 24px; /* Adiciona espaçamento inferior consistente */
+  width: 100%; /* Adiciona espaçamento inferior consistente */
+  margin-left: 220px;
   
   /* Força o SearchBar a ocupar espaço disponível */
   .search-bar-container {
