@@ -3,15 +3,14 @@
 // ========================================
 // VARIÁVEIS
 // ========================================
-
-// Colors
 $color-primary: #3b83f6;
 $color-primary-hover: #2563eb;
-$color-secondary: #64748b;  
+$color-secondary: #64748b;
 $color-success: #caecb1;
 $color-warning: #a5bbeb;
 $color-danger: #ef4444;
-$color-icon:#355EC5 ;
+$color-icon: #355ec5;
+$color-espera: #ffd93d;
 
 // Background Colors
 $bg-main: #ffffff;
@@ -81,10 +80,9 @@ $breakpoint-md: 768px;
 $breakpoint-lg: 992px;
 $breakpoint-xl: 1200px;
 
-// ========================================
+// ==================================================
 // MIXINS
-// ========================================
-
+// ==================================================
 @mixin flex($direction: row, $align: center, $justify: flex-start, $gap: 0) {
   display: flex;
   flex-direction: $direction;
@@ -93,13 +91,19 @@ $breakpoint-xl: 1200px;
   gap: $gap;
 }
 
-@mixin card($padding: $spacing-2xl, $radius: $radius-xl, $shadow: $shadow-sm) {
+@mixin card($padding: $spacing-lg, $radius: $radius-md, $shadow: $shadow-md) {
   background: $bg-card;
   border: 1px solid $border-light;
   border-radius: $radius;
   padding: $padding;
   box-shadow: $shadow;
   transition: all $transition-base;
+}
+
+@mixin responsive($breakpoint) {
+  @media (max-width: $breakpoint) {
+    @content;
+  }
 }
 
 @mixin hover-lift() {
@@ -109,101 +113,94 @@ $breakpoint-xl: 1200px;
   }
 }
 
-@mixin button($bg: $color-primary, $color: $text-white, $padding: $spacing-sm $spacing-lg) {
-  background: $bg;
-  color: $color;
-  border: none;
-  padding: $padding;
-  border-radius: $radius-md;
-  font-weight: $font-medium;
-  cursor: pointer;
-  transition: all $transition-base;
-  
-  &:hover {
-    background: color.adjust($bg, $lightness: -10%);
-    transform: translateY(-1px);
-  }
-}
-
-@mixin avatar($size: 36px, $bg: $color-primary) {
-  width: $size;
-  height: $size;
-  border-radius: $radius-full;
-  background: $bg;
-  color: $text-white;
-  @include flex(row, center, center);
-  font-weight: $font-semibold;
-  font-size: calc(#{$size} * 0.36);
-}
-
-@mixin status-border($color: $color-warning, $width: 3px) {
-  border-left: $width solid $color;
-}
-
-@mixin responsive($breakpoint) {
-  @media (max-width: $breakpoint) {
-    @content;
-  }
-}
-
-// ========================================
-// RESET E BASE
-// ========================================
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  background: $bg-app;
-  overflow-x: hidden;
-}
-
-// ========================================
+// ==================================================
 // LAYOUT PRINCIPAL
-// ========================================
-
+// ==================================================
 .app-container {
   display: flex;
   min-height: 100vh;
   background: $bg-app;
+  position: relative;
 }
 
+// 🔹 SIDEBAR FIXA À ESQUERDA
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 280px;
+  height: 100vh;
+  background: $bg-sidebar;
+  z-index: 10;
+  overflow-y: auto;
+  color: white;
+  padding: 20px;
+}
+
+// ==================================================
+// CONTEÚDO PRINCIPAL
+// ==================================================
 .main-content {
   flex: 1;
-  background:#0e5dc5; 
-  padding: 20px;
+  background: #f9fafc;
+  margin-left: 320px;
+  padding: 40px;
+  position: relative;
+  z-index: 5;
 
-  @include responsive($breakpoint-xl) { padding: $spacing-2xl $spacing-3xl; }
-  @include responsive($breakpoint-lg) { padding: $spacing-2xl; }
-  @include responsive($breakpoint-md) { padding: $spacing-xl; }
-  @include responsive($breakpoint-xs) { padding: $spacing-lg; }
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; // Alinhamento inicial à esquerda
+  text-align: left;
+
+  @include responsive($breakpoint-lg) {
+    padding: 30px;
+    margin-left: 300px;
+  }
+
+  @include responsive($breakpoint-md) {
+    margin-left: 0;
+    padding: 20px;
+  }
 }
 
-// ========================================
+// ==================================================
 // HEADER
-// ========================================
-
+// ==================================================
 .header {
-  margin-bottom: $spacing-3xl;  
+  width: 100%;
+  max-width: 1200px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin-bottom: 32px;
+  padding-left: 14rem;
 
   h1 {
     font-size: $text-3xl;
     font-weight: $font-semibold;
-    color:#2E3DA3;
-    margin-bottom: $spacing-2xl;
-    letter-spacing: -0.025em;
+    color: #2E3DA3;
   }
+
+  
+  @include responsive($breakpoint-md) {
+    padding-left: 0; // remove padding no mobile
+  }
+
+
 }
 
-// ========================================
-// SEÇÕES (Em atendimento / Encerrados)
-// ========================================
-
+// ==================================================
+// SEÇÃO DE STATUS
+// ==================================================
 .section {
-  margin-bottom: $spacing-4xl;
+  width: 100%;
+  max-width: 1200px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  margin-bottom: 40px;
 }
 
 .section-header {
@@ -212,10 +209,17 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: $spacing-xl;
+  margin-bottom: 20px;
   padding: 6px 14px;
   border-radius: 24px;
   color: $text-white;
+  margin-left: 14rem;
+
+
+  &.espera {
+    background: rgba(239, 68, 68, 0.1);
+    color: $color-danger;
+  }
 
   &.andamento {
     background: $color-warning;
@@ -228,440 +232,115 @@ body {
   }
 }
 
-// ========================================
-// LISTA DE CHAMADOS
-// ========================================
-
+// ==================================================
+// LISTA DE CHAMADOS (implementação do primeiro código)
+// ==================================================
 .chamados-list {
   display: flex;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: $spacing-lg;
-  
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center; // cards alinhados à direita
+  align-items: flex-start;
+  padding-left: 14rem;
+
+  @include responsive($breakpoint-md) {
+    flex-direction: column;
+    justify-content: center; // centralizado no mobile
+    padding-left: 0;  
+  }
 }
 
+// ==================================================
+// CARD DO CHAMADO
+// ==================================================
 .chamado-card {
-  @include card($spacing-lg, $radius-md, $shadow-sm);
-  position: relative;
+  @include card($spacing-lg, $radius-md, $shadow-md);
+  width: calc(33.333% - 12px); // 3 colunas
+  min-width: 30rem;
+  max-width: 420px;
+  padding: 28px 32px;
+
   @include hover-lift();
-  background: $bg-card;
-  border: 1px solid $border-light;
-  border-radius: 12px;
-  padding: 24px 28px;
-  margin-bottom: 24px;
-  box-shadow: $shadow-sm;
-  font-size: 14px;  
-  line-height: 1.4;
-  transition: all $transition-base;
-  min-height: 220px;      
-  max-width: 22rem;
-  width: 100%;
-  
 
-  &.finalizado {
-    @include status-border($color-success);
+  @include responsive($breakpoint-lg) {
+    width: calc(50% - 10px); // 2 colunas
   }
 
-  &.andamento {
-    @include status-border($color-warning);
+  @include responsive($breakpoint-md) {
+    width: 100%; // 1 coluna no mobile
+    max-width: none;
   }
 
-  @include responsive($breakpoint-lg) { 
-    max-width: 450px; 
-    padding: 18px 22px;
-  }
-  @include responsive($breakpoint-md) { 
-    max-width: 100%; 
-    padding: $spacing-md; 
-  }
-  @include responsive($breakpoint-xs) { 
-    padding: $spacing-sm; 
-    border-radius: $radius-sm; 
-  }
-}
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
 
-// ========================================
-// CARD MAIN
-// ========================================
-
-.card-main {
-  @include flex(row, flex-start, space-between);
-  margin-bottom: $spacing-md;
-}
-
-.chamado-info {
-  flex: 1;
-  
-  .chamado-codigo {
-    font-size: $text-xs;
-    color: $text-secondary;
-    margin-bottom: 4px;
-    font-weight: $font-medium;
-  } 
-
-  .chamado-titulo {
-    font-size: $text-lg;
-    font-weight: $font-semibold;
-    color: $text-primary;
-    margin-bottom: 4px;
-    line-height: 1.3;
-  }
-
-  .chamado-descricao {
-    font-size: $text-sm;
-    color: $text-secondary;
-    line-height: 1.4;
-    margin-bottom: 18px;
-
-      display: -webkit-box;
-      #{-webkit-line-clamp}: 2; // número de linhas máximas
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-      text-overflow: ellipsis;
-  }
-
-  .chamado-data {
-    font-size: $text-xs;
-    color: $text-muted;
-    font-weight: $font-semibold;
-  }
-}
-
-.card-right {
-  @include flex(row, center, flex-end, $spacing-sm);
-}
-
-.btn-encerrar {
-  @include button(#000, $text-white, 6px $spacing-lg);
-  font-size: $text-xs;
-  font-weight: $font-medium;
-  border-radius: 6px;
-  width: 6rem;
-  height: 31px;
-
-  @include flex(row, center, center);
-
-  position: relative;
-  overflow: hidden;
-
-  &:hover { background: #1f2937; }
-}
-
-// ========================================
-// CARD FOOTER
-// ========================================
-
-.card-footer {
-  border-top: 1px solid $border-light;
-  padding-top: 16px;
-  margin-top: 32px;
-
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.user-info {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex: 1
-}
-
-.user-avatar {
-  @include avatar(26px, $color-primary);
-  font-size: 11px;
-  font-weight: $font-bold;
-}
-
-.user-name {
-  font-size: $text-sm;
-  color: $text-primary;
-  font-weight: $font-medium;
-  flex: 1;
-}
-
-.check-icon {
-  @include flex(row, center, center);
-  width: 22px;
-  height: 22px;
-  background: color.adjust($color-success, $lightness: 40%);
-  color: $color-success;
-  border-radius: $radius-full;
-  margin-left: auto;
-}
-
-// ========================================
-// RESPONSIVE AJUSTES
-// ========================================
-
-@include responsive($breakpoint-md) {
-  .card-main {
-    flex-direction: column;
-    gap: 16px;
-  }
-    
-  .card-right {
-    justify-content: flex-start;
-  }
-
-  .chamado-info {
-    margin-right: 0;
-  }
-}
-
-@include responsive($breakpoint-xs) {
-  .user-avatar {
-    @include avatar(28px, $color-primary);
-    font-size: 12px;
-  }
-  
-  .btn-encerrar {
-    padding: 6px 16px;
-    font-size: 12px;
-    width: 110px;
-    height: 36px;
-  }
-  
-  .check-icon {
-    width: 24px;
-    height: 24px;
-  }
-
-  .chamado-info {
-    .chamado-titulo {
-      font-size: $text-lg;
-    }
-    
-    .chamado-descricao {
-      font-size: $text-sm;
-    }
-  }
-}
-
-// ========================================
-// RIPPLE EFFECT
-// ========================================
-
-$ripple-duration: 0.8s;
-$ripple-size: 200px;
-$ripple-color: rgba(255, 255, 255, 0.4);
-$ripple-easing: cubic-bezier(0.4, 0, 0.2, 1);
-
-.btn-encerrar {
-  position: relative;
-  overflow: hidden;
-  
-  &:active {
-    transform: translateY(0px) scale(0.98);
-  }
-  
-  .ripple {
-    position: absolute;
-    border-radius: 50%;
-    background: $ripple-color;
-    pointer-events: none;
-    animation: rippleEffect $ripple-duration $ripple-easing forwards;
-    transform: translate(-50%, -50%);
-  }
-}
-
-@keyframes rippleEffect {
-  0% {
-    width: 0;
-    height: 0;
-    opacity: 0.6;
-    transform: translate(-50%, -50%) scale(0);
-  }
-  
-  50% {
-    opacity: 0.4;
-  }
-  
-  100% {
-    width: $ripple-size;
-    height: $ripple-size;
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(1);
-  }
-}
-
-.status-icon {
-  @include flex(row, center, center);
-  width: 26px;
-  height: 26px;
-  border-radius: $radius-full;
-
-  &.andamento {
-    background: color.adjust($color-warning, $lightness: 10%);
-    color: $color-icon;
-  }
-
-  &.finalizado {
-    background: color.adjust($color-success, $lightness: 10%);
-    color: #2E7D32;
-  }
-}
-
-
-  // ========================================
-  // BREAKPOINTS PARA AJUSTES FINOS
-  // ========================================
-
-  // até 480px (mobile pequeno)
-  @include responsive($breakpoint-xs) {
-  .chamado-card {
-    width: 23rem;        // ocupa toda a largura disponível
-    max-width: 17rem;    // evita travar o tamanho
-    padding: $spacing-lg; 
-    min-height: auto;
-    border-radius: $radius-sm;   // deixa altu ra se ajustar ao conteúdo
-  }
-  
-
-  .card-main {
-    flex-direction: column;
-    gap: $spacing-sm;
-  }
-
-  .btn-encerrar {
-    width: 100%;          // botão ocupa toda a largura
-    height: auto;
-    padding: 8px;                                                                           
-    font-size: $text-sm;
-  }                            
-
-  .chamado-info {
-    .chamado-titulo {
-      font-size: $text-base;
-    }
-
-    .chamado-descricao {
+    .chamado-codigo {
       font-size: $text-xs;
+      color: $text-secondary;
+      font-weight: $font-medium;
+    }
+  }
+
+  .chamado-info {
+    .chamado-titulo {
+      font-size: $text-xl;
+      font-weight: $font-semibold;
+      color: $text-primary;
+      margin-bottom: 6px;
+    }
+
+    .chamado-descricao {
+      font-size: $text-base;
+      color: $text-secondary;
+      margin-bottom: 8px;
+    }
+
+    .chamado-data {
+      font-size: $text-xs;
+      color: $text-muted;
+      font-weight: $font-semibold;
     }
   }
 
   .card-footer {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: $spacing-sm;
-    margin-top: $spacing-md;
-  }
-}
+    border-top: 1px solid $border-light;
+    padding-top: 16px;
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 
- // até 992px (notebook/tablet grande)
-@include responsive($breakpoint-lg) { 
-  .chamados-list {
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  }
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
 
-  .chamado-card {
-    padding: 18px 22px;
-  }
-}
+      .user-avatar {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: $color-primary;
+        color: white;
+        font-size: 12px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
 
-// até 768px (tablet)
-@include responsive($breakpoint-md) { 
-  .chamados-list {
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); // empilha no tablet/celular
-  }
-
-  .chamado-card {
-    padding: $spacing-md; 
-  }
-}
-
-
-
-
-// ========================================
-// RESPONSIVIDADE FINAL
-// ========================================
-
-// até 480px (mobile pequeno)
-@include responsive($breakpoint-xs) {
-  .chamado-card {
-    width: 100%;
-    max-width: 100%;
-    padding: $spacing-sm; 
-    min-height: auto;
-    border-radius: $radius-sm;
+      .user-name {
+        font-size: $text-sm;
+        font-weight: $font-medium;
+        color: $text-primary;
+      }
+    }
   }
 
-  .card-main {
-    flex-direction: column;
-    gap: $spacing-sm;
-  }
-
-  .btn-encerrar {
-    width: 100%;          
-    height: auto;
-    padding: 8px;                                                                           
-    font-size: $text-sm;
-  }                            
-
-  .chamado-info {
-    .chamado-titulo { font-size: $text-base; }
-    .chamado-descricao { font-size: $text-xs; }
-  }
-
-  .card-footer {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: $spacing-sm;
-    margin-top: $spacing-md;
-  }
-}
-
-// até 576px (celulares médios)
-@include responsive($breakpoint-sm) {
-  .chamados-list {
-    grid-template-columns: 1fr; // força apenas 1 card por linha
-  }
-
-  .chamado-card {
-    max-width: 100%;
-    padding: $spacing-md;
-  }
-
-  .chamado-info {
-    .chamado-titulo { font-size: $text-lg; }
-    .chamado-descricao { font-size: $text-sm; }
-  }
-}
-
-// até 768px (tablet)
-@include responsive($breakpoint-md) { 
-  .chamados-list {
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
-  }
-
-  .chamado-card {
-    padding: $spacing-md; 
-  }
-
-  .main-content {
-    padding: $spacing-xl;
-  }
-}
-
-// até 992px (notebooks pequenos)
-@include responsive($breakpoint-lg) { 
-  .chamados-list {
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  }
-
-  .chamado-card {
-    padding: 18px 22px;
-  }
-}
-
-// até 1200px (telas grandes)
-@include responsive($breakpoint-xl) {
-  .main-content {
-    padding: $spacing-3xl $spacing-4xl; // mais respiro lateral
-  }
-
-  .chamados-list {
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: $shadow-lg;
   }
 }
