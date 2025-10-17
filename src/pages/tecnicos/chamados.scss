@@ -121,20 +121,10 @@ $breakpoint-xl: 1200px;
   min-height: 100vh;
   background: $bg-app;
   position: relative;
-}
 
-// 🔹 SIDEBAR FIXA À ESQUERDA
-.sidebar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 280px;
-  height: 100vh;
-  background: $bg-sidebar;
-  z-index: 10;
-  overflow-y: auto;
-  color: white;
-  padding: 20px;
+  @include responsive($breakpoint-md) {
+    flex-direction: column;
+  }
 }
 
 // ==================================================
@@ -150,7 +140,7 @@ $breakpoint-xl: 1200px;
 
   display: flex;
   flex-direction: column;
-  align-items: flex-start; // Alinhamento inicial à esquerda
+  align-items: flex-start;
   text-align: left;
 
   @include responsive($breakpoint-lg) {
@@ -161,6 +151,14 @@ $breakpoint-xl: 1200px;
   @include responsive($breakpoint-md) {
     margin-left: 0;
     padding: 20px;
+  }
+
+  @include responsive($breakpoint-sm) {
+    padding: 16px;
+  }
+
+  @include responsive($breakpoint-xs) {
+    padding: 12px;
   }
 }
 
@@ -179,15 +177,20 @@ $breakpoint-xl: 1200px;
   h1 {
     font-size: $text-3xl;
     font-weight: $font-semibold;
-    color: #2E3DA3;
+    color: #2e3da3;
   }
 
-  
   @include responsive($breakpoint-md) {
-    padding-left: 0; // remove padding no mobile
+    padding-left: 0;
+    justify-content: center;
+    text-align: center;
   }
 
-
+  @include responsive($breakpoint-xs) {
+    h1 {
+      font-size: $text-xl;
+    }
+  }
 }
 
 // ==================================================
@@ -215,7 +218,6 @@ $breakpoint-xl: 1200px;
   color: $text-white;
   margin-left: 14rem;
 
-
   &.espera {
     background: rgba(239, 68, 68, 0.1);
     color: $color-danger;
@@ -228,25 +230,39 @@ $breakpoint-xl: 1200px;
 
   &.finalizado {
     background: $color-success;
-    color: #508B26;
+    color: #508b26;
+  }
+
+  @include responsive($breakpoint-md) {
+    margin-left: 0;
+    align-self: center;
+  }
+
+  @include responsive($breakpoint-xs) {
+    font-size: $text-sm;
+    padding: 4px 10px;
   }
 }
 
 // ==================================================
-// LISTA DE CHAMADOS (implementação do primeiro código)
+// LISTA DE CHAMADOS
 // ==================================================
 .chamados-list {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
-  justify-content: center; // cards alinhados à direita
+  justify-content: center;
   align-items: flex-start;
   padding-left: 14rem;
 
   @include responsive($breakpoint-md) {
     flex-direction: column;
-    justify-content: center; // centralizado no mobile
-    padding-left: 0;  
+    justify-content: center;
+    padding-left: 0;
+  }
+
+  @include responsive($breakpoint-xs) {
+    gap: 10px;
   }
 }
 
@@ -254,21 +270,48 @@ $breakpoint-xl: 1200px;
 // CARD DO CHAMADO
 // ==================================================
 .chamado-card {
+  position: relative;
   @include card($spacing-lg, $radius-md, $shadow-md);
-  width: calc(33.333% - 12px); // 3 colunas
+  width: calc(33.333% - 12px);
   min-width: 30rem;
   max-width: 420px;
   padding: 28px 32px;
-
   @include hover-lift();
 
   @include responsive($breakpoint-lg) {
-    width: calc(50% - 10px); // 2 colunas
+    width: calc(50% - 10px);
   }
 
   @include responsive($breakpoint-md) {
-    width: 100%; // 1 coluna no mobile
+    width: 100%;
     max-width: none;
+    min-width: auto;
+  }
+
+  @include responsive($breakpoint-sm) {
+    padding: 20px;
+  }
+
+  @include responsive($breakpoint-xs) {
+    padding: 16px;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .btn-encerrar {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    padding: 8px 16px;
+    color: $text-white;
+    border-radius: $radius-sm;
+    font-weight: $font-semibold;
+    cursor: pointer;
+
+    @include responsive($breakpoint-xs) {
+      padding: 6px 12px;
+      font-size: $text-sm;
+    }
   }
 
   .card-header {
@@ -290,12 +333,27 @@ $breakpoint-xl: 1200px;
       font-weight: $font-semibold;
       color: $text-primary;
       margin-bottom: 6px;
+
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: normal;
+
+      @include responsive($breakpoint-xs) {
+        font-size: $text-lg;
+      }
     }
 
     .chamado-descricao {
       font-size: $text-base;
       color: $text-secondary;
       margin-bottom: 8px;
+
+      @include responsive($breakpoint-xs) {
+        font-size: $text-sm;
+      }
     }
 
     .chamado-data {
@@ -312,6 +370,12 @@ $breakpoint-xl: 1200px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+
+    @include responsive($breakpoint-xs) {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+    }
 
     .user-info {
       display: flex;
