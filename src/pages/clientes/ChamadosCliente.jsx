@@ -1,4 +1,4 @@
-import React, { useState, useEffect, forwardRef } from "react";
+import React, { useState, useEffect, forwardRef, useMemo } from "react";
 import { Plus, Check, Clock2 } from "lucide-react";
 import SideBar from "../../components/SideBar";
 import "../clientes/clientes.scss";
@@ -6,7 +6,7 @@ import Botao from "../../components/Button";
 import { ModalCriarChamado } from "../../components/Modals/CriarChamado";
 import ModalChamadoDetalhes from "../../components/Modals/DetalhesChamados";
 import EditTicketModal from "../../components/Modals/EditarChamado";
-import { SearchProvider } from "../../context/search-context";
+import { SearchProvider, useSearch } from "../../context/search-context";
 import SearchBar from "../../components/search-bar";
 import { useAuth } from "../../context/auth-context";
 import chamadosService from "../../services/chamadosService";
@@ -20,8 +20,10 @@ const Alert = forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
-const ChamadosCliente = () => {
+// Conteúdo que usa o contexto de busca
+const ChamadosClienteContent = () => {
   const { user } = useAuth();
+  const { search } = useSearch(); // <-- usa "search" conforme seu contexto
 
   const [chamados, setChamados] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -33,6 +35,14 @@ const ChamadosCliente = () => {
 
   const [toastOpen, setToastOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
+
+  // Normaliza texto (remove acentos e deixa minúsculo)
+  const normalizar = (txt = "") =>
+    txt
+      .toString()
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
 
   // Polling inteligente + detectar atribuição de técnico
   useEffect(() => {
@@ -48,15 +58,11 @@ const ChamadosCliente = () => {
       try {
         const data = await chamadosService.getChamadosDoCliente();
 
-        // Detectar alterações comparando cada campo relevante
         const changed = data.filter((novo) => {
           const antigo = chamados.find((c) => c.id === novo.id);
           if (!antigo) return false;
-          // mudança de status
           if (antigo.status !== novo.status) return true;
-          // mudança de técnico atribuído (supondo que campo seja 'tecnico' ou algo parecido)
           if (antigo.tecnico !== novo.tecnico) return true;
-          // se tiver outros campos que importam, adiciona aqui
           return false;
         });
 
@@ -66,17 +72,19 @@ const ChamadosCliente = () => {
         if (dataString !== currentString) {
           setChamados(data);
 
-          // para cada que mudou, exibir toast
           changed.forEach((c) => {
-            // se técnico atribuído (novo.tecnico existe) e antigo não tinha
             const antigo = chamados.find((x) => x.id === c.id);
             if (antigo) {
-              // status mudou para atendimento
-              if (c.status?.toLowerCase() === "em_andamento" && antigo.status !== c.status) {
+              if (
+                c.status?.toLowerCase() === "em_andamento" &&
+                antigo.status !== c.status
+              ) {
                 showToast(`Chamado #${c.id} foi atendido por um técnico!`);
               }
-              // status virou encerrado
-              if (c.status?.toLowerCase() === "encerrado" && antigo.status !== c.status) {
+              if (
+                c.status?.toLowerCase() === "encerrado" &&
+                antigo.status !== c.status
+              ) {
                 showToast(`Chamado #${c.id} finalizado!`);
               }
             }
@@ -96,12 +104,14 @@ const ChamadosCliente = () => {
     // fetch inicial
     fetchChamados(true);
 
+    // polling
     intervalId = setInterval(() => {
       fetchChamados(false);
     }, 10000);
 
     return () => clearInterval(intervalId);
-  }, [user, chamados]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]); // removi "chamados" das deps para evitar loop infinito de fetch
 
   const showToast = (message) => {
     setToastMessage(message);
@@ -148,7 +158,11 @@ const ChamadosCliente = () => {
       );
       setOpenModalEditar(false);
 
-      if (["em_andamento", "encerrado"].includes(atualizado.status?.toLowerCase())) {
+      if (
+        ["em_andamento", "encerrado"].includes(
+          atualizado.status?.toLowerCase()
+        )
+      ) {
         const mensagem =
           atualizado.status.toLowerCase() === "em_andamento"
             ? "Chamado atendido!"
@@ -160,13 +174,27 @@ const ChamadosCliente = () => {
     }
   };
 
-  const esperaChamados = chamados.filter(
+  // Filtragem otimizada com useMemo
+  const chamadosFiltrados = useMemo(() => {
+    if (!search) return chamados;
+    const termo = normalizar(search);
+    return chamados.filter((c) => {
+      return (
+        normalizar(c.titulo || "").includes(termo) ||
+        normalizar(c.descricao || "").includes(termo) ||
+        normalizar(c.status || "").includes(termo) ||
+        (c.id !== undefined && c.id.toString().includes(termo))
+      );
+    });
+  }, [chamados, search]);
+
+  const esperaChamados = chamadosFiltrados.filter(
     (c) => c.status?.toLowerCase() === "aberto"
   );
-  const andamentoChamados = chamados.filter(
+  const andamentoChamados = chamadosFiltrados.filter(
     (c) => c.status?.toLowerCase() === "em_andamento"
   );
-  const finalizadosChamados = chamados.filter(
+  const finalizadosChamados = chamadosFiltrados.filter(
     (c) => c.status?.toLowerCase() === "encerrado"
   );
 
@@ -248,9 +276,11 @@ const ChamadosCliente = () => {
       <div className="main-content-wrapper">
         <div className="header">
           <h1>Meus chamados</h1>
-          <Botao icon={Plus} onClick={() => setOpenModalCalls(true)}>
-            Novo Chamado
-          </Botao>
+          <div className="botao-novo">
+            <Botao icon={Plus} onClick={() => setOpenModalCalls(true)}>
+              Novo Chamado
+            </Botao>
+          </div>
           <ModalCriarChamado
             isOpen={openModalCalls}
             onClose={() => setOpenModalCalls(false)}
@@ -259,9 +289,7 @@ const ChamadosCliente = () => {
         </div>
 
         <div className="search-bar">
-          <SearchProvider>
-            <SearchBar />
-          </SearchProvider>
+          <SearchBar />
         </div>
 
         {loading ? (
@@ -311,9 +339,7 @@ const ChamadosCliente = () => {
                               {chamado.descricao}
                             </div>
                             <div className="chamado-data">
-                              {new Date(
-                                chamado.data_criacao
-                              ).toLocaleDateString()}
+                              {new Date(chamado.data_criacao).toLocaleDateString()}
                             </div>
                           </div>
                         </div>
@@ -325,18 +351,14 @@ const ChamadosCliente = () => {
                             <span className="user-name">
                               {user?.nome || "Usuário"}
                             </span>
-                            <div
-                              className={`status-icon ${secao.classe}`}
-                            >
+                            <div className={`status-icon ${secao.classe}`}>
                               {secao.icone}
                             </div>
 
                             {chamado.status?.toLowerCase() !== "encerrado" && (
                               <IconButton
                                 size="small"
-                                onClick={(e) =>
-                                  handleOpenModalEditar(chamado, e)
-                                }
+                                onClick={(e) => handleOpenModalEditar(chamado, e)}
                                 sx={{ marginLeft: 1 }}
                                 aria-label="Editar chamado"
                               >
@@ -348,12 +370,7 @@ const ChamadosCliente = () => {
                       </div>
                     ))
                   ) : (
-                    <p
-                      style={{
-                        color: "#64748b",
-                        paddingLeft: "8px",
-                      }}
-                    >
+                    <p style={{ color: "#64748b", paddingLeft: "8px" }}>
                       Nenhum chamado nesta seção.
                     </p>
                   )}
@@ -383,5 +400,12 @@ const ChamadosCliente = () => {
     </div>
   );
 };
+
+// Componente exportado, envolvendo o conteúdo com o Provider
+const ChamadosCliente = () => (
+  <SearchProvider>
+    <ChamadosClienteContent />
+  </SearchProvider>
+);
 
 export default ChamadosCliente;
