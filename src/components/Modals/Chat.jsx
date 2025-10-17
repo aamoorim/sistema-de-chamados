@@ -9,7 +9,6 @@ import {
   Divider,
 } from "@mui/material";
 import { X, Minus, Maximize2, MessageCircle, Send } from "lucide-react";
-import chamadosService from "../../services/chamadosService";
 import { useAuth } from "../../context/auth-context";
 
 const DraggableChatDialog = ({ isOpen, onClose, chamado }) => {
@@ -58,7 +57,7 @@ const DraggableChatDialog = ({ isOpen, onClose, chamado }) => {
   }, [dragging]);
   // ==================================
 
-  // ======== CONEXÃO WEBSOCKET + MENSAGENS =========
+  // ======== CONEXÃO WEBSOCKET =========
   useEffect(() => {
     if (!isOpen || !chamado?.id) return;
 
@@ -66,14 +65,12 @@ const DraggableChatDialog = ({ isOpen, onClose, chamado }) => {
 
     async function initChat() {
       try {
-        const historico = await chamadosService.getMensagensDoChamado(chamado.id);
-        setMessages(historico);
-
-        // ===== Conectar WebSocket =====
-        socket = new WebSocket(`ws://127.0.0.1:9000`);
+        // Cria a conexão com o servidor PHP WS
+        socket = new WebSocket("ws://127.0.0.1:9000");
 
         socket.onopen = () => {
-          console.log("Conectado ao servidor WS");
+          console.log("✅ Conectado ao servidor WS");
+          setIsConnected(true);
           socket.send(JSON.stringify({ type: "auth", token: user?.token }));
         };
 
@@ -81,33 +78,27 @@ const DraggableChatDialog = ({ isOpen, onClose, chamado }) => {
           const msg = JSON.parse(event.data);
           console.log("📨 Recebido:", msg);
 
-          if (msg.success === "Autenticado com sucesso" || msg.type === "auth_ok") {
+          if (msg.success?.includes("Autenticado")) {
             socket.send(JSON.stringify({ type: "join", chamado_id: chamado.id }));
           } else if (msg.success?.includes("Entrou no chamado")) {
-            setIsConnected(true);
+            console.log("👥 Entrou no chamado", chamado.id);
           } else if (msg.type === "msg") {
-            // Evitar duplicação usando timestamp e texto
-            setMessages((prev) => {
-              const exists = prev.some(
-                (m) =>
-                  m.usuario_id === msg.usuario_id &&
-                  m.mensagem === msg.mensagem &&
-                  m.criado_em === msg.criado_em
-              );
-              if (exists) return prev;
-              return [...prev, msg];
-            });
+            // adiciona mensagem recebida
+            setMessages((prev) => [...prev, msg]);
           } else if (msg.erro) {
-            console.error("Erro WS:", msg.erro);
+            console.error("❌ Erro WS:", msg.erro);
           }
         };
 
         socket.onclose = () => {
-          console.warn("Conexão WS encerrada");
+          console.warn("⚠️ Conexão WS encerrada");
           setIsConnected(false);
         };
 
-        socket.onerror = (err) => console.error("Erro WS:", err);
+        socket.onerror = (err) => {
+          console.error("🚨 Erro WS:", err);
+          setIsConnected(false);
+        };
 
         window.chatSocket = socket;
       } catch (err) {
@@ -122,18 +113,18 @@ const DraggableChatDialog = ({ isOpen, onClose, chamado }) => {
     };
   }, [isOpen, chamado?.id]);
 
-  // Scroll automático para o final
+  // Scroll automático
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  // ======== ENVIO DE MENSAGEM =========
   const handleSendMessage = async () => {
-    if (!inputMessage.trim()) return;
+    if (!inputMessage.trim() || !window.chatSocket) return;
 
     const texto = inputMessage.trim();
     const agora = new Date();
 
-    // Feedback instantâneo
     const novaMsg = {
       type: "msg",
       chamado_id: chamado.id,
@@ -146,23 +137,12 @@ const DraggableChatDialog = ({ isOpen, onClose, chamado }) => {
       }),
     };
 
-    setMessages((prev) => {
-      const exists = prev.some(
-        (m) =>
-          m.usuario_id === novaMsg.usuario_id &&
-          m.mensagem === novaMsg.mensagem &&
-          m.criado_em === novaMsg.criado_em
-      );
-      if (exists) return prev;
-      return [...prev, novaMsg];
-    });
-
+    // Mostra instantaneamente na tela
+    setMessages((prev) => [...prev, novaMsg]);
     setInputMessage("");
 
-    // Envia via WebSocket
-    if (window.chatSocket && window.chatSocket.readyState === WebSocket.OPEN) {
-      window.chatSocket.send(JSON.stringify({ type: "msg", message: texto }));
-    }
+    // Envia via WS
+    window.chatSocket.send(JSON.stringify({ type: "msg", message: texto }));
   };
 
   if (!isOpen) return null;
@@ -200,9 +180,10 @@ const DraggableChatDialog = ({ isOpen, onClose, chamado }) => {
           <MessageCircle size={18} />
           <Box>
             <Typography variant="body2" fontWeight="bold">
-              Chat - {user?.id === chamado.tecnico_id
-        ? chamado.cliente_nome
-        : chamado.tecnico_nome || "Cliente"}
+              Chat -{" "}
+              {user?.id === chamado.tecnico_id
+                ? chamado.cliente_nome
+                : chamado.tecnico_nome || "Cliente"}
             </Typography>
             <Box display="flex" alignItems="center" gap={1}>
               <Box
@@ -258,23 +239,21 @@ const DraggableChatDialog = ({ isOpen, onClose, chamado }) => {
 
             {messages.map((msg, idx) => (
               <Box
-                key={msg.id || idx}
+                key={idx}
                 display="flex"
                 justifyContent={
-                  msg.usuario_id === user?.id || msg.type === "sent"
-                    ? "flex-end"
-                    : "flex-start"
+                  msg.usuario_id === user?.id ? "flex-end" : "flex-start"
                 }
                 mb={1}
               >
                 <Box
                   sx={{
                     bgcolor:
-                      msg.usuario_id === user?.id || msg.type === "sent"
+                      msg.usuario_id === user?.id
                         ? "primary.main"
                         : "white",
                     color:
-                      msg.usuario_id === user?.id || msg.type === "sent"
+                      msg.usuario_id === user?.id
                         ? "white"
                         : "black",
                     px: 2,
@@ -285,16 +264,14 @@ const DraggableChatDialog = ({ isOpen, onClose, chamado }) => {
                   }}
                 >
                   <Typography variant="body2">
-                    {msg.mensagem || msg.text}
+                    {msg.mensagem}
                   </Typography>
                   <Typography
                     variant="caption"
                     sx={{
                       display: "block",
                       textAlign:
-                        msg.usuario_id === user?.id || msg.type === "sent"
-                          ? "right"
-                          : "left",
+                        msg.usuario_id === user?.id ? "right" : "left",
                       opacity: 0.7,
                       mt: 0.3,
                     }}
