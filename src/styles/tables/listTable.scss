@@ -1,21 +1,95 @@
 /* Esconde cards no desktop, mostra tabela */
-.client-table-mobile {
+.calls-admin-table-mobile {
   display: none;
 }
-.client-table-desktop {
+.calls-admin-table-desktop {
   display: block;
 }
 
-@media (max-width: 900px) {
-  .client-table-desktop {
+@media (max-width: 1115px) {
+  .calls-admin-table-desktop {
     display: none;
   }
-  .client-table-mobile {
+
+  .calls-admin-table-mobile {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+
+    /* Espaço para sidebar */
+    padding-left: 230px;
+
+    /* Espaço para navbar no topo */
+    right: 60rem;
+
+    /* Centraliza cards */
+    align-items: center;
+
+    /* Altura mínima para evitar sobreposição */
+    min-height: calc(100vh - 60px);
+  }
+
+  .calls-admin-card {
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 2px 8px rgba(44, 62, 80, 0.07);
+    padding: 18px 16px 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    width: clamp(300px, 70vw, 60rem);
+    max-width: none;   // remove limite máximo para responsividade fluida
+    min-width: 300px;  // define um mínimo para não ficar muito pequeno
+  }
+
+  .calls-admin-card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 4px;
+  }
+
+  .calls-admin-card-title {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #2e3da3;
+  }
+
+  .calls-admin-card-info {
+    font-size: 0.98rem;
+    color: #444;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .calls-admin-card-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 6px;
+  }
+
+  .calls-admin-card-empty {
+    text-align: center;
+    color: #999;
+    padding: 32px 0;
+    font-size: 1.05rem;
+  }
+}
+
+@media (max-width: 900px) {
+  .calls-admin-table-desktop {
+    display: none;
+  }
+
+  .calls-admin-table-mobile {
     display: flex;
     flex-direction: column;
     gap: 18px;
   }
-  .client-card {
+
+  .calls-admin-card {
     background: #fff;
     border-radius: 14px;
     box-shadow: 0 2px 8px rgba(44, 62, 80, 0.07);
@@ -24,33 +98,48 @@
     flex-direction: column;
     gap: 10px;
   }
-  .client-card-header {
+
+  .calls-admin-card-header {
     display: flex;
     align-items: center;
     gap: 10px;
     margin-bottom: 4px;
   }
-  .client-card-title {
+
+  .calls-admin-card-title {
     font-weight: 700;
     font-size: 1.1rem;
     color: #2e3da3;
   }
-  .client-card-info {
+
+  .calls-admin-card-info {
     font-size: 0.98rem;
     color: #444;
     display: flex;
     flex-direction: column;
     gap: 2px;
   }
-  .client-card-actions {
+
+  .calls-admin-card-actions {
     display: flex;
     gap: 10px;
     margin-top: 6px;
   }
-  .client-card-empty {
+
+  .calls-admin-card-empty {
     text-align: center;
     color: #999;
     padding: 32px 0;
     font-size: 1.05rem;
   }
 }
+
+@media (max-width: 576px) {
+  .calls-admin-card {
+    width: 100%;
+    left: 0;
+    transform: translateX(-85%);
+  }
+}
+
+
