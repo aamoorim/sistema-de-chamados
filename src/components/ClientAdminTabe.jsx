@@ -81,7 +81,7 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 });
 
 export default function ClientAdminTabe() {
-  const isMobile = useIsMobile(1200); // Verifica se é dispositivo móvel (largura menor que 1200px)
+  const isMobile = useIsMobile(768); // Verifica se é dispositivo móvel (largura menor que 1200px)
   const { search } = useSearch(); // Texto da busca do contexto global
   const { clientes, fetchClientes, deleteCliente } = useClientes(); // Clientes e ações do contexto
   const { token } = useAuth(); // Token de autenticação
@@ -205,142 +205,154 @@ export default function ClientAdminTabe() {
   if (loading) return <LoadingSpinner />; // Mostra spinner enquanto carrega
 
   return (
-    <div style={{ fontFamily: "Lato" }}>
-      {/* Informações de quantidade */}
-      <div style={{ marginBottom: 16, color: "#666", fontSize: 14 }}>
-        Mostrando {filteredRows.length} de {clientes.length} clientes
-      </div>
-
-      {/* Layout móvel simplificado */}
-      {isMobile ? (
-        <div className="client-table-mobile">
-          {filteredRows.map((row) => (
-            <div key={row.id} className="client-card">
-              <div><b>Nome:</b> {row.nome}</div>
-              <div><b>Empresa:</b> {row.empresa}</div>
-              <div><b>Setor:</b> {row.setor}</div>
-              <div><b>Email:</b> {row.email}</div>
-              <div className="actions">
-                <IconButton onClick={() => handleOpenEdit(row)}>
-                  <Pencil size={18} />
-                </IconButton>
-                <IconButton color="error" onClick={() => handleOpenDelete(row)}>
-                  <Trash2 size={18} />
-                </IconButton>
-              </div>
-            </div>
-          ))}
+    <div
+      style={{
+        fontFamily: "Lato",
+        marginLeft: isMobile ? 0 : 230, // margem só se não for mobile (sidebar fixa)
+        padding: 20,
+        minHeight: "100vh",
+        boxSizing: "border-box",
+        backgroundColor: "#f5f5f5",
+        display: "flex",
+        justifyContent: "center", // centraliza horizontalmente
+      }}
+    >
+      <div style={{ width: "70rem", maxWidth: "calc(100% - 3.75rem)" }}>
+        {/* Informações de quantidade */}
+        <div style={{ marginBottom: 16, color: "#666", fontSize: 14 }}>
+          Mostrando {filteredRows.length} de {clientes.length} clientes
         </div>
-      ) : (
-        // Layout desktop: tabela completa
-        <TableContainer
-          component={Paper}
-          sx={{
-            borderRadius: 2,
-            boxShadow: "0 2px 8px rgba(44,62,80,0.04)",
-            marginBottom: 4,
-            overflowX: "auto",
-            "@media (max-width: 768px)": {
-              "& table": {
-                minWidth: "700px",
+
+        {/* Layout móvel simplificado */}
+        {isMobile ? (
+          <div className="client-table-mobile">
+            {filteredRows.map((row) => (
+              <div key={row.id} className="client-card">
+                <div><b>Nome:</b> {row.nome}</div>
+                <div><b>Empresa:</b> {row.empresa}</div>
+                <div><b>Setor:</b> {row.setor}</div>
+                <div><b>Email:</b> {row.email}</div>
+                <div className="actions">
+                  <IconButton onClick={() => handleOpenEdit(row)}>
+                    <Pencil size={18} />
+                  </IconButton>
+                  <IconButton color="error" onClick={() => handleOpenDelete(row)}>
+                    <Trash2 size={18} />
+                  </IconButton>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          // Layout desktop: tabela completa
+          <TableContainer
+            component={Paper}
+            sx={{
+              borderRadius: 2,
+              boxShadow: "0 2px 8px rgba(44,62,80,0.04)",
+              marginBottom: 4,
+              overflowX: "auto",
+              "@media (max-width: 768px)": {
+                "& table": {
+                  minWidth: "700px",
+                },
               },
-            },
-          }}
-        >
-          <Table aria-label="tabela de clientes">
-            <TableHead>
-              <TableRow>
-                <TableCell sx={{ color: "#858B99", fontWeight: 600 }}>Nome</TableCell>
-                <TableCell sx={{ color: "#858B99", fontWeight: 600 }}>Empresa</TableCell>
-                <TableCell sx={{ color: "#858B99", fontWeight: 600 }}>Setor</TableCell>
-                <TableCell sx={{ color: "#858B99", fontWeight: 600 }}>E‑mail</TableCell>
-                <TableCell sx={{ color: "#858B99", fontWeight: 600 }}>Ações</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {filteredRows.length > 0 ? (
-                filteredRows.map((row) => {
-                  // Pega as iniciais para o avatar, máximo 2 letras
-                  const initials = row.nome
-                    ? row.nome
-                        .split(" ")
-                        .map((n) => (n && n.length > 0 ? n[0] : ""))
-                        .join("")
-                        .slice(0, 2)
-                        .toUpperCase()
-                    : "??";
-
-                  return (
-                    <TableRow key={row.id} hover>
-                      <TableCell>
-                        <Avatar initials={initials} />
-                        {row.nome || "-"}
-                      </TableCell>
-                      <TableCell>{row.empresa || "-"}</TableCell>
-                      <TableCell>{row.setor || "-"}</TableCell>
-                      <TableCell>{row.email || "-"}</TableCell>
-                      <TableCell>
-                        <IconButton onClick={() => handleOpenEdit(row)}>
-                          <Pencil size={18} />
-                        </IconButton>
-                        <IconButton color="error" onClick={() => handleOpenDelete(row)}>
-                          <Trash2 size={18} />
-                        </IconButton>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })
-              ) : (
-                // Mensagem se nenhum cliente encontrado
+            }}
+          >
+            <Table aria-label="tabela de clientes">
+              <TableHead>
                 <TableRow>
-                  <TableCell
-                    colSpan={5}
-                    style={{
-                      textAlign: "center",
-                      padding: "40px",
-                      color: "#999",
-                    }}
-                  >
-                    Nenhum cliente encontrado com os filtros aplicados
-                  </TableCell>
+                  <TableCell sx={{ color: "#858B99", fontWeight: 600 }}>Nome</TableCell>
+                  <TableCell sx={{ color: "#858B99", fontWeight: 600 }}>Empresa</TableCell>
+                  <TableCell sx={{ color: "#858B99", fontWeight: 600 }}>Setor</TableCell>
+                  <TableCell sx={{ color: "#858B99", fontWeight: 600 }}>E‑mail</TableCell>
+                  <TableCell sx={{ color: "#858B99", fontWeight: 600 }}>Ações</TableCell>
                 </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      )}
+              </TableHead>
+              <TableBody>
+                {filteredRows.length > 0 ? (
+                  filteredRows.map((row) => {
+                    const initials = row.nome
+                      ? row.nome
+                          .split(" ")
+                          .map((n) => (n && n.length > 0 ? n[0] : ""))
+                          .join("")
+                          .slice(0, 2)
+                          .toUpperCase()
+                      : "??";
 
-      {/* Modal para confirmação de exclusão */}
-      <DeletarPerfil
-        isOpen={openDeleteModal}
-        onClose={handleCloseDelete}
-        onDelete={handleDeleteConfirmed}
-        usuario={selectedRow}
-      />
+                    return (
+                      <TableRow key={row.id} hover>
+                        <TableCell>
+                          <Avatar initials={initials} />
+                          {row.nome || "-"}
+                        </TableCell>
+                        <TableCell>{row.empresa || "-"}</TableCell>
+                        <TableCell>{row.setor || "-"}</TableCell>
+                        <TableCell>{row.email || "-"}</TableCell>
+                        <TableCell>
+                          <IconButton onClick={() => handleOpenEdit(row)}>
+                            <Pencil size={18} />
+                          </IconButton>
+                          <IconButton color="error" onClick={() => handleOpenDelete(row)}>
+                            <Trash2 size={18} />
+                          </IconButton>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })
+                ) : (
+                  <TableRow>
+                    <TableCell
+                      colSpan={5}
+                      style={{
+                        textAlign: "center",
+                        padding: "40px",
+                        color: "#999",
+                      }}
+                    >
+                      Nenhum cliente encontrado com os filtros aplicados
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
 
-      {/* Modal para editar cliente */}
-      <ModalEditarCliente
-        isOpen={openEditModal}
-        onClose={handleCloseEdit}
-        cliente={selectedClienteEdit}
-        onSuccess={handleEditSuccess} // Atualiza lista após edição
-      />
+        {/* Modal para confirmação de exclusão */}
+        <DeletarPerfil
+          isOpen={openDeleteModal}
+          onClose={handleCloseDelete}
+          onDelete={handleDeleteConfirmed}
+          usuario={selectedRow}
+        />
 
-      {/* Snackbar para toasts */}
-      <Snackbar
-        open={toastOpen}
-        autoHideDuration={4000}
-        onClose={handleToastClose}
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
-      >
-        <Alert
+        {/* Modal para editar cliente */}
+        <ModalEditarCliente
+          isOpen={openEditModal}
+          onClose={handleCloseEdit}
+          cliente={selectedClienteEdit}
+          onSuccess={handleEditSuccess}
+        />
+
+        {/* Snackbar para toasts */}
+        <Snackbar
+          open={toastOpen}
+          autoHideDuration={4000}
           onClose={handleToastClose}
-          severity={toastSeverity}
-          sx={{ width: "100%", bgcolor: "#604FEB", color: "#fff" }}
+          anchorOrigin={{ vertical: "top", horizontal: "right" }}
         >
-          {toastMessage}
-        </Alert>
-      </Snackbar>
+          <Alert
+            onClose={handleToastClose}
+            severity={toastSeverity}
+            sx={{ width: "100%", bgcolor: "#604FEB", color: "#fff" }}
+          >
+            {toastMessage}
+          </Alert>
+        </Snackbar>
+      </div>
     </div>
   );
+
 }

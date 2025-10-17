@@ -1,83 +1,148 @@
-
-/* Esconde cards no desktop, mostra tabela */
+/* Exibe tabela no desktop, esconde cards */
 .client-table-mobile {
-	display: none;
+  display: none;
 }
 .client-table-desktop {
-	display: block;
+  display: block;
 }
 
-@media (max-width: 1250px) {
-	.client-table-desktop {
-		display: none;
-	}
-	.client-table-mobile {
-		display: flex;
-		flex-direction: column;
-		gap: 18px;
-	}
-	.client-card {
-		background: #fff;
-		border-radius: 14px;
-		box-shadow: 0 2px 8px rgba(44,62,80,0.07);
-		padding: 18px 16px 12px 16px;
-		display: flex;
-		flex-direction: column;
-		gap: 10px;
-	}
-	.client-card-header {
-		display: flex;
-		align-items: center;
-		gap: 10px;
-		margin-bottom: 4px;
-	}
-	.client-card-title {
-		font-weight: 700;
-		font-size: 1.1rem;
-		color: #2E3DA3;
-	}
-	.client-card-info {
-		font-size: 0.98rem;
-		color: #444;
-		display: flex;
-		flex-direction: column;
-		gap: 2px;
-	}
-	.client-card-actions {
-		display: flex;
-		gap: 10px;
-		margin-top: 6px;
-	}
-	.client-card-empty {
-		text-align: center;
-		color: #999;
-		padding: 32px 0;
-		font-size: 1.05rem;
-	}
-}
-
-.client-table-mobile {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-
+/* Estilos para telas maiores que 768px até 1250px */
+@media (max-width: 1250px) and (min-width: 769px) {
+  .client-table-desktop {
+    display: none;
+  }
+  .client-table-mobile {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    margin-left: 5rem; /* margem moderada considerando sidebar */
+    padding: 0 20px;
+    max-width: 360px;
+    align-items: center;
+  }
   .client-card {
     background: #fff;
-    padding: 12px;
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    border-radius: 14px;
+    box-shadow: 0 2px 8px rgba(44, 62, 80, 0.07);
+    padding: 18px 16px 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 20rem;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .client-card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 4px;
+  }
+  .client-card-title {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #2E3DA3;
+  }
+  .client-card-info {
+    font-size: 0.98rem;
+    color: #444;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .client-card-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 6px;
+  }
+  .client-card-empty {
+    text-align: center;
+    color: #999;
+    padding: 32px 0;
+    font-size: 1.05rem;
+  }
+}
 
-    .actions {
-      margin-top: 8px;
-      display: flex;
-      gap: 8px;
-    }
+/* Estilos para telas entre 577px e 768px */
+/* Estilos para telas entre 577px e 768px */
+@media (max-width: 768px) and (min-width: 577px) {
+  .client-table-desktop {
+    display: none;
+  }
+  .client-table-mobile {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    /* Aproxima mais da esquerda */
+    margin-left: calc((100vw - 480px) / 2 + 30px); /* Ajustado para o novo max-width */
+    padding: 0 16px;
+    max-width: 480px; /* max-width ajustado para acomodar o card maior */
+    align-items: center;
+  }
+  .client-card {
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 2px 8px rgba(44, 62, 80, 0.07);
+    padding: 18px 16px 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 30rem; /* alterado para 30rem */
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .client-card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 4px;
+  }
+  .client-card-title {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #2E3DA3;
+  }
+  .client-card-info {
+    font-size: 0.98rem;
+    color: #444;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .client-card-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 6px;
+  }
+  .client-card-empty {
+    text-align: center;
+    color: #999;
+    padding: 32px 0;
+    font-size: 1.05rem;
   }
 }
 
 
-@media (min-width: 1250px) {
-  .client-table-mobile {
+/* Estilos para telas até 576px */
+@media (max-width: 576px) {
+  .client-table-desktop {
     display: none;
+  }
+  .client-table-mobile {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    justify-content: center; /* centraliza horizontalmente */
+    margin: 0 auto;
+    padding: 0 12px;
+  }
+  .client-card {
+    background: #fff;
+    padding: 12px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    max-width: 22rem;
+    width: 100%; /* ocupa 100% até o max-width */
   }
 }
