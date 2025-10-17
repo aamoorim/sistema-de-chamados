@@ -219,14 +219,28 @@ export default function TableAdminTec() {
 
   if (loading) return <LoadingSpinner />; // Mostra spinner enquanto carrega
 
+  
   return (
-    <div style={{ fontFamily: "Lato" }}>
+    <div
+      style={{
+        fontFamily: "Lato",
+        marginLeft: "230px", // desloca a tabela para a direita
+        padding: "24px", // adiciona um respiro interno
+        transition: "margin-left 0.3s ease", // suave ao abrir/fechar sidebar
+      }}
+    >
       <div style={{ marginBottom: 16, color: "#666", fontSize: 14 }}>
         Mostrando {filteredTecnicos.length} de {tecnicos.length} técnicos
       </div>
 
       {isMobile ? (
-        <div className="client-table-mobile">
+        <div
+          className="client-table-mobile"
+          style={{
+            marginLeft: 0, // mobile ignora o deslocamento lateral
+            padding: "8px",
+          }}
+        >
           {filteredTecnicos.length > 0 ? (
             filteredTecnicos.map((tec) => (
               <div key={tec.id} className="client-card">
@@ -262,7 +276,8 @@ export default function TableAdminTec() {
             },
           }}
         >
-          <Table aria-label="Tabela de técnicos">
+          <div className="table-tec">
+            <Table aria-label="Tabela de técnicos">
             <TableHead>
               <TableRow>
                 <TableCell sx={{ color: "#858B99", fontWeight: 600 }}>Nome</TableCell>
@@ -313,40 +328,41 @@ export default function TableAdminTec() {
               )}
             </TableBody>
           </Table>
+          </div>
         </TableContainer>
       )}
 
-      {/* Modal para confirmação de exclusão */}
-            <DeletarPerfil
-              isOpen={openDeleteModal}
-              onClose={handleCloseDelete}
-              onDelete={handleDeleteConfirmed}
-              usuario={selectedRow}
-            />
-      
-            {/* Modal para editar tecnico */}
-            <ModalEditarTecnico
-              isOpen={openEditModal}
-              onClose={handleCloseEdit}
-              tecnico={selectedTecnicoEdit}
-              onSuccess={handleEditSuccess} // Atualiza lista após edição
-            />
-      
-            {/* Snackbar para toasts */}
-            <Snackbar
-              open={toastOpen}
-              autoHideDuration={4000}
-              onClose={handleToastClose}
-              anchorOrigin={{ vertical: "top", horizontal: "right" }}
-            >
-              <Alert
-                onClose={handleToastClose}
-                severity={toastSeverity}
-                sx={{ width: "100%", bgcolor: "#604FEB", color: "#fff" }}
-              >
-                {toastMessage}
-              </Alert>
-            </Snackbar>
+      {/* Modais e Toasts */}
+      <DeletarPerfil
+        isOpen={openDeleteModal}
+        onClose={handleCloseDelete}
+        onDelete={handleDeleteConfirmed}
+        usuario={selectedRow}
+      />
+
+      <ModalEditarTecnico
+        isOpen={openEditModal}
+        onClose={handleCloseEdit}
+        tecnico={selectedTecnicoEdit}
+        onSuccess={handleEditSuccess}
+      />
+
+      <Snackbar
+        open={toastOpen}
+        autoHideDuration={4000}
+        onClose={handleToastClose}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Alert
+          onClose={handleToastClose}
+          severity={toastSeverity}
+          sx={{ width: "100%", bgcolor: "#604FEB", color: "#fff" }}
+        >
+          {toastMessage}
+        </Alert>
+      </Snackbar>
     </div>
   );
+
+
 }
