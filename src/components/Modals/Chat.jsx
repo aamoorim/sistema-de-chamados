@@ -78,13 +78,17 @@ const DraggableChatDialog = ({ isOpen, onClose, chamado }) => {
           const msg = JSON.parse(event.data);
           console.log("📨 Recebido:", msg);
 
+
           if (msg.success?.includes("Autenticado")) {
             socket.send(JSON.stringify({ type: "join", chamado_id: chamado.id }));
           } else if (msg.success?.includes("Entrou no chamado")) {
             console.log("👥 Entrou no chamado", chamado.id);
           } else if (msg.type === "msg") {
-            // adiciona mensagem recebida
-            setMessages((prev) => [...prev, msg]);
+            // Evita duplicação: só adiciona se ainda não existir no array
+            setMessages((prev) => {
+              const alreadyExists = prev.some((m) => m.id === msg.id);
+              return alreadyExists ? prev : [...prev, msg];
+            });
           } else if (msg.erro) {
             console.error("❌ Erro WS:", msg.erro);
           }
@@ -138,7 +142,7 @@ const DraggableChatDialog = ({ isOpen, onClose, chamado }) => {
     };
 
     // Mostra instantaneamente na tela
-    setMessages((prev) => [...prev, novaMsg]);
+    // setMessages((prev) => [...prev, novaMsg]);
     setInputMessage("");
 
     // Envia via WS
