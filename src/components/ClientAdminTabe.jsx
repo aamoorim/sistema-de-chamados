@@ -16,6 +16,7 @@ import { ModalEditarCliente } from "./Modals/EditarCliente";
 import useIsMobile from "../hooks/useIsMobile";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
+import Spinner from "./LoadingSpinner";
 import "../styles/tables/clientTable.scss";
 
 // Componente simples que mostra as iniciais do nome no avatar
@@ -40,41 +41,6 @@ function Avatar({ initials }) {
     </span>
   );
 }
-
-// Spinner para mostrar durante carregamentos
-const LoadingSpinner = () => (
-  <div
-    style={{
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      height: "100vh",
-      width: "100vw",
-      position: "fixed",
-      top: 0,
-      left: 0,
-      backgroundColor: "rgba(255, 255, 255, 0.7)",
-      zIndex: 9999,
-    }}
-  >
-    <div
-      style={{
-        border: "6px solid #f3f3f3",
-        borderTop: "6px solid #604FEB",
-        borderRadius: "50%",
-        width: "40px",
-        height: "40px",
-        animation: "spin 1s linear infinite",
-      }}
-    />
-    <style>{`
-      @keyframes spin {
-        0% { transform: rotate(0deg);}
-        100% { transform: rotate(360deg);}
-      }
-    `}</style>
-  </div>
-);
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -196,7 +162,7 @@ export default function ClientAdminTabe() {
     }
   };
 
-  if (loading) return <LoadingSpinner />; // Mostra spinner enquanto carrega
+  if (loading) return <Spinner />; // Mostra spinner enquanto carrega
 
   return (
     <div style={{ fontFamily: "Lato" }}>
