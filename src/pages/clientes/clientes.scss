@@ -78,6 +78,7 @@ $breakpoint-md: 768px;
 $breakpoint-lg: 992px;
 $breakpoint-xl: 1200px;
 $breakpoint-xxl: 2000px;
+$breakpoint-xxxl: 4000px;
 
 // ========================================
 // MIXINS
@@ -243,7 +244,7 @@ body {
   display: flex;
   flex-direction: column;
   padding: 10px;
-  margin-right: 280px; // espaço sidebar desktop
+  margin-right: 230px; // espaço sidebar desktop
   transition: margin-right 0.3s ease;
 
   @include responsive($breakpoint-md) {
@@ -317,15 +318,13 @@ body {
 // LISTA DE CHAMADOS
 // ========================================
 .chamados-list {
+  width: 100%;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   gap: 13px;
   align-items: flex-start;
 
-  @include responsive($breakpoint-md) {
-    flex-direction: column;
-  }
 }
 
 // ========================================
@@ -363,24 +362,40 @@ body {
   }
 }
 
+  @media (min-width: $breakpoint-md) {
+    .chamado-card {
+      flex: 1;
+      width: 100%;
+      min-width: 32rem !important;
+      max-width: 46rem !important;
+    }
+  }
+
 @media (min-width: $breakpoint-lg) {
     .chamado-card {
-      min-width: 35rem !important;
+      min-width: 46rem !important;
       max-width: 58rem !important;
     }
   }
 
 @media (min-width: $breakpoint-xl) {
     .chamado-card {
-      min-width: 20vw !important;
-      max-width: 35vw !important;
+      min-width: 28vw !important;
+      max-width: 38vw !important;
     }
 }
 
 @media (min-width: $breakpoint-xxl) {
     .chamado-card {
-      min-width: 35vw !important;
-      max-width: 40vw !important;
+      min-width: 32vw !important;
+      max-width: 46vw !important;
+    }
+}
+
+@media (min-width: $breakpoint-xxxl) {
+    .chamado-card {
+      min-width: 42vw !important;
+      max-width: 56vw !important;
     }
 }
 
