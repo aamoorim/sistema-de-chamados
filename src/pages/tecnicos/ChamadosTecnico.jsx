@@ -114,6 +114,7 @@ export default function ChamadosTecnico() {
     setOpenModal(true);
   };
 
+  // Spinner para o botão
   const ButtonSpinner = () => (
     <div
       style={{

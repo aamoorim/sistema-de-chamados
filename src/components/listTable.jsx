@@ -21,6 +21,7 @@ import StatusChip from "./StatusChip";
 import { useTheme } from "@emotion/react";
 import useIsMobile from "../hooks/useIsMobile";
 import MuiAlert from "@mui/material/Alert";
+import Spinner from "./LoadingSpinner";
 
 const Alert = forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -57,41 +58,6 @@ function AvatarInitials({ name }) {
     </span>
   );
 }
-
-// Spinner de carregamento
-const LoadingSpinner = () => (
-  <div
-    style={{
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      height: "100vh",
-      width: "100vw",
-      position: "fixed",
-      top: 0,
-      left: 0,
-      backgroundColor: "rgba(255, 255, 255, 0.7)",
-      zIndex: 9999,
-    }}
-  >
-    <div
-      style={{
-        border: "6px solid #f3f3f3",
-        borderTop: "6px solid #604FEB",
-        borderRadius: "50%",
-        width: "40px",
-        height: "40px",
-        animation: "spin 1s linear infinite",
-      }}
-    />
-    <style>{`
-      @keyframes spin {
-        0% { transform: rotate(0deg);}
-        100% { transform: rotate(360deg);}
-      }
-    `}</style>
-  </div>
-);
 
 export default function ListTable() {
   const theme = useTheme();
@@ -272,8 +238,9 @@ export default function ListTable() {
 
   const filteredRows = applySearchAndFilters(rows);
 
-  if (loading) return <LoadingSpinner />;
-  if (error) return <div style={{ color: "red", fontFamily: "Lato" }}>{error}</div>;
+  if (loading) return <Spinner />;
+  if (error)
+    return <div style={{ color: "red", fontFamily: "Lato" }}>{error}</div>;
 
   return (
   <div
