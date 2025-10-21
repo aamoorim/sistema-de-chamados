@@ -4,7 +4,6 @@ import {
   Modal,
   Typography,
   TextField,
-  Button,
   IconButton,
   InputAdornment,
 } from "@mui/material";
@@ -13,10 +12,12 @@ import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { useTecnicos } from "../../context/TecnicosContext";
 import { useAuth } from "../../context/auth-context";
-import api from "../../services/api"; // ✅ Importação do api.js
+import EditIcon from "@mui/icons-material/Edit";
+import Botao from "../Button.jsx";
+import api from "../../services/api"; 
 
-export function ModalEditarTecnico({ isOpen, onClose, tecnico }) {
-  const { setTecnicos } = useTecnicos(); // ✅ Troca de updateTecnico por setTecnicos
+export function ModalEditarTecnico({ isOpen, onClose, tecnico, onSuccess }) {
+  const { setTecnicos } = useTecnicos(); 
   const { token } = useAuth();
 
   const [nome, setNome] = useState("");
@@ -31,8 +32,7 @@ export function ModalEditarTecnico({ isOpen, onClose, tecnico }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const senhasNaoConferem =
-    senha && confirmarSenha && senha !== confirmarSenha;
+  const senhasNaoConferem = senha && confirmarSenha && senha !== confirmarSenha;
 
   useEffect(() => {
     if (tecnico) {
@@ -76,10 +76,13 @@ export function ModalEditarTecnico({ isOpen, onClose, tecnico }) {
 
       const data = response.data;
 
-      // Atualiza o técnico na lista do contexto
+      // Atualiza localmente
       setTecnicos((prev) =>
         prev.map((t) => (t.id === data.id ? data : t))
       );
+
+      // ✅ Chama função para exibir toast e atualizar lista na tabela
+      if (onSuccess) onSuccess();
 
       onClose();
     } catch (err) {
@@ -125,7 +128,6 @@ export function ModalEditarTecnico({ isOpen, onClose, tecnico }) {
         </Typography>
 
         <form onSubmit={handleSubmit}>
-          {/* Nome */}
           <Typography variant="caption" fontWeight="bold" color="text.secondary">
             NOME
           </Typography>
@@ -140,7 +142,6 @@ export function ModalEditarTecnico({ isOpen, onClose, tecnico }) {
             disabled={loading}
           />
 
-          {/* Email */}
           <Typography variant="caption" fontWeight="bold" color="text.secondary">
             E-MAIL
           </Typography>
@@ -156,7 +157,6 @@ export function ModalEditarTecnico({ isOpen, onClose, tecnico }) {
             disabled={loading}
           />
 
-          {/* Cargo */}
           <Typography variant="caption" fontWeight="bold" color="text.secondary">
             CARGO
           </Typography>
@@ -172,7 +172,6 @@ export function ModalEditarTecnico({ isOpen, onClose, tecnico }) {
             disabled={loading}
           />
 
-          {/* Senha */}
           <Typography variant="caption" fontWeight="bold" color="text.secondary">
             SENHA (DEIXE VAZIO CASO NÃO QUEIRA ALTERAR)
           </Typography>
@@ -185,23 +184,20 @@ export function ModalEditarTecnico({ isOpen, onClose, tecnico }) {
             value={senha}
             onChange={(e) => setSenha(e.target.value)}
             disabled={loading}
-            slotProps={{
-              input: {
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      onClick={() => setMostrarSenha(!mostrarSenha)}
-                      disabled={loading}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    onClick={() => setMostrarSenha(!mostrarSenha)}
+                    disabled={loading}
                   >
                     {mostrarSenha ? <VisibilityOff /> : <Visibility />}
                   </IconButton>
                 </InputAdornment>
               ),
-             }
             }}
           />
 
-          {/* Confirmar Senha */}
           <Typography variant="caption" fontWeight="bold" color="text.secondary">
             CONFIRMAR SENHA
           </Typography>
@@ -216,19 +212,17 @@ export function ModalEditarTecnico({ isOpen, onClose, tecnico }) {
             disabled={loading}
             error={senhasNaoConferem}
             helperText={senhasNaoConferem ? "As senhas não coincidem" : ""}
-            slotProps={{
-              input: {
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      onClick={() => setMostrarConfirmar(!mostrarConfirmar)}
-                      disabled={loading}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    onClick={() => setMostrarConfirmar(!mostrarConfirmar)}
+                    disabled={loading}
                   >
                     {mostrarConfirmar ? <VisibilityOff /> : <Visibility />}
                   </IconButton>
                 </InputAdornment>
               ),
-             }
             }}
           />
 
@@ -239,24 +233,13 @@ export function ModalEditarTecnico({ isOpen, onClose, tecnico }) {
           )}
 
           <Box display="flex" justifyContent="center">
-            <Button
+            <Botao
               type="submit"
-              variant="contained"
               disabled={loading || senhasNaoConferem}
-              sx={{
-                bgcolor: "#111",
-                px: 6,
-                py: 1.5,
-                borderRadius: "8px",
-                textTransform: "none",
-                fontWeight: "bold",
-                "&:hover": {
-                  bgcolor: "#000",
-                },
-              }}
+              icon={EditIcon}
             >
               {loading ? "Salvando..." : "Salvar Alterações"}
-            </Button>
+            </Botao>
           </Box>
         </form>
       </Box>

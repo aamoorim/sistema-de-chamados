@@ -12,6 +12,8 @@ import CloseIcon from "@mui/icons-material/Close";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { useTecnicos } from "../../context/TecnicosContext";
+import Botao from "../Button.jsx"
+import { Plus } from "lucide-react";
 
 export function ModalCriarTecnico({ isOpen, onClose }) {
   const { addTecnico } = useTecnicos();
@@ -201,24 +203,13 @@ export function ModalCriarTecnico({ isOpen, onClose }) {
           )}
 
           <Box display="flex" justifyContent="center">
-            <Button
+            <Botao
               type="submit"
-              variant="contained"
               disabled={loading || senhasNaoConferem}
-              sx={{
-                bgcolor: "#111",
-                px: 6,
-                py: 1.5,
-                borderRadius: "8px",
-                textTransform: "none",
-                fontWeight: "bold",
-                "&:hover": {
-                  bgcolor: "#000",
-                },
-              }}
+              icon={Plus}
             >
-              {loading ? "Salvando..." : "Salvar"}
-            </Button>
+              {loading ? "Criando....." : "Criar Técnico"}
+            </Botao>
           </Box>
         </form>
       </Box>

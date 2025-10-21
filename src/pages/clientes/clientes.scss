@@ -1,6 +1,4 @@
-// ========================================
-// VARIÁVEIS
-// ========================================
+
 $color-primary: #3b83f6;
 $color-primary-hover: #2563eb;
 $color-secondary: #64748b;
@@ -10,24 +8,24 @@ $color-danger: #ef4444;
 $color-icon: #355ec5;
 $color-espera: #ffd93d;
 
-// Background Colors
+
 $bg-main: #ffffff;
 $bg-sidebar: #1e293b;
 $bg-card: #ffffff;
 $bg-app: #f1f5f9;
 $bg-hover: #f8fafc;
 
-// Text Colors
+
 $text-primary: #0f172a;
 $text-secondary: #64748b;
 $text-muted: #94a3b8;
 $text-white: #ffffff;
 
-// Border Colors
+
 $border-light: #e2e8f0;
 $border-dark: #334155;
 
-// Spacing
+
 $spacing-xs: 4px;
 $spacing-sm: 8px;
 $spacing-md: 12px;
@@ -37,7 +35,6 @@ $spacing-2xl: 24px;
 $spacing-3xl: 32px;
 $spacing-4xl: 40px;
 
-// Border Radius
 $radius-sm: 6px;
 $radius-md: 8px;
 $radius-lg: 12px;
@@ -45,19 +42,17 @@ $radius-xl: 16px;
 $radius-2xl: 20px;
 $radius-full: 50%;
 
-// Shadows
 $shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
 $shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
 $shadow-lg: 0 8px 25px rgba(0, 0, 0, 0.1);
 $shadow-primary: 0 2px 8px rgba(59, 130, 246, 0.3);
 
-// Font Weights
 $font-normal: 400;
 $font-medium: 500;
 $font-semibold: 600;
 $font-bold: 700;
 
-// Font Sizes
+
 $text-xs: 12px;
 $text-sm: 13px;
 $text-base: 14px;
@@ -66,12 +61,11 @@ $text-xl: 18px;
 $text-2xl: 20px;
 $text-3xl: 28px;
 
-// Transitions
 $transition-fast: 0.15s ease;
 $transition-base: 0.2s ease;
 $transition-slow: 0.3s ease;
 
-// Breakpoints
+
 $breakpoint-xs: 480px;
 $breakpoint-sm: 576px;
 $breakpoint-md: 768px;
@@ -188,9 +182,6 @@ body {
   }
 }
 
-// ========================================
-// HEADER
-// ========================================
 .header {
   margin-top: 40px;
   display: flex;
@@ -213,7 +204,10 @@ body {
   .btn-encerrar {
     min-width: 120px;
     max-width: 100%;
+    margin-right: 5rem;
   }
+
+
 
   @include responsive($breakpoint-md) {
     flex-direction: column;
@@ -230,35 +224,35 @@ body {
     .botao {
       width: 100%;
       min-width: 0;
+
     }
   }
 }
 
-// ========================================
-// MAIN CONTENT WRAPPER & SIDEBAR
-// ========================================
+
 .main-content-wrapper {
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding: 10px;
-  margin-right: 280px; // espaço sidebar desktop
-  transition: margin-right 0.3s ease;
+  padding: 20px 40px;
+  margin-left: 230px; // agora o painel está à esquerda
+  transition: margin-left 0.3s ease;
 
   @include responsive($breakpoint-md) {
-    margin-right: 0;
-    padding: 12px;
+    margin-left: 0;
+    padding: 16px;
   }
 
   @include responsive($breakpoint-xs) {
-    padding: 8px;
+    padding: 12px;
   }
 }
+
 
 .sidebar-container {
   position: fixed;
   top: 0;
-  right: 0;
+  left: 0;
   width: 230px;
   height: 100vh;
   z-index: 1000;
@@ -276,6 +270,8 @@ body {
 // ========================================
 .search-bar {
   margin-top: -20px;
+  display: flex;
+  justify-content: center;
 }
 
 // ========================================
@@ -317,13 +313,11 @@ body {
 // ========================================
 .chamados-list {
   display: flex;
-  flex-direction: row;
   flex-wrap: wrap;
-  gap: 13px;
-  align-items: flex-start;
-
+  gap: 12px;
+  align-items: center;
   @include responsive($breakpoint-md) {
-    flex-direction: column;
+    flex-direction: row;
   }
 }
 
@@ -331,40 +325,23 @@ body {
 // CARD CHAMADO
 // ========================================
 .chamado-card {
-  @include card($spacing-lg, $radius-md, $shadow-sm);
-  width: 100%;
-  max-width: 360px;
-  padding: 24px 28px;
-  font-size: 14px;
-  line-height: 1.4;
+  @include card($spacing-lg, $radius-md, $shadow-md);
+  width: calc(33.333% - 12px);
+  min-width: 30rem;
+  max-width: 420px;
+  padding: 28px 32px;
 
-  &.espera {
-    @include status-border(#b91c1cea);
-  }
-
-  &.finalizado {
-    @include status-border($color-success);
-  }
-
-  &.andamento {
-    @include status-border($color-warning);
-  }
+  @include hover-lift();
 
   @include responsive($breakpoint-lg) {
-    max-width: 450px;
+    width: calc(50% - 10px);
   }
 
   @include responsive($breakpoint-md) {
-    max-width: 100%;
     width: 100%;
-    padding: 18px 22px;
-  }
-
-  @include responsive($breakpoint-xs) {
-    padding: $spacing-sm;
-    border-radius: $radius-sm;
   }
 }
+
 
 // ========================================
 // CARD MAIN E FOOTER
@@ -372,6 +349,7 @@ body {
 .card-main {
   @include flex(row, flex-start, space-between);
   margin-bottom: $spacing-md;
+  width: 230px;
 
   @include responsive($breakpoint-md) {
     flex-direction: column;

@@ -7,7 +7,7 @@ import StatusChip from "../../components/StatusChip";
 import { SearchProvider } from "../../context/search-context";
 import ListTableTec from "../../components/tableTec";
 import chamadosService from "../../services/chamadosService";
-import "./chamados.scss";
+import "./ChamadosAbertos.scss";
 
 export default function TecEmAndamento() {
   const [loading, setLoading] = useState(true);
@@ -71,6 +71,7 @@ export default function TecEmAndamento() {
 
   return (
     <Box sx={{ p: 3, minHeight: "100vh" }}>
+      <div className="chamados-aberto">
       {/* Título */}
       <Typography
         component="h1"
@@ -88,15 +89,16 @@ export default function TecEmAndamento() {
       </Box>
 
       {/* StatusChip logo abaixo da barra */}
-      <Box>
+      <Box sx={{ marginLeft: "5px" }} >
         <StatusChip label="Espera" />
       </Box>
 
       {/* Tabela */}
-      <ListTableTec chamados={chamados} />
+        <ListTableTec chamados={chamados} />
 
       {/* Outlet para rotas filhas, se necessário */}
       <Outlet />
+      </div>
     </Box>
   );
 }
