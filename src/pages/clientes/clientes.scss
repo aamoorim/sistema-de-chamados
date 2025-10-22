@@ -1,6 +1,5 @@
-// ========================================
 // VARIÁVEIS
-// ========================================
+
 $color-primary: #3b83f6;
 $color-primary-hover: #2563eb;
 $color-secondary: #64748b;
@@ -257,32 +256,12 @@ body {
   }
 }
 
-.sidebar-container {
-  position: fixed;
-  top: 0;
-  right: 0;
-  width: 230px;
-  height: 100vh;
-  z-index: 1000;
-  background: $bg-sidebar;
-
-  @include responsive($breakpoint-md) {
-    position: relative;
-    width: 100%;
-    height: auto;
-  }
-}
-
-// ========================================
 // SEARCH BAR
-// ========================================
 .search-bar {
   margin-top: -20px;
 }
 
-// ========================================
 // SEÇÕES
-// ========================================
 .section {
   margin-bottom: $spacing-4xl;
 }

@@ -14,8 +14,6 @@ import { useModal } from '../context/modal-context';
 import { ModalSairPerfil } from './Modals/Sair';
 import '../styles/SideBar/sidebar.scss';
 
-
-
 const SideBar = () => {
   const [open, setOpen] = useState(false); // modal sair
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false); // dropdown usuário
