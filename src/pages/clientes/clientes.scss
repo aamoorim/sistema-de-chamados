@@ -79,9 +79,7 @@ $breakpoint-xl: 1200px;
 $breakpoint-xxl: 2000px;
 $breakpoint-xxxl: 4000px;
 
-// ========================================
 // MIXINS
-// ========================================
 @mixin flex($direction: row, $align: center, $justify: flex-start, $gap: 0) {
   display: flex;
   flex-direction: $direction;
@@ -147,9 +145,7 @@ $breakpoint-xxxl: 4000px;
   }
 }
 
-// ========================================
 // RESET E BASE
-// ========================================
 * {
   margin: 0;
   padding: 0;
@@ -161,9 +157,7 @@ body {
   overflow-x: hidden;
 }
 
-// ========================================
 // LAYOUT PRINCIPAL
-// ========================================
 .app-container {
   display: flex;
   min-height: 100vh;
@@ -189,9 +183,7 @@ body {
   }
 }
 
-// ========================================
 // HEADER
-// ========================================
 .header {
   margin-top: 40px;
   display: flex;
@@ -235,26 +227,21 @@ body {
   }
 }
 
-// ========================================
 // MAIN CONTENT WRAPPER & SIDEBAR
-// ========================================
 .main-content-wrapper {
   flex: 1;
   display: flex;
   flex-direction: column;
   padding: 10px;
-  margin-right: 230px; // espaço sidebar desktop
-  transition: margin-right 0.3s ease;
+  transition: margin-left 0.3s ease;
+  margin-left: 18rem; // margem padrão para telas grandes
 
+  // Remover margem em telas menores que 768px
   @include responsive($breakpoint-md) {
-    margin-right: 0;
-    padding: 12px;
-  }
-
-  @include responsive($breakpoint-xs) {
-    padding: 8px;
+    margin-left: 0;
   }
 }
+
 
 // SEARCH BAR
 .search-bar {
@@ -293,9 +280,7 @@ body {
   }
 }
 
-// ========================================
 // LISTA DE CHAMADOS
-// ========================================
 .chamados-list {
   width: 100%;
   display: flex;
@@ -303,16 +288,12 @@ body {
   flex-wrap: wrap;
   gap: 13px;
   align-items: flex-start;
-
 }
 
-// ========================================
 // CARD CHAMADO
-// ========================================
 .chamado-card {
   @include card($spacing-lg, $radius-md, $shadow-sm);
   width: 100%;
-  max-width: 360px;
   padding: 24px 28px;
   font-size: 14px;
   line-height: 1.4;
@@ -350,19 +331,25 @@ body {
     }
   }
 
-@media (min-width: $breakpoint-lg) {
+  @media (min-width: 769px) {
     .chamado-card {
-      min-width: 46rem !important;
-      max-width: 58rem !important;
+      min-width: 28rem !important;
     }
   }
 
-@media (min-width: $breakpoint-xl) {
-    .chamado-card {
-      min-width: 28vw !important;
-      max-width: 38vw !important;
+  @media (min-width: $breakpoint-lg) {
+      .chamado-card {
+        min-width: 46rem !important;
+        max-width: 58rem !important;
+      }
     }
-}
+
+  @media (min-width: $breakpoint-xl) {
+      .chamado-card {
+        min-width: 28vw !important;
+        max-width: 42vw !important;
+      }
+  }
 
 @media (min-width: $breakpoint-xxl) {
     .chamado-card {
@@ -378,9 +365,7 @@ body {
     }
 }
 
-// ========================================
 // CARD MAIN E FOOTER
-// ========================================
 .card-main {
   @include flex(row, flex-start, space-between);
   margin-bottom: $spacing-md;
@@ -432,9 +417,7 @@ body {
   }
 }
 
-// ========================================
 // USER INFO / AVATAR
-// ========================================
 .user-info {
   @include flex(row, center, flex-start, 8px);
   flex: 1;
@@ -458,9 +441,7 @@ body {
   flex: 1;
 }
 
-// ========================================
 // BUTTONS
-// ========================================
 .btn-encerrar {
   @include button(#000, $text-white, 6px $spacing-lg);
   font-size: $text-xs;
@@ -490,9 +471,7 @@ body {
   }
 }
 
-// ========================================
 // STATUS ICON
-// ========================================
 .status-icon {
   @include flex(row, center, center);
   width: 26px;
@@ -515,9 +494,7 @@ body {
   }
 }
 
-// ========================================
 // SECTIONS WRAPPER
-// ========================================
 .sections-wrapper {
   display: flex;
   flex-direction: row;
