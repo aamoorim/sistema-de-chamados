@@ -197,7 +197,7 @@ class ChatService {
    */
   async fetchMessageHistory(chamadoId, token) {
     try {
-      const response = await fetch(`http://localhost/api-sdc/chamados/mensagens/${chamadoId}`, {
+      const response = await fetch(`https://api-sdc-1.onrender.com/chamados/mensagens/${chamadoId}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,

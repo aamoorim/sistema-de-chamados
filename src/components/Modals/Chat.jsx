@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 import { X, Minus, Maximize2, MessageCircle, Send } from "lucide-react";
 import { useAuth } from "../../context/auth-context";
+import chatService from "../../services/ChatServer";
 
 const DraggableChatDialog = ({ isOpen, onClose, chamado }) => {
   const { user } = useAuth();
@@ -55,9 +56,9 @@ const DraggableChatDialog = ({ isOpen, onClose, chamado }) => {
       window.removeEventListener("mouseup", handleMouseUp);
     };
   }, [dragging]);
-  // ==================================
 
-  // ======== CONEXÃO WEBSOCKET =========
+  // ==================================
+  // ======== CONEXÃO WEBSOCKET + HISTÓRICO =========
   useEffect(() => {
     if (!isOpen || !chamado?.id) return;
 
@@ -65,72 +66,82 @@ const DraggableChatDialog = ({ isOpen, onClose, chamado }) => {
 
     async function initChat() {
       try {
-        // Cria a conexão com o servidor PHP WS
+        console.log(
+          "%c[1️⃣ Iniciando chat]",
+          "color: dodgerblue; font-weight: bold;",
+          { chamado }
+        );
+
+        // 🟢 1. Buscar histórico antes de conectar ao WebSocket
+        console.log("%c[🕓 Buscando histórico de mensagens...]", "color: gray;");
+        try {
+          const historico = await chatService.fetchMessageHistory(chamado.id, user?.token);
+          console.log("%c[✅ Histórico carregado]", "color: green;", historico);
+          setMessages(historico);
+        } catch (err) {
+          console.error("%c[❌ Erro ao buscar histórico]", "color: red;", err);
+        }
+
+        // 🟢 2. Conectar via WebSocket
+        console.log("%c[⚙️ Conectando ao WebSocket...]", "color: dodgerblue;");
         socket = new WebSocket("ws://127.0.0.1:9000");
 
         socket.onopen = () => {
-          console.log("✅ Conectado ao servidor WS");
+          console.log("%c[2️⃣ WS aberto]", "color: limegreen; font-weight: bold;");
           setIsConnected(true);
           socket.send(JSON.stringify({ type: "auth", token: user?.token }));
         };
 
         socket.onmessage = (event) => {
           const msg = JSON.parse(event.data);
-          console.log("📨 Recebido:", msg);
-
-
           if (msg.success?.includes("Autenticado")) {
             socket.send(JSON.stringify({ type: "join", chamado_id: chamado.id }));
-          } else if (msg.success?.includes("Entrou no chamado")) {
-            console.log("👥 Entrou no chamado", chamado.id);
           } else if (msg.type === "msg") {
-            // Evita duplicação: só adiciona se ainda não existir no array
+            console.log("%c[💬 Nova mensagem recebida]", "color: cyan;", msg);
             setMessages((prev) => {
-              const alreadyExists = prev.some((m) => m.id === msg.id);
-              return alreadyExists ? prev : [...prev, msg];
+              const exists = prev.some((m) => m.id === msg.id && msg.id);
+              return exists ? prev : [...prev, msg];
             });
-          } else if (msg.erro) {
-            console.error("❌ Erro WS:", msg.erro);
           }
         };
 
-        socket.onclose = () => {
-          console.warn("⚠️ Conexão WS encerrada");
+        socket.onerror = (err) => {
+          console.error("%c[🚨 Erro no WebSocket]", "color: red; font-weight: bold;", err);
           setIsConnected(false);
         };
 
-        socket.onerror = (err) => {
-          console.error("🚨 Erro WS:", err);
+        socket.onclose = () => {
+          console.warn("%c[⚠️ Conexão WS encerrada]", "color: orange;");
           setIsConnected(false);
         };
 
         window.chatSocket = socket;
       } catch (err) {
-        console.error("Erro ao iniciar chat:", err);
+        console.error("%c[🔥 Erro crítico ao iniciar chat]", "color: red;", err);
       }
     }
 
     initChat();
 
     return () => {
+      console.log("%c[🧹 Fechando WS do chat]", "color: gray;");
       socket?.close();
     };
   }, [isOpen, chamado?.id]);
 
-  // Scroll automático
+  // ======== SCROLL AUTOMÁTICO =========
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   // ======== ENVIO DE MENSAGEM =========
   const handleSendMessage = async () => {
-    if (!inputMessage.trim() || !window.chatSocket) return;
-
+    if (!inputMessage.trim()) return;
     const texto = inputMessage.trim();
-    const agora = new Date();
+    setInputMessage("");
 
+    const agora = new Date();
     const novaMsg = {
-      type: "msg",
       chamado_id: chamado.id,
       usuario_id: user?.id,
       mensagem: texto,
@@ -141,12 +152,19 @@ const DraggableChatDialog = ({ isOpen, onClose, chamado }) => {
       }),
     };
 
-    // Mostra instantaneamente na tela
-    // setMessages((prev) => [...prev, novaMsg]);
-    setInputMessage("");
 
-    // Envia via WS
-    window.chatSocket.send(JSON.stringify({ type: "msg", message: texto }));
+
+    try {
+      if (window.chatSocket && window.chatSocket.readyState === WebSocket.OPEN) {
+        console.log("%c[📤 Enviando via WS]", "color: deepskyblue;");
+        window.chatSocket.send(JSON.stringify({ type: "msg", message: texto }));
+      } else {
+        console.warn("%c[🔁 Enviando via API REST (fallback)]", "color: orange;");
+        await chatService.sendMessageViaAPI(chamado.id, texto, user?.token);
+      }
+    } catch (err) {
+      console.error("%c[❌ Erro ao enviar mensagem]", "color: red;", err);
+    }
   };
 
   if (!isOpen) return null;
@@ -267,9 +285,7 @@ const DraggableChatDialog = ({ isOpen, onClose, chamado }) => {
                     boxShadow: 1,
                   }}
                 >
-                  <Typography variant="body2">
-                    {msg.mensagem}
-                  </Typography>
+                  <Typography variant="body2">{msg.mensagem}</Typography>
                   <Typography
                     variant="caption"
                     sx={{
