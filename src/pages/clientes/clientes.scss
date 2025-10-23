@@ -316,11 +316,11 @@ body {
     padding: 18px 22px;
   }
 
-  @include responsive($breakpoint-xs) {
+  @include responsive($breakpoint-xs){
     padding: $spacing-sm;
     border-radius: $radius-sm;
   }
-}
+  }
 
   @media (min-width: $breakpoint-md) {
     .chamado-card {

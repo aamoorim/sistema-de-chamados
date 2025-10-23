@@ -1,8 +1,5 @@
 @use "sass:color";
-
-// ========================================
 // VARIÁVEIS
-// ========================================
 
 // Colors
 $color-primary: #3b83f6;
@@ -80,10 +77,10 @@ $breakpoint-sm: 576px;
 $breakpoint-md: 768px;
 $breakpoint-lg: 992px;
 $breakpoint-xl: 1200px;
+$breakpoint-xxl: 2000px;
+$breakpoint-xxxl: 4000px;
 
-// ========================================
 // MIXINS
-// ========================================
 
 @mixin flex($direction: row, $align: center, $justify: flex-start, $gap: 0) {
   display: flex;
@@ -146,9 +143,7 @@ $breakpoint-xl: 1200px;
   }
 }
 
-// ========================================
 // RESET E BASE
-// ========================================
 
 * {
   margin: 0;
@@ -161,9 +156,7 @@ body {
   overflow-x: hidden;
 }
 
-// ========================================
 // LAYOUT PRINCIPAL
-// ========================================
 
 .app-container {
   display: flex;
@@ -182,10 +175,7 @@ body {
   @include responsive($breakpoint-xs) { padding: $spacing-lg; }
 }
 
-// ========================================
 // HEADER
-// ========================================
-
 .header {
   margin-bottom: $spacing-3xl;  
 
@@ -198,24 +188,37 @@ body {
   }
 }
 
-// ========================================
 // SEÇÕES (Em atendimento / Encerrados)
-// ========================================
-
 .section {
   margin-bottom: $spacing-4xl;
+  display: flex;
+  flex-direction: column;
+  transition: margin-left 0.3s ease;
+  margin-left: 18rem; // margem padrão para telas grandes
+
+  // Remover margem em telas menores que 768px
+  @include responsive($breakpoint-md) {
+    margin-left: 0;
+  }
 }
 
 .section-header {
-  font-size: $text-base;
-  font-weight: $font-normal;
-  display: inline-flex;
+  display: inline-flex;        // mantém comportamento de conteúdo
   align-items: center;
+  align-self: flex-start;      // impede de esticar no container flex
+  width: auto;                 // garante que o tamanho siga o conteúdo
   gap: 8px;
   margin-bottom: $spacing-xl;
   padding: 6px 14px;
   border-radius: 24px;
+  font-size: $text-base;
+  font-weight: $font-normal;
   color: $text-white;
+
+  &.espera {
+    background: #fee2e2;
+    color: #b91c1c;
+  }
 
   &.andamento {
     background: $color-warning;
@@ -224,37 +227,24 @@ body {
 
   &.finalizado {
     background: $color-success;
-    color: #508B26;
+    color: #508b26;
   }
 }
 
-// ========================================
-// LISTA DE CHAMADOS
-// ========================================
 
+// LISTA DE CHAMADOS
 .chamados-list {
   display: flex;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: $spacing-lg;
   
 }
 
 .chamado-card {
   @include card($spacing-lg, $radius-md, $shadow-sm);
-  position: relative;
-  @include hover-lift();
-  background: $bg-card;
-  border: 1px solid $border-light;
-  border-radius: 12px;
-  padding: 24px 28px;
-  margin-bottom: 24px;
-  box-shadow: $shadow-sm;
-  font-size: 14px;  
-  line-height: 1.4;
-  transition: all $transition-base;
-  min-height: 220px;      
-  max-width: 22rem;
   width: 100%;
+  padding: 24px 28px;
+  font-size: 14px;
+  line-height: 1.4;
   
 
   &.finalizado {
@@ -265,23 +255,62 @@ body {
     @include status-border($color-warning);
   }
 
-  @include responsive($breakpoint-lg) { 
-    max-width: 450px; 
+  @include responsive($breakpoint-md) {
+    max-width: 100%;
+    width: 100%;
     padding: 18px 22px;
   }
-  @include responsive($breakpoint-md) { 
-    max-width: 100%; 
-    padding: $spacing-md; 
+
+  @include responsive($breakpoint-xs){
+    padding: $spacing-sm;
+    border-radius: $radius-sm;
   }
-  @include responsive($breakpoint-xs) { 
-    padding: $spacing-sm; 
-    border-radius: $radius-sm; 
   }
+
+  @media (min-width: $breakpoint-md) {
+    .chamado-card {
+      flex: 1;
+      width: 100%;
+      min-width: 32rem !important;
+      max-width: 46rem !important;
+    }
+  }
+
+  @media (min-width: 769px) {
+    .chamado-card {
+      min-width: 28rem !important;
+    }
+  }
+
+  @media (min-width: $breakpoint-lg) {
+      .chamado-card {
+        min-width: 42rem !important;
+        max-width: 58rem !important;
+      }
+    }
+
+  @media (min-width: $breakpoint-xl) {
+      .chamado-card {
+        min-width: 28vw !important;
+        max-width: 42vw !important;
+      }
+  }
+
+@media (min-width: $breakpoint-xxl) {
+    .chamado-card {
+      min-width: 32vw !important;
+      max-width: 46vw !important;
+    }
 }
 
-// ========================================
+@media (min-width: $breakpoint-xxxl) {
+    .chamado-card {
+      min-width: 42vw !important;
+      max-width: 56vw !important;
+    }
+}
+
 // CARD MAIN
-// ========================================
 
 .card-main {
   @include flex(row, flex-start, space-between);
@@ -346,9 +375,7 @@ body {
   &:hover { background: #1f2937; }
 }
 
-// ========================================
 // CARD FOOTER
-// ========================================
 
 .card-footer {
   border-top: 1px solid $border-light;
@@ -390,9 +417,7 @@ body {
   margin-left: auto;
 }
 
-// ========================================
 // RESPONSIVE AJUSTES
-// ========================================
 
 @include responsive($breakpoint-md) {
   .card-main {
@@ -438,9 +463,7 @@ body {
   }
 }
 
-// ========================================
 // RIPPLE EFFECT
-// ========================================
 
 $ripple-duration: 0.8s;
 $ripple-size: 200px;
@@ -503,10 +526,8 @@ $ripple-easing: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 
-  // ========================================
-  // BREAKPOINTS PARA AJUSTES FINOS
-  // ========================================
-
+    // BREAKPOINTS PARA AJUSTES FINOS
+  
   // até 480px (mobile pequeno)
   @include responsive($breakpoint-xs) {
   .chamado-card {
@@ -573,9 +594,7 @@ $ripple-easing: cubic-bezier(0.4, 0, 0.2, 1);
 
 
 
-// ========================================
 // RESPONSIVIDADE FINAL
-// ========================================
 
 // até 480px (mobile pequeno)
 @include responsive($breakpoint-xs) {
