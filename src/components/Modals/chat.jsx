@@ -60,74 +60,73 @@ const DraggableChatDialog = ({ isOpen, onClose, chamado }) => {
   // ==================================
   // ======== CONEXÃO WEBSOCKET + HISTÓRICO =========
   useEffect(() => {
-    if (!isOpen || !chamado?.id) return;
+  if (!isOpen || !chamado?.id) return;
 
-    let socket;
+  let socket;
+  let isMounted = true; // <-- flag para evitar state update após unmount
 
-    async function initChat() {
+  async function initChat() {
+    try {
+      console.log("%c[1️⃣ Iniciando chat]", "color: dodgerblue; font-weight: bold;", { chamado });
+
+      // 1️⃣ Carrega histórico
       try {
-        console.log(
-          "%c[1️⃣ Iniciando chat]",
-          "color: dodgerblue; font-weight: bold;",
-          { chamado }
-        );
-
-        // 🟢 1. Buscar histórico antes de conectar ao WebSocket
-        console.log("%c[🕓 Buscando histórico de mensagens...]", "color: gray;");
-        try {
-          const historico = await chatService.fetchMessageHistory(chamado.id, user?.token);
-          console.log("%c[✅ Histórico carregado]", "color: green;", historico);
-          setMessages(historico);
-        } catch (err) {
-          console.error("%c[❌ Erro ao buscar histórico]", "color: red;", err);
-        }
-
-        // 🟢 2. Conectar via WebSocket
-        console.log("%c[⚙️ Conectando ao WebSocket...]", "color: dodgerblue;");
-        socket = new WebSocket("ws://127.0.0.1:9000");
-
-        socket.onopen = () => {
-          console.log("%c[2️⃣ WS aberto]", "color: limegreen; font-weight: bold;");
-          setIsConnected(true);
-          socket.send(JSON.stringify({ type: "auth", token: user?.token }));
-        };
-
-        socket.onmessage = (event) => {
-          const msg = JSON.parse(event.data);
-          if (msg.success?.includes("Autenticado")) {
-            socket.send(JSON.stringify({ type: "join", chamado_id: chamado.id }));
-          } else if (msg.type === "msg") {
-            console.log("%c[💬 Nova mensagem recebida]", "color: cyan;", msg);
-            setMessages((prev) => {
-              const exists = prev.some((m) => m.id === msg.id && msg.id);
-              return exists ? prev : [...prev, msg];
-            });
-          }
-        };
-
-        socket.onerror = (err) => {
-          console.error("%c[🚨 Erro no WebSocket]", "color: red; font-weight: bold;", err);
-          setIsConnected(false);
-        };
-
-        socket.onclose = () => {
-          console.warn("%c[⚠️ Conexão WS encerrada]", "color: orange;");
-          setIsConnected(false);
-        };
-
-        window.chatSocket = socket;
+        const historico = await chatService.fetchMessageHistory(chamado.id, user?.token);
+        if (isMounted) setMessages(historico);
       } catch (err) {
-        console.error("%c[🔥 Erro crítico ao iniciar chat]", "color: red;", err);
+        console.error("%c[❌ Erro ao buscar histórico]", "color: red;", err);
       }
+
+      // 2️⃣ Conecta ao WebSocket
+      socket = new WebSocket("ws://127.0.0.1:9000");
+
+      socket.onopen = () => {
+        if (!isMounted) return;
+        console.log("%c[2️⃣ WS aberto]", "color: limegreen; font-weight: bold;");
+        setIsConnected(true);
+        socket.send(JSON.stringify({ type: "auth", token: user?.token }));
+      };
+
+      socket.onmessage = (event) => {
+        if (!isMounted) return;
+        const msg = JSON.parse(event.data);
+        if (msg.success?.includes("Autenticado")) {
+          socket.send(JSON.stringify({ type: "join", chamado_id: chamado.id }));
+        } else if (msg.type === "msg") {
+          setMessages((prev) => {
+            const exists = prev.some((m) => m.id === msg.id && msg.id);
+            return exists ? prev : [...prev, msg];
+          });
+        }
+      };
+
+      socket.onerror = (err) => {
+        if (!isMounted) return;
+        console.error("%c[🚨 Erro no WebSocket]", "color: red; font-weight: bold;", err);
+        setIsConnected(false);
+      };
+
+      socket.onclose = () => {
+        if (!isMounted) return;
+        console.warn("%c[⚠️ Conexão WS encerrada]", "color: orange;");
+        setIsConnected(false);
+      };
+
+      window.chatSocket = socket;
+    } catch (err) {
+      console.error("%c[🔥 Erro crítico ao iniciar chat]", "color: red;", err);
     }
+  }
 
-    initChat();
+  initChat();
 
-    return () => {
-      console.log("%c[🧹 Fechando WS do chat]", "color: gray;");
-      socket?.close();
-    };
-  }, [isOpen, chamado?.id]);
+  return () => {
+    console.log("%c[🧹 Fechando WS do chat]", "color: gray;");
+    isMounted = false;
+    if (socket?.readyState === WebSocket.OPEN) socket.close();
+  };
+}, [isOpen, chamado?.id]);
+
 
   // ======== SCROLL AUTOMÁTICO =========
   useEffect(() => {
@@ -140,17 +139,6 @@ const DraggableChatDialog = ({ isOpen, onClose, chamado }) => {
     const texto = inputMessage.trim();
     setInputMessage("");
 
-    const agora = new Date();
-    const novaMsg = {
-      chamado_id: chamado.id,
-      usuario_id: user?.id,
-      mensagem: texto,
-      criado_em: agora.toISOString(),
-      time: agora.toLocaleTimeString("pt-BR", {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-    };
 
 
 
