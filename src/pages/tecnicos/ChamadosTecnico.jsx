@@ -131,7 +131,7 @@ export default function ChamadosTecnico() {
 
   return (
     <div className="tecnico-chamados">
-      <div className="header">
+      <div className="header-tecnico">
         <h1>Meus chamados</h1>
       </div>
 
@@ -144,25 +144,25 @@ export default function ChamadosTecnico() {
       {!loading && (
         <>
           {/* Em Atendimento */}
-          <div className="section">
-            <div className="section-header andamento">
+          <div className="section-tecnico">
+            <div className="section-tecnico-header andamento">
               <Clock2 size={16} /> Em atendimento ({andamentoChamados.length})
             </div>
-            <div className="chamados-list">
+            <div className="chamados-tecnico-list">
               {andamentoChamados.length > 0 ? (
                 andamentoChamados.map((chamado) => (
                   <div
                     key={chamado.id}
-                    className="chamado-card andamento"
+                    className="chamado-tecnico-card andamento"
                     onClick={() => handleOpenModal(chamado)}
                     style={{ cursor: "pointer" }}
                   >
-                    <div className="card-main">
-                      <div className="chamado-info">
-                        <div className="chamado-codigo">{chamado.codigo || chamado.id}</div>
-                        <div className="chamado-titulo">{chamado.titulo || chamado.tipo}</div>
-                        <div className="chamado-descricao">{chamado.descricao}</div>
-                        <div className="chamado-data">{chamado.data_criacao || chamado.data}</div>
+                    <div className="card-tecnico-main">
+                      <div className="chamado-tecnico-info">
+                        <div className="chamado-tecnico-codigo">{chamado.codigo || chamado.id}</div>
+                        <div className="chamado-tecnico-titulo">{chamado.titulo || chamado.tipo}</div>
+                        <div className="chamado-tecnico-descricao">{chamado.descricao}</div>
+                        <div className="chamado-tecnico-data">{chamado.data_criacao || chamado.data}</div>
                       </div>
                       <Botao
                         onClick={(e) => handleEncerrar(e, chamado.id)}
@@ -184,7 +184,7 @@ export default function ChamadosTecnico() {
                         {encerrandoId === chamado.id && <ButtonSpinner />}
                       </Botao>
                     </div>
-                    <div className="card-footer">
+                    <div className="card-tecnico-footer">
                       <div className="user-info">
                         <div className="user-avatar">{chamado.avatar}</div>
                         <span className="user-name">{chamado.cliente_nome || chamado.usuario}</span>
@@ -202,28 +202,28 @@ export default function ChamadosTecnico() {
           </div>
 
           {/* Encerrados */}
-          <div className="section">
-            <div className="section-header finalizado">
+          <div className="section-tecnico">
+            <div className="section-tecnico-header finalizado">
               <Check size={16} /> Encerrados ({finalizadosChamados.length})
             </div>
-            <div className="chamados-list">
+            <div className="chamados-tecnico-list">
               {finalizadosChamados.length > 0 ? (
                 finalizadosChamados.map((chamado) => (
                   <div
                     key={chamado.id}
-                    className="chamado-card finalizado"
+                    className="chamado-tecnico-card finalizado"
                     onClick={() => handleOpenModal(chamado)}
                     style={{ cursor: "pointer" }}
                   >
-                    <div className="card-main">
-                      <div className="chamado-info">
-                        <div className="chamado-codigo">{chamado.codigo || chamado.id}</div>
-                        <div className="chamado-titulo">{chamado.titulo || chamado.tipo}</div>
-                        <div className="chamado-descricao">{chamado.descricao}</div>
-                        <div className="chamado-data">{chamado.data_criacao || chamado.data}</div>
+                    <div className="card-tecnico-main">
+                      <div className="chamado-tecnico-info">
+                        <div className="chamado-tecnico-codigo">{chamado.codigo || chamado.id}</div>
+                        <div className="chamado-tecnico-titulo">{chamado.titulo || chamado.tipo}</div>
+                        <div className="chamado-tecnico-descricao">{chamado.descricao}</div>
+                        <div className="chamado-tecnico-data">{chamado.data_criacao || chamado.data}</div>
                       </div>
                     </div>
-                    <div className="card-footer">
+                    <div className="card-tecnico-footer">
                       <div className="user-info">
                         <div className="user-avatar">{chamado.avatar}</div>
                         <span className="user-name">{chamado.cliente_nome || chamado.usuario}</span>
