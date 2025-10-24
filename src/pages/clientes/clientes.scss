@@ -234,7 +234,7 @@ body {
   flex-direction: column;
   padding: 10px;
   transition: margin-left 0.3s ease;
-  margin-left: 18rem; // margem padrão para telas grandes
+  margin-left: 15vw; // margem padrão para telas grandes
 
   // Remover margem em telas menores que 768px
   @include responsive($breakpoint-md) {
