@@ -8,7 +8,7 @@ import { SearchProvider } from "../../context/search-context";
 import ListTableTec from "../../components/tableTec";
 import chamadosService from "../../services/chamadosService";
 import Spinner from "../../components/LoadingSpinner";
-import "./chamados.scss";
+import "./ChamadosAbertos.scss";
 
 export default function TecEmAndamento() {
   const [loading, setLoading] = useState(true);
@@ -37,14 +37,14 @@ export default function TecEmAndamento() {
   }
 
   return (
-    <Box sx={{ p: 3, minHeight: "100vh" }}>
+    <Box className="chamadosAbertos" sx={{ minHeight: "100vh" }}>
       {/* Título */}
       <Typography
         component="h1"
         variant="h4"
         sx={{ color: "#1e3a8a", fontWeight: 600, mb: 2, ml: 2.7 }}
       >
-        Chamados
+        Chamados Abertos
       </Typography>
 
       {/* SearchBar */}
