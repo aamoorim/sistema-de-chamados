@@ -147,7 +147,6 @@ $breakpoint-xxxl: 4000px;
   }
 }
 
-
 // RESET E BASE
 
 * {
@@ -188,7 +187,6 @@ body {
     margin-left: 0;
   }
 
-
   h1 {
     font-size: $text-3xl;
     font-weight: $font-semibold;
@@ -196,8 +194,17 @@ body {
     margin-bottom: $spacing-2xl;
     letter-spacing: -0.025em;
     margin-left: 2px;
-  }
 
+    @media(min-width: $breakpoint-xxl) {
+      font-size: 2.5rem;
+      font-weight: $font-bold;
+    }
+
+    @media(min-width: $breakpoint-xxxl) {
+      font-size: 3rem;
+      font-weight: $font-bold;
+    }
+  }
 }
 
 // SEÇÕES (Em atendimento / Encerrados)
@@ -228,8 +235,6 @@ body {
   border-radius: 24px;
   color: $text-white;
 
-
-
   &.andamento {
     background: $color-warning;
     color: #0739b8;
@@ -239,6 +244,24 @@ body {
     background: $color-success;
     color: #508b26;
   }
+
+    @media(min-width: $breakpoint-xxl) {
+      font-size: 1.5rem;
+      font-weight: $font-medium;
+       .status{
+        width: 26px;
+        height: 26px;
+       }
+    }
+
+    @media(min-width: $breakpoint-xxxl) {
+      font-size: 2rem;
+      font-weight: $font-medium;
+       .status{
+        width: 32px;
+        height: 32px;
+       }
+    }
 }
 
 // LISTA DE CHAMADOS
@@ -253,86 +276,94 @@ body {
 
 .chamado-tecnico-card {
   @include card($spacing-lg, $radius-md, $shadow-sm);
-    width: 100%;
-    padding: 24px 28px;
-    font-size: 14px;
-    line-height: 1.4;
+  width: 100%;
+  padding: 24px 28px;
+  font-size: 14px;
+  line-height: 1.4;
 
-    &.espera {
-      @include status-border(#b91c1cea);
-    }
-
-    &.finalizado {
-      @include status-border($color-success);
-    }
-
-    &.andamento {
-      @include status-border($color-warning);
-    }
-
-    @include responsive($breakpoint-md) {
-      max-width: 100%;
-      width: 100%;
-      padding: 18px 22px;
-    }
-
-    @include responsive($breakpoint-xs) {
-      padding: $spacing-lg;
-      border-radius: $radius-sm;
-      width: 28rem;
-    }
+  &.espera {
+    @include status-border(#b91c1cea);
   }
 
-    @media (max-width: 768px) {
-      .card-tecnico-main {
-        flex-direction: row !important;  // para manter botão no canto superior direito
-      }
-    }
+  &.finalizado {
+    @include status-border($color-success);
+  }
 
-    @media (min-width: $breakpoint-md) {
-      .chamado-tecnico-card {
-        flex: 1;
-        width: 100%;
-        min-width: 32rem !important;
-        max-width: 46rem !important;
-      }
-    }
+  &.andamento {
+    @include status-border($color-warning);
+  }
 
-    @media (min-width: 769px) {
-      .chamado-tecnico-card {
-        min-width: 28rem !important;
-      }
-    }
+  @include responsive($breakpoint-md) {
+    padding: 18px 22px;
+  }
 
-    @media (min-width: $breakpoint-lg) {
-        .chamado-tecnico-card {
-          min-width: 42rem !important;
-          max-width: 58rem !important;
-        }
-      }
-
-    @media (min-width: $breakpoint-xl) {
-        .chamado-tecnico-card {
-          min-width: 28vw !important;
-          max-width: 42vw !important;
-        }
-    }
-
-    @media (min-width: $breakpoint-xxl) {
-        .chamado-tecnico-card {
-          min-width: 32vw !important;
-          max-width: 46vw !important;
-        }
-    }
-
-    @media (min-width: $breakpoint-xxxl) {
-        .chamado-tecnico-card {
-          min-width: 42vw !important;
-          max-width: 56vw !important;
-        }
+  @include responsive($breakpoint-xs) {
+    padding: $spacing-lg;
+    border-radius: $radius-sm;
+  }
 }
-// CARD MAIN
 
+@media (max-width: $breakpoint-xs) {
+  .chamado-tecnico-card {
+    min-width: 50vw;
+    max-width: 94vw;
+  }
+}
+
+@media (max-width: 768px) {
+  .card-tecnico-main {
+    flex-direction: row !important; // para manter botão no canto superior direito
+  }
+}
+
+@media (min-width: $breakpoint-md) {
+  .chamado-tecnico-card {
+    flex: 1;
+    min-width: 32rem !important;
+    max-width: 46rem !important;
+  }
+}
+
+@media (min-width: 769px) {
+  .chamado-tecnico-card {
+    min-width: 28rem !important;
+  }
+}
+
+@media (min-width: $breakpoint-lg) {
+  .chamado-tecnico-card {
+    min-width: 42rem !important;
+    max-width: 58rem !important;
+  }
+}
+
+@media (min-width: $breakpoint-xl) {
+  .chamado-tecnico-card {
+    min-width: 28vw !important;
+    max-width: 42vw !important;
+  }
+}
+
+@media (min-width: $breakpoint-xxl) {
+  .chamado-tecnico-card {
+    min-width: 32vw !important;
+    max-width: 46vw !important;
+  }
+}
+
+@media (min-width: 4000px) {
+  .chamado-tecnico-card {
+    min-width: 42vw !important;
+    max-width: 82vw !important;
+    min-height: 20vh;
+
+    .card-tecnico-main {
+      font-size: 60px !important;  // Tamanho da fonte aumentado
+    }
+  }
+}
+
+// CARD MAIN
 .card-tecnico-main {
   @include flex(row, flex-start, space-between);
   margin-bottom: $spacing-md;
@@ -351,6 +382,16 @@ body {
     color: $text-secondary;
     margin-bottom: 4px;
     font-weight: $font-medium;
+
+    @media(min-width: $breakpoint-xxl) {
+      font-size: 1.2rem;
+      font-weight: $font-medium;
+    }
+
+    @media(min-width: $breakpoint-xxxl) {
+      font-size: 1.5rem;
+      font-weight: $font-medium;
+    }
   }
 
   .chamado-tecnico-titulo {
@@ -359,6 +400,16 @@ body {
     color: $text-primary;
     margin-bottom: 4px;
     line-height: 1.3;
+
+    @media(min-width: $breakpoint-xxl) {
+      font-size: 1.6rem;
+      font-weight: $font-bold;
+    } 
+
+    @media(min-width: $breakpoint-xxxl) {
+      font-size: 2rem;
+      font-weight: $font-bold;
+    }
   }
 
   .chamado-tecnico-descricao {
@@ -366,15 +417,34 @@ body {
     color: $text-secondary;
     line-height: 1.4;
     margin-bottom: 18px;
+
+    @media(min-width: $breakpoint-xxl) {
+      font-size: 1.2rem;
+      font-weight: $font-medium;
+    }
+
+    @media(min-width: $breakpoint-xxxl) {
+      font-size: 2rem;
+      font-weight: $font-medium;
+    }
   }
 
   .chamado-tecnico-data {
     font-size: $text-xs;
     color: $text-muted;
     font-weight: $font-semibold;
+
+      @media(min-width: $breakpoint-xxl) {
+        font-size: 1.2rem;
+        font-weight: $font-medium;
+      }
+
+      @media(min-width: $breakpoint-xxxl) {
+        font-size: 2rem;
+        font-weight: $font-medium;
+      }
   }
 }
-
 
 .btn-encerrar {
   @include button(#000, $text-white, 6px $spacing-lg);
@@ -393,7 +463,7 @@ body {
   &:hover {
     background: #1f2937;
   }
-
+  
   @include responsive($breakpoint-xs) {
     width: 100% !important;
     font-size: 1rem;
@@ -420,13 +490,25 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-  flex: 1
+  flex: 1;
 }
 
 .user-avatar {
   @include avatar(26px, $color-primary);
   font-size: 11px;
   font-weight: $font-bold;
+
+  @media(min-width: $breakpoint-xxl) {
+    @include avatar(2rem, $color-primary);
+      font-size: 1.2rem;
+      font-weight: $font-bold;
+  }
+
+  @media(min-width: $breakpoint-xxxl) {
+    @include avatar(3rem, $color-primary);
+      font-size: 2rem;
+      font-weight: $font-bold;
+  }
 }
 
 .user-name {
@@ -434,6 +516,16 @@ body {
   color: $text-primary;
   font-weight: $font-medium;
   flex: 1;
+
+  @media(min-width: $breakpoint-xxl) {
+    font-size: 1.2rem;
+    font-weight: $font-medium;
+  }
+
+  @media(min-width: $breakpoint-xxxl) {
+    font-size: 2rem;
+    font-weight: $font-medium;
+  }
 }
 
 .check-icon {
@@ -447,7 +539,6 @@ body {
 }
 
 // RIPPLE EFFECT
-
 $ripple-duration: 0.8s;
 $ripple-size: 200px;
 $ripple-color: rgba(255, 255, 255, 0.4);
@@ -456,11 +547,11 @@ $ripple-easing: cubic-bezier(0.4, 0, 0.2, 1);
 .btn-encerrar {
   position: relative;
   overflow: hidden;
-  
+
   &:active {
     transform: translateY(0px) scale(0.98);
   }
-  
+
   .ripple {
     position: absolute;
     border-radius: 50%;
@@ -478,11 +569,11 @@ $ripple-easing: cubic-bezier(0.4, 0, 0.2, 1);
     opacity: 0.6;
     transform: translate(-50%, -50%) scale(0);
   }
-  
+
   50% {
     opacity: 0.4;
   }
-  
+
   100% {
     width: $ripple-size;
     height: $ripple-size;
@@ -504,7 +595,6 @@ $ripple-easing: cubic-bezier(0.4, 0, 0.2, 1);
 
   &.finalizado {
     background: color.adjust($color-success, $lightness: 10%);
-    color: #2E7D32;
+    color: #2e7d32;
   }
 }
-

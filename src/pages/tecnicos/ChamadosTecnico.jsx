@@ -146,7 +146,7 @@ export default function ChamadosTecnico() {
           {/* Em Atendimento */}
           <div className="section-tecnico">
             <div className="section-tecnico-header andamento">
-              <Clock2 size={16} /> Em atendimento ({andamentoChamados.length})
+              <Clock2 size={16} className="status"/> Em atendimento ({andamentoChamados.length})
             </div>
             <div className="chamados-tecnico-list">
               {andamentoChamados.length > 0 ? (
@@ -204,7 +204,7 @@ export default function ChamadosTecnico() {
           {/* Encerrados */}
           <div className="section-tecnico">
             <div className="section-tecnico-header finalizado">
-              <Check size={16} /> Encerrados ({finalizadosChamados.length})
+              <Check size={16} className="status" /> Encerrados ({finalizadosChamados.length})
             </div>
             <div className="chamados-tecnico-list">
               {finalizadosChamados.length > 0 ? (
