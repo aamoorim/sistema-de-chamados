@@ -14,10 +14,10 @@ import { useTecnicos } from "../../context/TecnicosContext";
 import { useAuth } from "../../context/auth-context";
 import EditIcon from "@mui/icons-material/Edit";
 import Botao from "../Button.jsx";
-import api from "../../services/api"; 
+import api from "../../services/api";
 
 export function ModalEditarTecnico({ isOpen, onClose, tecnico, onSuccess }) {
-  const { setTecnicos } = useTecnicos(); 
+  const { setTecnicos } = useTecnicos();
   const { token } = useAuth();
 
   const [nome, setNome] = useState("");
@@ -32,7 +32,29 @@ export function ModalEditarTecnico({ isOpen, onClose, tecnico, onSuccess }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const senhasNaoConferem = senha && confirmarSenha && senha !== confirmarSenha;
+  // ======== Função de validação (baseada no backend PHP) ========
+  const validarSenha = (senha) => {
+    return {
+      comprimento: senha.length >= 8,
+      espacos: !/\s/.test(senha),
+      maiuscula: /[A-Z]/.test(senha),
+      minuscula: /[a-z]/.test(senha),
+      numero: /[0-9]/.test(senha),
+      especial: /[\W_]/.test(senha),
+    };
+  };
+
+  const validacoes = validarSenha(senha);
+  const senhasCoincidem = senha === confirmarSenha && senha.length > 0;
+
+  const senhaValida =
+    validacoes.comprimento &&
+    validacoes.espacos &&
+    validacoes.maiuscula &&
+    validacoes.minuscula &&
+    validacoes.numero &&
+    validacoes.especial &&
+    senhasCoincidem;
 
   useEffect(() => {
     if (tecnico) {
@@ -47,12 +69,11 @@ export function ModalEditarTecnico({ isOpen, onClose, tecnico, onSuccess }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setError(null);
 
-    if (senhasNaoConferem) {
-      setError("As senhas não coincidem");
-      setLoading(false);
+    // Se o campo senha não estiver vazio, validar
+    if (senha && !senhaValida) {
+      setError("A senha não atende aos requisitos mínimos.");
       return;
     }
 
@@ -63,27 +84,16 @@ export function ModalEditarTecnico({ isOpen, onClose, tecnico, onSuccess }) {
       ...(senha.trim() ? { senha } : {}),
     };
 
+    setLoading(true);
     try {
-      const response = await api.put(
-        `/tecnicos/${tecnico.id}`,
-        tecnicoAtualizado,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await api.put(`/tecnicos/${tecnico.id}`, tecnicoAtualizado, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
       const data = response.data;
+      setTecnicos((prev) => prev.map((t) => (t.id === data.id ? data : t)));
 
-      // Atualiza localmente
-      setTecnicos((prev) =>
-        prev.map((t) => (t.id === data.id ? data : t))
-      );
-
-      // ✅ Chama função para exibir toast e atualizar lista na tabela
       if (onSuccess) onSuccess();
-
       onClose();
     } catch (err) {
       setError(err?.response?.data?.message || "Erro ao atualizar técnico");
@@ -118,12 +128,7 @@ export function ModalEditarTecnico({ isOpen, onClose, tecnico, onSuccess }) {
         <Typography variant="h6" fontWeight="bold" mb={1}>
           Editar Técnico
         </Typography>
-        <Typography
-          variant="caption"
-          color="text.secondary"
-          fontSize={14}
-          mb={3}
-        >
+        <Typography variant="caption" color="text.secondary" fontSize={14} mb={3}>
           Atualize as informações do técnico
         </Typography>
 
@@ -172,14 +177,15 @@ export function ModalEditarTecnico({ isOpen, onClose, tecnico, onSuccess }) {
             disabled={loading}
           />
 
+          {/* ==================== SENHA ==================== */}
           <Typography variant="caption" fontWeight="bold" color="text.secondary">
-            SENHA (DEIXE VAZIO CASO NÃO QUEIRA ALTERAR)
+            SENHA (deixe vazia caso não queira alterar)
           </Typography>
           <TextField
             fullWidth
             type={mostrarSenha ? "text" : "password"}
             variant="standard"
-            placeholder="Senha"
+            placeholder="Nova Senha"
             sx={{ mb: 3 }}
             value={senha}
             onChange={(e) => setSenha(e.target.value)}
@@ -198,6 +204,50 @@ export function ModalEditarTecnico({ isOpen, onClose, tecnico, onSuccess }) {
             }}
           />
 
+
+          {/* ===== Requisitos de Senha ===== */}
+          {senha && (
+            <Box sx={{ mb: 2, mt: -1 }}>
+              <Typography
+                variant="body2"
+                color={validacoes.comprimento ? "success.main" : "error"}
+              >
+                • Mínimo 8 caracteres
+              </Typography>
+              <Typography
+                variant="body2"
+                color={validacoes.maiuscula ? "success.main" : "error"}
+              >
+                • Pelo menos 1 letra maiúscula
+              </Typography>
+              <Typography
+                variant="body2"
+                color={validacoes.minuscula ? "success.main" : "error"}
+              >
+                • Pelo menos 1 letra minúscula
+              </Typography>
+              <Typography
+                variant="body2"
+                color={validacoes.numero ? "success.main" : "error"}
+              >
+                • Pelo menos 1 número
+              </Typography>
+              <Typography
+                variant="body2"
+                color={validacoes.especial ? "success.main" : "error"}
+              >
+                • Pelo menos 1 caractere especial
+              </Typography>
+              <Typography
+                variant="body2"
+                color={senhasCoincidem ? "success.main" : "error"}
+              >
+                • As senhas coincidem
+              </Typography>
+            </Box>
+          )}
+
+          {/* CONFIRMAR SENHA */}
           <Typography variant="caption" fontWeight="bold" color="text.secondary">
             CONFIRMAR SENHA
           </Typography>
@@ -206,12 +256,16 @@ export function ModalEditarTecnico({ isOpen, onClose, tecnico, onSuccess }) {
             type={mostrarConfirmar ? "text" : "password"}
             variant="standard"
             placeholder="Confirme a Senha"
-            sx={{ mb: 4 }}
+            sx={{ mb: 2 }}
             value={confirmarSenha}
             onChange={(e) => setConfirmarSenha(e.target.value)}
             disabled={loading}
-            error={senhasNaoConferem}
-            helperText={senhasNaoConferem ? "As senhas não coincidem" : ""}
+            error={senha && confirmarSenha && !senhasCoincidem}
+            helperText={
+              senha && confirmarSenha && !senhasCoincidem
+                ? "As senhas não coincidem"
+                : ""
+            }
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
@@ -226,6 +280,9 @@ export function ModalEditarTecnico({ isOpen, onClose, tecnico, onSuccess }) {
             }}
           />
 
+
+
+          {/* ======= MENSAGEM DE ERRO ======= */}
           {error && (
             <Typography color="error" sx={{ mb: 2 }}>
               {error}
@@ -235,7 +292,7 @@ export function ModalEditarTecnico({ isOpen, onClose, tecnico, onSuccess }) {
           <Box display="flex" justifyContent="center">
             <Botao
               type="submit"
-              disabled={loading || senhasNaoConferem}
+              disabled={loading || (senha && !senhaValida)}
               icon={EditIcon}
             >
               {loading ? "Salvando..." : "Salvar Alterações"}

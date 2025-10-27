@@ -3,7 +3,6 @@ import {
   Modal,
   Typography,
   TextField,
-  Button,
   IconButton,
   InputAdornment,
   Fade,
@@ -14,7 +13,7 @@ import { useState } from "react";
 import { useClientes } from "../../context/ClientesContext";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
-import Botao from "../Button.jsx"
+import Botao from "../Button.jsx";
 import { Plus } from "lucide-react";
 
 export function ModalCriarCliente({ isOpen, onClose, onCreateSuccess }) {
@@ -30,6 +29,9 @@ export function ModalCriarCliente({ isOpen, onClose, onCreateSuccess }) {
     p: 4,
   };
 
+  const { addCliente } = useClientes();
+
+  // Campos do formulário
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [setor, setSetor] = useState("");
@@ -37,35 +39,73 @@ export function ModalCriarCliente({ isOpen, onClose, onCreateSuccess }) {
   const [senha, setSenha] = useState("");
   const [confirmarSenha, setConfirmarSenha] = useState("");
 
+  // Estado de exibição de senha
   const [showSenha, setShowSenha] = useState(false);
   const [showConfirmarSenha, setShowConfirmarSenha] = useState(false);
 
-  const { addCliente } = useClientes();
-  const [loadingLocal, setLoadingLocal] = useState(false);
+  // Controle de status
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [isClosing, setIsClosing] = useState(false);
+
+  // ===== validador (mesmo do backend) =====
+  const validarSenha = (s) => ({
+    comprimento: s.length >= 8,
+    espacos: !/\s/.test(s),
+    maiuscula: /[A-Z]/.test(s),
+    minuscula: /[a-z]/.test(s),
+    numero: /[0-9]/.test(s),
+    especial: /[\W_]/.test(s),
+  });
+
+  const validacoes = validarSenha(senha);
+  const senhasCoincidem = senha === confirmarSenha && senha.length > 0;
+
+  // senhaValida será true somente quando todos critérios + coincidência estiverem OK
+  const senhaValida =
+    validacoes.comprimento &&
+    validacoes.espacos &&
+    validacoes.maiuscula &&
+    validacoes.minuscula &&
+    validacoes.numero &&
+    validacoes.especial &&
+    senhasCoincidem;
+
+  // Permite submissão quando: senha está vazia (gera-se automaticamente no back) OU senhaValida === true
+  const podeSubmeter = !loading && (senha.trim() === "" || senhaValida);
 
   const senhasNaoConferem = senha && confirmarSenha && senha !== confirmarSenha;
 
-  // Controla se o modal está fechando para aguardar animação antes de chamar onCreateSuccess
-  const [isClosing, setIsClosing] = useState(false);
-
+  // Submissão do formulário
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
 
     if (senhasNaoConferem) {
-      setError("As senhas não coincidem");
+      setError("As senhas não coincidem.");
       return;
     }
 
-    setLoadingLocal(true);
+    // Se o admin preencheu senha, exige que ela seja válida conforme critérios
+    if (senha.trim() && !senhaValida) {
+      setError("A senha não atende aos requisitos mínimos.");
+      return;
+    }
 
+    if (!nome.trim() || !email.trim() || !setor.trim() || !empresa.trim()) {
+      setError("Preencha todos os campos obrigatórios.");
+      return;
+    }
+
+    setLoading(true);
+
+    // Envia senha somente se preenchida
     const novoCliente = {
-      nome,
-      email,
-      setor,
-      empresa,
-      senha,
+      nome: nome.trim(),
+      email: email.trim(),
+      setor: setor.trim(),
+      empresa: empresa.trim(),
+      ...(senha.trim() ? { senha: senha.trim() } : {}),
     };
 
     try {
@@ -79,22 +119,27 @@ export function ModalCriarCliente({ isOpen, onClose, onCreateSuccess }) {
       setSenha("");
       setConfirmarSenha("");
 
-      // Começa fechamento
+      // Fechar modal com leve delay visual
       setIsClosing(true);
       onClose();
-
-    } catch (error) {
-      console.error(error);
-      setError("Erro ao criar cliente");
-      setLoadingLocal(false);
+    } catch (err) {
+      console.error("❌ Erro ao criar cliente:", err);
+      setError(
+        err?.response?.data?.message ||
+          "Erro inesperado ao criar o cliente. Tente novamente."
+      );
+      setLoading(false);
+    } finally {
+      // loading só fica false se não estiver no processo de sair (isClosing controla onCreateSuccess)
+      if (!isClosing) setLoading(false);
     }
   };
 
-  // Quando a animação do modal terminar de fechar (Fade sair)
+  // Callback chamado após a animação de saída
   const handleExited = () => {
     if (isClosing) {
       setIsClosing(false);
-      setLoadingLocal(false);
+      setLoading(false);
       if (onCreateSuccess) onCreateSuccess();
     }
   };
@@ -103,7 +148,7 @@ export function ModalCriarCliente({ isOpen, onClose, onCreateSuccess }) {
     <Modal
       open={isOpen}
       onClose={() => {
-        if (!loadingLocal) onClose();
+        if (!loading) onClose();
       }}
       closeAfterTransition
       slots={{ backdrop: Backdrop }}
@@ -113,24 +158,35 @@ export function ModalCriarCliente({ isOpen, onClose, onCreateSuccess }) {
         <Box sx={style}>
           <IconButton
             onClick={() => {
-              if (!loadingLocal) onClose();
+              if (!loading) onClose();
             }}
             sx={{ position: "absolute", right: 12, top: 12 }}
-            disabled={loadingLocal}
-            aria-label="fechar modal"
+            disabled={loading}
+            aria-label="Fechar modal"
           >
             <CloseIcon />
           </IconButton>
 
           <Typography variant="h6" fontWeight="bold" gutterBottom>
-            Dados Pessoais
+            Criar Cliente
           </Typography>
-          <Typography variant="caption" color="text.secondary" fontSize={14} gutterBottom>
-            Defina as informações do perfil do cliente
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            fontSize={14}
+            gutterBottom
+          >
+            Preencha os dados do novo cliente
           </Typography>
 
           <form onSubmit={handleSubmit}>
-            <Typography variant="caption" fontWeight="bold" color="text.secondary" gutterBottom>
+            {/* Nome */}
+            <Typography
+              variant="caption"
+              fontWeight="bold"
+              color="text.secondary"
+              gutterBottom
+            >
               NOME
             </Typography>
             <TextField
@@ -141,11 +197,17 @@ export function ModalCriarCliente({ isOpen, onClose, onCreateSuccess }) {
               required
               value={nome}
               onChange={(e) => setNome(e.target.value)}
-              disabled={loadingLocal}
+              disabled={loading}
             />
 
-            <Typography variant="caption" fontWeight="bold" color="text.secondary" gutterBottom>
-              E‑MAIL
+            {/* Email */}
+            <Typography
+              variant="caption"
+              fontWeight="bold"
+              color="text.secondary"
+              gutterBottom
+            >
+              E-MAIL
             </Typography>
             <TextField
               fullWidth
@@ -156,38 +218,56 @@ export function ModalCriarCliente({ isOpen, onClose, onCreateSuccess }) {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              disabled={loadingLocal}
+              disabled={loading}
             />
 
-            <Typography variant="caption" fontWeight="bold" color="text.secondary" gutterBottom>
+            {/* Setor */}
+            <Typography
+              variant="caption"
+              fontWeight="bold"
+              color="text.secondary"
+              gutterBottom
+            >
               SETOR
             </Typography>
             <TextField
               fullWidth
               variant="standard"
-              placeholder="Nome do Setor"
+              placeholder="Setor do cliente"
               sx={{ mb: 2 }}
               required
               value={setor}
               onChange={(e) => setSetor(e.target.value)}
-              disabled={loadingLocal}
+              disabled={loading}
             />
 
-            <Typography variant="caption" fontWeight="bold" color="text.secondary" gutterBottom>
+            {/* Empresa */}
+            <Typography
+              variant="caption"
+              fontWeight="bold"
+              color="text.secondary"
+              gutterBottom
+            >
               EMPRESA
             </Typography>
             <TextField
               fullWidth
               variant="standard"
-              placeholder="Nome da Empresa"
+              placeholder="Empresa do cliente"
               sx={{ mb: 2 }}
               required
               value={empresa}
               onChange={(e) => setEmpresa(e.target.value)}
-              disabled={loadingLocal}
+              disabled={loading}
             />
 
-            <Typography variant="caption" fontWeight="bold" color="text.secondary" gutterBottom>
+            {/* Senha */}
+            <Typography
+              variant="caption"
+              fontWeight="bold"
+              color="text.secondary"
+              gutterBottom
+            >
               SENHA
             </Typography>
             <TextField
@@ -196,18 +276,16 @@ export function ModalCriarCliente({ isOpen, onClose, onCreateSuccess }) {
               variant="standard"
               placeholder="Senha"
               sx={{ mb: 2 }}
-              required
               value={senha}
               onChange={(e) => setSenha(e.target.value)}
-              disabled={loadingLocal}
+              disabled={loading}
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
                     <IconButton
                       onClick={() => setShowSenha(!showSenha)}
                       edge="end"
-                      disabled={loadingLocal}
-                      aria-label={showSenha ? "Ocultar senha" : "Mostrar senha"}
+                      disabled={loading}
                     >
                       {showSenha ? <VisibilityOff /> : <Visibility />}
                     </IconButton>
@@ -216,7 +294,57 @@ export function ModalCriarCliente({ isOpen, onClose, onCreateSuccess }) {
               }}
             />
 
-            <Typography variant="caption" fontWeight="bold" color="text.secondary" gutterBottom>
+
+
+            {/* Requisitos da senha em tempo real (aparece somente se usuário digitou algo em senha) */}
+            {senha && (
+              <Box sx={{ mb: 2, mt: -1 }}>
+                <Typography
+                  variant="body2"
+                  color={validacoes.comprimento ? "success.main" : "error"}
+                >
+                  • Mínimo 8 caracteres
+                </Typography>
+                <Typography
+                  variant="body2"
+                  color={validacoes.maiuscula ? "success.main" : "error"}
+                >
+                  • Pelo menos 1 letra maiúscula
+                </Typography>
+                <Typography
+                  variant="body2"
+                  color={validacoes.minuscula ? "success.main" : "error"}
+                >
+                  • Pelo menos 1 letra minúscula
+                </Typography>
+                <Typography
+                  variant="body2"
+                  color={validacoes.numero ? "success.main" : "error"}
+                >
+                  • Pelo menos 1 número
+                </Typography>
+                <Typography
+                  variant="body2"
+                  color={validacoes.especial ? "success.main" : "error"}
+                >
+                  • Pelo menos 1 caractere especial
+                </Typography>
+                <Typography
+                  variant="body2"
+                  color={senhasCoincidem ? "success.main" : "error"}
+                >
+                  • As senhas coincidem
+                </Typography>
+              </Box>
+            )}
+
+            {/* Confirmar senha */}
+            <Typography
+              variant="caption"
+              fontWeight="bold"
+              color="text.secondary"
+              gutterBottom
+            >
               CONFIRMAR SENHA
             </Typography>
             <TextField
@@ -225,29 +353,26 @@ export function ModalCriarCliente({ isOpen, onClose, onCreateSuccess }) {
               variant="standard"
               placeholder="Confirme a senha"
               sx={{ mb: 2 }}
-              required
               value={confirmarSenha}
               onChange={(e) => setConfirmarSenha(e.target.value)}
-              disabled={loadingLocal}
+              disabled={loading}
               error={senhasNaoConferem}
               helperText={senhasNaoConferem ? "As senhas não coincidem" : ""}
-              slotProps={{
-                input:{
-                  endAdornment: (
+              InputProps={{
+                endAdornment: (
                   <InputAdornment position="end">
                     <IconButton
                       onClick={() => setShowConfirmarSenha(!showConfirmarSenha)}
                       edge="end"
-                      disabled={loadingLocal}
-                      aria-label={showConfirmarSenha ? "Ocultar senha" : "Mostrar senha"}
+                      disabled={loading}
                     >
                       {showConfirmarSenha ? <VisibilityOff /> : <Visibility />}
                     </IconButton>
                   </InputAdornment>
                 ),
-                }
               }}
             />
+
 
             {error && (
               <Typography color="error" sx={{ mb: 2 }}>
@@ -256,12 +381,8 @@ export function ModalCriarCliente({ isOpen, onClose, onCreateSuccess }) {
             )}
 
             <Box display="flex" justifyContent="center">
-              <Botao
-                type="submit"
-                disabled={loadingLocal || senhasNaoConferem}
-                icon={Plus}
-              >
-                {loadingLocal ? "Criando...." : "Criar Cliente"}
+              <Botao type="submit" disabled={!podeSubmeter} icon={Plus}>
+                {loading ? "Criando..." : "Criar Cliente"}
               </Botao>
             </Box>
           </form>
