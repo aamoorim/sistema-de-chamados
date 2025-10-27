@@ -9,27 +9,7 @@ import ModalAtenderChamado from "./Modals/AtenderChamado";
 import useIsMobile from "../hooks/useIsMobile";
 import api from "../services/api"; // ← usado no polling direto
 import "../styles/tables/listTable.scss";
-
-// Spinner para mudanças
-const LoadingSpinner = () => (
-  <div style={{
-    display: "flex", justifyContent: "center", alignItems: "center",
-    height: "100vh", width: "100vw", position: "fixed", top: 0, left: 0,
-    backgroundColor: "rgba(255, 255, 255, 0.7)", zIndex: 9999,
-  }}>
-    <div style={{
-      border: "6px solid #f3f3f3", borderTop: "6px solid #604FEB",
-      borderRadius: "50%", width: "40px", height: "40px",
-      animation: "spin 1s linear infinite",
-    }} />
-    <style>{`
-      @keyframes spin {
-        0% { transform: rotate(0deg);}
-        100% { transform: rotate(360deg);}
-      }
-    `}</style>
-  </div>
-);
+import Spinner from "./LoadingSpinner";
 
 export default function ListTableTec() {
   const { chamados, loading, error, fetchChamados } = useContext(ChamadosAbertosTecnicosContext);
@@ -90,7 +70,7 @@ export default function ListTableTec() {
       />
 
       {(loading || isUpdating) ? (
-        <LoadingSpinner />
+        <Spinner />
       ) : (
         <TableContainer component={Paper} sx={{
           borderRadius: "12px",

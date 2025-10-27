@@ -10,11 +10,12 @@ import { SearchProvider, useSearch } from "../../context/search-context";
 import SearchBar from "../../components/search-bar";
 import { useAuth } from "../../context/auth-context";
 import chamadosService from "../../services/chamadosService";
-
+import Spinner from "../../components/LoadingSpinner";
 import EditIcon from "@mui/icons-material/Edit";
 import { IconButton } from "@mui/material";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
+import "../../styles/SideBar/sidebar.scss";
 
 const Alert = forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -222,40 +223,6 @@ const ChamadosClienteContent = () => {
     );
   }
 
-  const LoadingSpinner = () => (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "100vh",
-        width: "100vw",
-        position: "fixed",
-        top: 0,
-        left: 0,
-        backgroundColor: "rgba(255,255,255,0.7)",
-        zIndex: 9999,
-      }}
-    >
-      <div
-        style={{
-          border: "6px solid #f3f3f3",
-          borderTop: "6px solid #604FEB",
-          borderRadius: "50%",
-          width: "40px",
-          height: "40px",
-          animation: "spin 1s linear infinite",
-        }}
-      />
-      <style>{`
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-      `}</style>
-    </div>
-  );
-
   return (
     <div className="tecnico-chamados">
       <Snackbar
@@ -293,7 +260,7 @@ const ChamadosClienteContent = () => {
         </div>
 
         {loading ? (
-          <LoadingSpinner />
+          <Spinner />
         ) : (
           <>
             {[
