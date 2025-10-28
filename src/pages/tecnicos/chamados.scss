@@ -169,7 +169,7 @@ body {
 
 // HEADER
 .header-tecnico {
-  margin-top: 40px;
+  padding-top: 2vh;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -193,11 +193,7 @@ body {
     color: #2e3da3;
     margin-bottom: 2vh;
     letter-spacing: -0.025em;
-    margin-left: 35vw;
-
-    @media(max-width: $breakpoint-xs) {
-      margin-left: 25vw;
-    }
+    margin-left: 1vw;
 
     @media(min-width: $breakpoint-xxl) {
       font-size: 2.5rem;
@@ -314,12 +310,6 @@ body {
   }
 }
 
-@media (max-width: 768px) {
-  .card-tecnico-main {
-    flex-direction: row !important; // para manter botão no canto superior direito
-  }
-}
-
 @media (min-width: $breakpoint-md) {
   .chamado-tecnico-card {
     flex: 1;
@@ -359,7 +349,6 @@ body {
   .chamado-tecnico-card {
     min-width: 42vw !important;
     max-width: 82vw !important;
-    min-height: 18vh;
   }
 }
 
@@ -447,7 +436,6 @@ body {
 }
 
 // CARD FOOTER
-
 .card-tecnico-footer {
   border-top: 1px solid $border-light;
   padding-top: 16px;
