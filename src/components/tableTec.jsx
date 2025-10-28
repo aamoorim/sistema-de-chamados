@@ -61,7 +61,7 @@ export default function ListTableTec() {
   if (error) return <div style={{ color: "red" }}>{error}</div>;
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: 2 }}>
       <ModalAtenderChamado
         isOpen={open}
         onClose={handleCloseModal}
