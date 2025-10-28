@@ -37,6 +37,7 @@
 
     const logout = () => {
       setUser(null);
+      localStorage.removeItem("token");
     };
 
     // Extrai token do usuário para facilitar acesso

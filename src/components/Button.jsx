@@ -8,41 +8,27 @@ export default function Botao({
   onClick,
   variant = "contained",
   size = "medium",
+  icon, 
+  sx = {},
   ...props 
 }) {
+  const IconComponent = icon || Plus; 
+
   const renderContent = () => {
-    if (iconOnly) {
-      return <Plus size={20} />;
-    }
-    
-    if (children) {
-      return (
-        <>
-          <Plus size={18} style={{ marginRight: text || children ? 8 : 0 }} />
-          {children}
-        </>
-      );
-    }
-    
-    if (text) {
-      return (
-        <>
-          <Plus size={18} style={{ marginRight: 8 }} />
-          {text}
-        </>
-      );
-    }
-    
-    return <Plus size={20} />;
+    return (
+      <>
+        {icon && (
+          <IconComponent size={18} style={{ marginRight: text || children ? 8 : 0 }} />
+        )}
+        {text}
+        {children}
+      </>
+    );
   };
 
   const getDynamicStyles = () => {
     const baseStyles = {
       borderRadius: '12px',
-      backgroundColor: '#604FEB',
-      '&:hover': {
-        backgroundColor: '#604FEB',
-      },
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
@@ -51,29 +37,52 @@ export default function Botao({
       fontWeight: 500,
     };
 
-    if (iconOnly) {
-      return {
-        ...baseStyles,
-        height: 44,
-        width: 44,
-        minWidth: 44,
-        padding: '8px',
-      };
-    }
+    const containedStyles = {
+      backgroundColor: '#604FEB',
+      color: '#fff',
+      '&:hover': {
+        backgroundColor: '#4e3dce',
+      },
+    };
+
+    const outlinedStyles = {
+      borderColor: '#604FEB',
+      color: '#604FEB',
+      backgroundColor: 'transparent',
+      '&:hover': {
+        backgroundColor: '#f2f0ff',
+        borderColor: '#4e3dce',
+      },
+    };
+
+    const variantStyles = variant === 'outlined' ? outlinedStyles : containedStyles;
+
+    const sizeStyles = iconOnly
+      ? {
+          height: 44,
+          width: 44,
+          minWidth: 44,
+          padding: '8px',
+        }
+      : {
+          height: 44,
+          minWidth: 44,
+          padding: '8px 16px',
+        };
 
     return {
       ...baseStyles,
-      height: 44,
-      minWidth: 44,
-      padding: '8px 16px',
+      ...variantStyles,
+      ...sizeStyles,
     };
   };
 
   return (
     <Button 
       variant={variant}
+      size={size}
       onClick={onClick}
-      sx={getDynamicStyles()}
+      sx={[getDynamicStyles(), sx]}  
       {...props}
     >
       {renderContent()}

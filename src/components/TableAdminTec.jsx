@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
-import { useTecnicos } from "../context/TecnicosContext";
+import React, { useEffect, useState } from "react";
 import { useSearch } from "../context/search-context";
-import useIsMobile from "../hooks/useIsMobile";
+import { useTecnicos } from "../context/TecnicosContext";
+import { useAuth } from "../context/auth-context"
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -12,43 +12,12 @@ import Paper from "@mui/material/Paper";
 import IconButton from "@mui/material/IconButton";
 import { Pencil, Trash2 } from "lucide-react";
 import { DeletarPerfil } from "./Modals/DeletarPerfil";
-import { ModalEditarTecnico } from "./Modals/EditarTecnico";  
+import { ModalEditarTecnico } from "./Modals/EditarTecnico";
+import useIsMobile from "../hooks/useIsMobile";
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
 import "../styles/tables/listTable.scss";
-
-// Spinner component
-const LoadingSpinner = () => (
-  <div
-    style={{
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      height: "100vh",
-      width: "100vw",
-      position: "fixed",
-      top: 0,
-      left: 0,
-      backgroundColor: "rgba(255, 255, 255, 0.7)",
-      zIndex: 9999,
-    }}
-  >
-    <div
-      style={{
-        border: "6px solid #f3f3f3",
-        borderTop: "6px solid #604FEB",
-        borderRadius: "50%",
-        width: "40px",
-        height: "40px",
-        animation: "spin 1s linear infinite",
-      }}
-    />
-    <style>{`
-      @keyframes spin {
-        0% { transform: rotate(0deg);}
-        100% { transform: rotate(360deg);}
-      }
-    `}</style>
-  </div>
-);
+import Spinner from "./LoadingSpinner";
 
 // Avatar com iniciais
 function Avatar({ initials }) {
@@ -73,169 +42,235 @@ function Avatar({ initials }) {
   );
 }
 
-export default function TechnicianTable() {
-  const isMobile = useIsMobile(900);
+// Alert personalizado com cor 604FEB
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return (
+    <MuiAlert
+      elevation={6}
+      ref={ref}
+      variant="filled"
+      {...props}
+      sx={{
+        backgroundColor: "#604FEB",
+        color: "#fff",
+        "& .MuiAlert-icon": {
+          color: "#fff",
+        },
+      }}
+    />
+  );
+});
+
+export default function TableAdminTec() {
+  const isMobile = useIsMobile(1200);
   const { search } = useSearch();
-  const { tecnicos, deleteTecnico } = useTecnicos();
+  const { tecnicos, deleteTecnico, fetchTecnicos, createTecnico } = useTecnicos();
+  const { token } = useAuth(); // Token de autenticação
 
   const [loading, setLoading] = useState(true);
-
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
-  const [selectedRow, setSelectedRow] = useState(null);
-
+  const [selectedRow, setSelectedRow] = useState(null); // Linha selecionada para exclusão
+  
+  // const [selectedTecnico, setSelectedTecnico] = useState(null);
   const [openEditModal, setOpenEditModal] = useState(false);
   const [selectedTecnicoEdit, setSelectedTecnicoEdit] = useState(null);
 
-  // Quando tecnicos muda, parar o loading
-  useEffect(() => {
-    if (tecnicos && Array.isArray(tecnicos)) {
-      // você pode ajustar esse timeout ou removê-lo
-      const timer = setTimeout(() => {
-        setLoading(false);
-      }, 300);
-      return () => clearTimeout(timer);
-    }
-  }, [tecnicos]);
+  // Estados para toast
+  const [toastOpen, setToastOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastSeverity, setToastSeverity] = useState("success"); // "success", "error", "warning", "info"
 
-  const handleOpenEdit = (tecnico) => {
-    setSelectedTecnicoEdit(tecnico);
-    setOpenEditModal(true);
-  };
+    // Carrega tecnicos assim que o token estiver disponível
+    useEffect(() => {
+      const load = async () => {
+        setLoading(true);
+        try {
+          await fetchTecnicos();
+        } catch (err) {
+          console.error("Erro ao carregar tecnicos:", err);
+          showToast("error", "Erro ao carregar tecnicos");
+        } finally {
+          setLoading(false);
+        }
+      };
+      if (token) load();
+    }, [token]);
+  
+    // Função para abrir toast
+    const showToast = (severity, message) => {
+      setToastSeverity(severity);
+      setToastMessage(message);
+      setToastOpen(true);
+    };
 
-  const handleCloseEdit = () => {
-    setSelectedTecnicoEdit(null);
-    setOpenEditModal(false);
-  };
+    // Fecha o toast
+    const handleToastClose = (event, reason) => {
+      if (reason === "clickaway") return;
+      setToastOpen(false);
+    };
 
+  const filteredTecnicos = tecnicos.filter((tec) => {
+    if (!tec) return false;
+    const term = search.toLowerCase();
+    return (
+      search === "" ||
+      (tec.nome && tec.nome.toLowerCase().includes(term)) ||
+      (tec.cargo && tec.cargo.toLowerCase().includes(term)) ||
+      (tec.email && tec.email.toLowerCase().includes(term))
+    );
+  });
+
+  // Abre modal de excluir para a linha selecionada
   const handleOpenDelete = (row) => {
     setSelectedRow(row);
     setOpenDeleteModal(true);
   };
 
+  // Fecha modal de exclusão e limpa seleção
   const handleCloseDelete = () => {
     setSelectedRow(null);
     setOpenDeleteModal(false);
   };
 
-  const handleDeleteConfirmed = async (id) => {
-  if (!id) {
-    alert("Usuário não identificado.");
-    return;
-  }
+  // Confirma exclusão, remove do backend e recarrega lista
+  const handleDeleteConfirmed = async () => {
+    if (!selectedRow) return;
+    setLoading(true);
+    try {
+      await deleteTecnico(selectedRow.id);
+      await fetchTecnicos();
+      setOpenDeleteModal(false);
+      showToast("success", `Tecnico "${selectedRow.nome}" deletado com sucesso!`);
+      setSelectedRow(null);
+    } catch (error) {
+      console.error("Erro ao deletar tecnico:", error);
+      showToast(
+        "error",
+        <>
+          Não foi possível deletar o técnico "{selectedRow?.nome || ''}".<br />
+          Certifique-se de que ele não possui chamados atribuídos.
+        </>
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  try {
-    await deleteTecnico(id);
-    handleCloseDelete();
-  } catch (error) {
-    console.error("Erro ao deletar técnico:", error);
+  // Abre modal de edição com tecnico selecionado
+  const handleOpenEdit = (tecnico) => {
+    setSelectedTecnicoEdit(tecnico);
+    setOpenEditModal(true);
+  };
 
-    const apiMessage =
-      error.response?.data?.erro || // API personalizada
-      error.response?.data?.message || // fallback padrão
-      error.message;
+  // Fecha modal de edição e limpa seleção
+  const handleCloseEdit = () => {
+    setSelectedTecnicoEdit(null);
+    setOpenEditModal(false);
+  };
 
-    alert(`Erro ao deletar técnico: ${apiMessage}`);
-  }
-};
+  // Recarrega tecnicos após edição bem-sucedida e mostra toast
+    const handleEditSuccess = async () => {
+    setLoading(true);
+    try {
+      await fetchTecnicos(); 
+      showToast("success", `Técnico "${selectedTecnicoEdit?.nome}" editado com sucesso!`);
+    } catch (error) {
+      console.error("Erro ao recarregar técnico:", error);
+      showToast("error", `Erro ao atualizar o técnico "${selectedTecnicoEdit?.nome}".`);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-
-  const filteredRows = tecnicos.filter((row) => {
-    const term = search.toLowerCase();
-    return (
-      search === "" ||
-      (row.nome && row.nome.toLowerCase().includes(term)) ||
-      (row.cargo && row.cargo.toLowerCase().includes(term)) ||
-      (row.email && row.email.toLowerCase().includes(term))
-    );
-  });
-
-  if (loading) {
-    return <LoadingSpinner />;
-  }
+  if (loading) return <Spinner />;
 
   return (
     <div style={{ fontFamily: "Lato" }}>
       <div style={{ marginBottom: 16, color: "#666", fontSize: 14 }}>
-        Mostrando {filteredRows.length} de {tecnicos.length} técnicos
+        Mostrando {filteredTecnicos.length} de {tecnicos.length} técnicos
       </div>
 
-      {/* TABELA DESKTOP */}
-      <div className="client-table-desktop">
+      {isMobile ? (
+        <div className="client-table-mobile">
+          {filteredTecnicos.length > 0 ? (
+            filteredTecnicos.map((tec) => (
+              <div key={tec.id} className="client-card">
+                <div><b>Nome:</b> {tec.nome || "-"}</div>
+                <div><b>Cargo:</b> {tec.cargo || "-"}</div>
+                <div><b>Email:</b> {tec.email || "-"}</div>
+                <div className="actions">
+                  <IconButton onClick={() => handleOpenEdit(tec)}>
+                    <Pencil size={18} />
+                  </IconButton>
+                  <IconButton color="error" onClick={() => handleOpenDelete(tec)}>
+                    <Trash2 size={18} />
+                  </IconButton>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="client-card-empty">
+              Nenhum técnico encontrado com os filtros aplicados
+            </div>
+          )}
+        </div>
+      ) : (
         <TableContainer
           component={Paper}
-          style={{
-            borderRadius: 14,
+          sx={{
+            borderRadius: 2,
             boxShadow: "0 2px 8px rgba(44,62,80,0.04)",
-            marginBottom: 32,
+            marginBottom: 4,
+            overflowX: "auto",
+            "@media (max-width: 768px)": {
+              "& table": { minWidth: "700px" },
+            },
           }}
         >
-          <Table sx={{ minWidth: 900 }} aria-label="tabela de técnicos">
+          <Table aria-label="Tabela de técnicos">
             <TableHead>
               <TableRow>
-                <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
-                  Nome
-                </TableCell>
-                <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
-                  Cargo
-                </TableCell>
-                <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
-                  E-mail
-                </TableCell>
-                <TableCell style={{ color: "#858B99", fontWeight: 600 }}>
-                  Ações
-                </TableCell>
+                <TableCell sx={{ color: "#858B99", fontWeight: 600 }}>Nome</TableCell>
+                <TableCell sx={{ color: "#858B99", fontWeight: 600 }}>Cargo</TableCell>
+                <TableCell sx={{ color: "#858B99", fontWeight: 600 }}>E-mail</TableCell>
+                <TableCell sx={{ color: "#858B99", fontWeight: 600 }}>Ações</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {filteredRows.length > 0 ? (
-                filteredRows.map((row) => (
-                  <TableRow key={row.id} hover>
-                    <TableCell>
-                      <Avatar
-                        initials={
-                          row.nome
-                            ? row.nome
-                                .split(" ")
-                                .map((n) => n[0])
-                                .join("")
-                                .slice(0, 2)
-                            : "??"
-                        }
-                      />
-                      {row.nome || "-"}
-                    </TableCell>
-                    <TableCell>{row.cargo || "-"}</TableCell>
-                    <TableCell>{row.email || "-"}</TableCell>
-                    <TableCell>
-                      <IconButton
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleOpenEdit(row);
-                        }}
-                      >
-                        <Pencil size={18} />
-                      </IconButton>
-                      <IconButton
-                        color="error"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleOpenDelete(row);
-                        }}
-                      >
-                        <Trash2 size={18} />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                ))
+              {filteredTecnicos.length > 0 ? (
+                filteredTecnicos.map((tec) => {
+                  const initials = tec.nome
+                    ? tec.nome
+                        .split(" ")
+                        .map((n) => (n && n.length > 0 ? n[0] : ""))
+                        .join("")
+                        .slice(0, 2)
+                        .toUpperCase()
+                    : "??";
+                  return (
+                    <TableRow key={tec.id} hover>
+                      <TableCell>
+                        <Avatar initials={initials} />
+                        {tec.nome || "-"}
+                      </TableCell>
+                      <TableCell>{tec.cargo || "-"}</TableCell>
+                      <TableCell>{tec.email || "-"}</TableCell>
+                      <TableCell>
+                        <IconButton onClick={() => handleOpenEdit(tec)}>
+                          <Pencil size={18} />
+                        </IconButton>
+                        <IconButton color="error" onClick={() => handleOpenDelete(tec)}>
+                          <Trash2 size={18} />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
               ) : (
                 <TableRow>
                   <TableCell
                     colSpan={4}
-                    style={{
-                      textAlign: "center",
-                      padding: "40px",
-                      color: "#999",
-                    }}
+                    style={{ textAlign: "center", padding: "40px", color: "#999" }}
                   >
                     Nenhum técnico encontrado com os filtros aplicados
                   </TableCell>
@@ -244,76 +279,39 @@ export default function TechnicianTable() {
             </TableBody>
           </Table>
         </TableContainer>
-      </div>
+      )}
 
-      {/* MOBILE CARDS */}
-      <div className="client-table-mobile">
-        {filteredRows.length > 0 ? (
-          filteredRows.map((row) => {
-            const initials = row.nome
-              ? row.nome
-                  .split(" ")
-                  .map((n) => (n && n.length > 0 ? n[0] : ""))
-                  .join("")
-                  .slice(0, 2)
-              : "??";
-            return (
-              <div className="client-card" key={row.id}>
-                <div className="client-card-header">
-                  <Avatar initials={initials} />
-                  <div className="client-card-title">{row.nome || "-"}</div>
-                </div>
-                <div className="client-card-info">
-                  <div>
-                    <b>Cargo:</b> {row.cargo || "-"}
-                  </div>
-                  <div>
-                    <b>E-mail:</b> {row.email || "-"}
-                  </div>
-                </div>
-                <div className="client-card-actions">
-                  <IconButton
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleOpenEdit(row);
-                    }}
-                  >
-                    <Pencil size={18} />
-                  </IconButton>
-                  <IconButton
-                    color="error"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleOpenDelete(row);
-                    }}
-                  >
-                    <Trash2 size={18} />
-                  </IconButton>
-                </div>
-              </div>
-            );
-          })
-        ) : (
-          <div className="client-card-empty">
-            Nenhum técnico encontrado com os filtros aplicados
-          </div>
-        )}
-      </div>
-
-      {/* Modal de deleção */}
-      <DeletarPerfil
-        isOpen={openDeleteModal}
-        onClose={handleCloseDelete}
-        onDelete={() => handleDeleteConfirmed(selectedRow?.id)}
-        usuario={selectedRow}
-      />
-
-      {/* Modal de edição */}
-      <ModalEditarTecnico
-        isOpen={openEditModal}
-        onClose={handleCloseEdit}
-        tecnico={selectedTecnicoEdit}
-      />
+      {/* Modal para confirmação de exclusão */}
+            <DeletarPerfil
+              isOpen={openDeleteModal}
+              onClose={handleCloseDelete}
+              onDelete={handleDeleteConfirmed}
+              usuario={selectedRow}
+            />
+      
+            {/* Modal para editar tecnico */}
+            <ModalEditarTecnico
+              isOpen={openEditModal}
+              onClose={handleCloseEdit}
+              tecnico={selectedTecnicoEdit}
+              onSuccess={handleEditSuccess} // Atualiza lista após edição
+            />
+      
+            {/* Snackbar para toasts */}
+            <Snackbar
+              open={toastOpen}
+              autoHideDuration={4000}
+              onClose={handleToastClose}
+              anchorOrigin={{ vertical: "top", horizontal: "right" }}
+            >
+              <Alert
+                onClose={handleToastClose}
+                severity={toastSeverity}
+                sx={{ width: "100%", bgcolor: "#604FEB", color: "#fff" }}
+              >
+                {toastMessage}
+              </Alert>
+            </Snackbar>
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, forwardRef } from "react";
 import {
   Table,
   TableBody,
@@ -8,8 +8,7 @@ import {
   TableRow,
   Paper,
   IconButton,
-  Typography,
-  useMediaQuery,
+  Snackbar,
 } from "@mui/material";
 import { Trash2, Pencil } from "lucide-react";
 import DeletarChamado from "./Modals/DeletarChamado";
@@ -20,6 +19,13 @@ import chamadosService from "../services/chamadosService";
 import { useSearch } from "../context/search-context";
 import StatusChip from "./StatusChip";
 import { useTheme } from "@emotion/react";
+import useIsMobile from "../hooks/useIsMobile";
+import MuiAlert from "@mui/material/Alert";
+import Spinner from "./LoadingSpinner";
+
+const Alert = forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 
 // Avatar com iniciais
 function AvatarInitials({ name }) {
@@ -53,44 +59,9 @@ function AvatarInitials({ name }) {
   );
 }
 
-// Spinner
-const LoadingSpinner = () => (
-  <div
-    style={{
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      height: "100vh",
-      width: "100vw",
-      position: "fixed",
-      top: 0,
-      left: 0,
-      backgroundColor: "rgba(255, 255, 255, 0.7)",
-      zIndex: 9999,
-    }}
-  >
-    <div
-      style={{
-        border: "6px solid #f3f3f3",
-        borderTop: "6px solid #604FEB",
-        borderRadius: "50%",
-        width: "40px",
-        height: "40px",
-        animation: "spin 1s linear infinite",
-      }}
-    />
-    <style>{`
-      @keyframes spin {
-        0% { transform: rotate(0deg);}
-        100% { transform: rotate(360deg);}
-      }
-    `}</style>
-  </div>
-);
-
 export default function ListTable() {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("md")); // telas menores que 600px
+  const isMobile = useIsMobile(1200);
 
   const { search, filters } = useSearch();
   const [rows, setRows] = useState([]);
@@ -105,6 +76,22 @@ export default function ListTable() {
 
   const [openEditModal, setOpenEditModal] = useState(false);
   const [selectedChamadoEdit, setSelectedChamadoEdit] = useState(null);
+
+  // Toast states
+  const [toastOpen, setToastOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastSeverity, setToastSeverity] = useState("success"); // "success", "error", etc.
+
+  const showToast = (message, severity = "success") => {
+    setToastMessage(message);
+    setToastSeverity(severity);
+    setToastOpen(true);
+  };
+
+  const handleToastClose = (_, reason) => {
+    if (reason === "clickaway") return;
+    setToastOpen(false);
+  };
 
   const fetchChamados = async () => {
     try {
@@ -121,7 +108,20 @@ export default function ListTable() {
   };
 
   useEffect(() => {
+    // Carregamento inicial
     fetchChamados();
+
+    // Polling ou atualização periódica
+    const interval = setInterval(async () => {
+      try {
+        const response = await api.get("/chamados");
+        setRows(response.data);
+      } catch (err) {
+        console.error("Erro ao atualizar chamados:", err);
+      }
+    }, 2000);
+
+    return () => clearInterval(interval);
   }, []);
 
   const handleOpenDelete = (chamado) => {
@@ -135,15 +135,24 @@ export default function ListTable() {
   };
 
   const handleDeleteConfirmed = async () => {
+    if (!selectedChamado) return;
+    if (["em_andamento"].includes(selectedChamado.status)) {
+      showToast("Não é permitido deletar chamados em andamento.", "error");
+      handleCloseDelete();
+      return;
+    }    
+
     try {
-      if (!selectedChamado) return;
       await api.delete(`/chamados/${selectedChamado.id}`);
       await fetchChamados();
+      showToast(`Chamado #${selectedChamado.id} deletado com sucesso`, "success");
     } catch (err) {
       console.error("Erro ao deletar chamado:", err);
+      showToast("Erro ao deletar chamado", "error");
     }
     handleCloseDelete();
   };
+
 
   const handleRowClick = (row) => {
     setSelectedChamadoDetalhes(row);
@@ -166,7 +175,6 @@ export default function ListTable() {
   };
 
   const handleEditSave = async (dadosEditados) => {
-    // Validação simples para evitar campos vazios
     if (!dadosEditados.titulo?.trim() || !dadosEditados.descricao?.trim()) {
       alert("Por favor, informe título e descrição.");
       return;
@@ -178,9 +186,11 @@ export default function ListTable() {
         descricao: dadosEditados.descricao,
       });
       await fetchChamados();
+      showToast(`Chamado #${selectedChamadoEdit.id} editado com sucesso`, "success");
       handleCloseEdit();
     } catch (error) {
       console.error("Erro ao atualizar chamado:", error);
+      showToast("Erro ao atualizar chamado", "error");
       alert("Erro ao atualizar chamado. Verifique os dados e tente novamente.");
     }
   };
@@ -191,12 +201,6 @@ export default function ListTable() {
       const matchesSearch =
         !textToSearch ||
         item.titulo.toLowerCase().includes(textToSearch) ||
-        (item.descricao &&
-          item.descricao.toLowerCase().includes(textToSearch)) ||
-        (item.cliente_nome &&
-          item.cliente_nome.toLowerCase().includes(textToSearch)) ||
-        (item.tecnico_nome &&
-          item.tecnico_nome.toLowerCase().includes(textToSearch));
         (item.descricao &&
           item.descricao.toLowerCase().includes(textToSearch)) ||
         (item.cliente_nome &&
@@ -229,8 +233,9 @@ export default function ListTable() {
 
   const filteredRows = applySearchAndFilters(rows);
 
-  if (loading) return <LoadingSpinner />;
-  if (error) return null;
+  if (loading) return <Spinner />;
+  if (error)
+    return <div style={{ color: "red", fontFamily: "Lato" }}>{error}</div>;
 
   return (
     <div
@@ -244,6 +249,21 @@ export default function ListTable() {
         fontFamily: "Lato",
       }}
     >
+      <Snackbar
+        open={toastOpen}
+        autoHideDuration={2000} // Tempo de expiração do toast
+        onClose={handleToastClose}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Alert
+          onClose={handleToastClose}
+          severity={toastSeverity}
+          sx={{ bgcolor: "#604FEB", color: "#fff" }}
+        >
+          {toastMessage}
+        </Alert>
+      </Snackbar>
+
       <div style={{ marginBottom: 16, color: "#666", fontSize: 14 }}>
         Mostrando {filteredRows.length} chamado
         {filteredRows.length !== 1 ? "s" : ""}
@@ -342,7 +362,7 @@ export default function ListTable() {
                   onClick={(e) => e.stopPropagation()}
                 >
                   <IconButton size="small">
-                    <Pencil size={18} />
+                    <Pencil size={18} onClick={() => handleOpenEdit(row)} />
                   </IconButton>
                   <IconButton
                     color="error"
@@ -369,47 +389,19 @@ export default function ListTable() {
             overflowX: "auto",
           }}
         >
-          <Table
-            aria-label="tabela de chamados"
-            size="medium"
-            sx={{ minWidth: 650 }}
-          >
+          <Table aria-label="tabela de chamados" size="medium" sx={{ minWidth: 650 }}>
             <TableHead>
               <TableRow>
-                <TableCell
-                  sx={{
-                    color: "#858B99",
-                    fontWeight: 600,
-                    whiteSpace: "nowrap",
-                  }}
-                >
+                <TableCell sx={{ color: "#858B99", fontWeight: 600, whiteSpace: "nowrap" }}>
                   Criado em
                 </TableCell>
-                <TableCell
-                  sx={{
-                    color: "#858B99",
-                    fontWeight: 600,
-                    whiteSpace: "nowrap",
-                  }}
-                >
+                <TableCell sx={{ color: "#858B99", fontWeight: 600, whiteSpace: "nowrap" }}>
                   ID
                 </TableCell>
-                <TableCell
-                  sx={{
-                    color: "#858B99",
-                    fontWeight: 600,
-                    whiteSpace: "nowrap",
-                  }}
-                >
+                <TableCell sx={{ color: "#858B99", fontWeight: 600, whiteSpace: "nowrap" }}>
                   Cliente
                 </TableCell>
-                <TableCell
-                  sx={{
-                    color: "#858B99",
-                    fontWeight: 600,
-                    whiteSpace: "nowrap",
-                  }}
-                >
+                <TableCell sx={{ color: "#858B99", fontWeight: 600, whiteSpace: "nowrap" }}>
                   Técnico
                 </TableCell>
                 <TableCell
@@ -423,22 +415,10 @@ export default function ListTable() {
                 >
                   Título / Descrição
                 </TableCell>
-                <TableCell
-                  sx={{
-                    color: "#858B99",
-                    fontWeight: 600,
-                    whiteSpace: "nowrap",
-                  }}
-                >
+                <TableCell sx={{ color: "#858B99", fontWeight: 600, whiteSpace: "nowrap" }}>
                   Status
                 </TableCell>
-                <TableCell
-                  sx={{
-                    color: "#858B99",
-                    fontWeight: 600,
-                    whiteSpace: "nowrap",
-                  }}
-                >
+                <TableCell sx={{ color: "#858B99", fontWeight: 600, whiteSpace: "nowrap" }}>
                   Ações
                 </TableCell>
               </TableRow>
@@ -452,12 +432,8 @@ export default function ListTable() {
                     onClick={() => handleRowClick(row)}
                     sx={{ cursor: "pointer" }}
                   >
-                    <TableCell sx={{ display: "flex", alignItems: "center" }}>
-                      {new Date(row.data_criacao).toLocaleDateString("pt-BR")}
-                    </TableCell>
-                    <TableCell sx={{ whiteSpace: "nowrap" }}>
-                      {row.id}
-                    </TableCell>
+                    <TableCell>{new Date(row.data_criacao).toLocaleDateString("pt-BR")}</TableCell>
+                    <TableCell>{row.id}</TableCell>
                     <TableCell
                       sx={{
                         whiteSpace: "nowrap",
@@ -468,13 +444,7 @@ export default function ListTable() {
                         paddingX: 1,
                       }}
                     >
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          minWidth: 0,
-                        }}
-                      >
+                      <div style={{ display: "flex", alignItems: "center", minWidth: 0 }}>
                         <AvatarInitials name={row.cliente_nome} />
                         <span
                           style={{
@@ -500,13 +470,7 @@ export default function ListTable() {
                         paddingX: 1,
                       }}
                     >
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          minWidth: 0,
-                        }}
-                      >
+                      <div style={{ display: "flex", alignItems: "center", minWidth: 0 }}>
                         <AvatarInitials name={row.tecnico_nome} />
                         <span
                           style={{
@@ -534,47 +498,21 @@ export default function ListTable() {
                         paddingX: 1,
                       }}
                     >
-                      <span
-                        style={{
-                          fontWeight: 600,
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          whiteSpace: "nowrap",
-                          display: "block",
-                          maxWidth: 210,
-                        }}
-                      >
+                      <span style={{ fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", display: "block", maxWidth: 210 }}>
                         {row.titulo}
                       </span>
-                      <span
-                        style={{
-                          color: "#888",
-                          fontSize: 13,
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          whiteSpace: "nowrap",
-                          display: "block",
-                          maxWidth: 210,
-                        }}
-                      >
+                      <span style={{ color: "#888", fontSize: 13, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", display: "block", maxWidth: 210 }}>
                         {row.descricao}
                       </span>
                     </TableCell>
-                    <TableCell sx={{ whiteSpace: "nowrap" }}>
+                    <TableCell>
                       <StatusChip label={row.status} />
                     </TableCell>
-                    <TableCell
-                      onClick={(e) => e.stopPropagation()}
-                      sx={{ whiteSpace: "nowrap" }}
-                    >
-                      <IconButton size="medium">
+                    <TableCell onClick={(e) => e.stopPropagation()}>
+                      <IconButton size="medium" onClick={() => handleOpenEdit(row)}>
                         <Pencil size={18} />
                       </IconButton>
-                      <IconButton
-                        color="error"
-                        size="medium"
-                        onClick={() => handleOpenDelete(row)}
-                      >
+                      <IconButton color="error" size="medium" onClick={() => handleOpenDelete(row)}>
                         <Trash2 size={18} />
                       </IconButton>
                     </TableCell>
@@ -582,10 +520,7 @@ export default function ListTable() {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell
-                    colSpan={7}
-                    sx={{ textAlign: "center", padding: 4, color: "#999" }}
-                  >
+                  <TableCell colSpan={7} sx={{ textAlign: "center", padding: 4, color: "#999" }}>
                     Nenhum chamado encontrado
                   </TableCell>
                 </TableRow>

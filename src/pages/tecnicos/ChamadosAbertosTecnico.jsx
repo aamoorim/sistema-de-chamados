@@ -1,27 +1,33 @@
 import React, { useState, useEffect } from "react";
 import { Outlet } from "react-router-dom";
-import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
 import SearchBar from "../../components/search-bar";
 import StatusChip from "../../components/StatusChip";
-import { SearchProvider } from "../../context/search-context";
-import ListTableTec from "../../components/tableTec";
+import { SearchProvider } from "../../context/search-context"
+import { Clock2 } from "lucide-react";
+import ListTableTec from "../../components/tableTec"; // Importando o ListTableTec
 import chamadosService from "../../services/chamadosService";
-import "./chamados.scss";
+import Spinner from "../../components/LoadingSpinner";
+import useIsMobile from "../../hooks/useIsMobile"; // Hook de responsividade
+import "./ChamadosAbertos.scss";
 
-export default function TecEmAndamento() {
+export default function ChamadosAbertos() {
   const [loading, setLoading] = useState(true);
   const [chamados, setChamados] = useState([]);
+  // const [openModal, setOpenModal] = useState(false);
+  
+
+  // Usando o hook useIsMobile para detectar se a tela é mobile
+  const isMobile = useIsMobile(1200);
 
   useEffect(() => {
     const fetchChamados = async () => {
       setLoading(true);
       try {
-        // Busca chamados abertos do técnico 
+        // Busca chamados abertos
         const data = await chamadosService.getChamadosAbertosDisponiveis();
         setChamados(data);
       } catch (error) {
-        console.error("Erro ao buscar chamados do técnico", error);
+        console.error("Erro ao buscar chamados", error);
         setChamados([]);
       } finally {
         setLoading(false);
@@ -31,72 +37,70 @@ export default function TecEmAndamento() {
     fetchChamados();
   }, []);
 
-  const LoadingSpinner = () => (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "100vh",
-        width: "100vw",
-        position: "fixed",
-        top: 0,
-        left: 0,
-        backgroundColor: "rgba(255, 255, 255, 0.7)",
-        zIndex: 9999,
-      }}
-    >
-      <div
-        style={{
-          border: "6px solid #f3f3f3",
-          borderTop: "6px solid #604FEB",
-          borderRadius: "50%",
-          width: "40px",
-          height: "40px",
-          animation: "spin 1s linear infinite",
-        }}
-      />
-      <style>{`
-        @keyframes spin {
-          0% { transform: rotate(0deg);}
-          100% { transform: rotate(360deg);}
-        }
-      `}</style>
-    </div>
-  );
-
   if (loading) {
-    return <LoadingSpinner />;
+    return <Spinner />;
   }
-
   return (
-    <Box sx={{ p: 3, minHeight: "100vh" }}>
+    <div className="chamadosAbertos" style={{ minHeight: "100vh" }}>
       {/* Título */}
-      <Typography
-        component="h1"
-        variant="h4"
-        sx={{ color: "#1e3a8a", fontWeight: 600, mb: 2, ml: 2.7 }}
-      >
-        Chamados
-      </Typography>
+      <div className="chamados-abertos-header">
+        <h1>Chamados Abertos</h1>
+      </div>
 
       {/* SearchBar */}
-      <Box sx={{ ml: 2.7 }}>
+      <div className="search-bar-abertos-container">
         <SearchProvider>
           <SearchBar />
         </SearchProvider>
-      </Box>
+      </div>
 
-      {/* StatusChip logo abaixo da barra */}
-      <Box>
+      {/* StatusChip */}
+      <div className="status-chip-container">
         <StatusChip label="Espera" />
-      </Box>
+      </div>
 
-      {/* Tabela */}
-      <ListTableTec chamados={chamados} />
+      {/* Renderização condicional baseado no tamanho da tela */}
+      {isMobile ? (
+        // Renderiza os Cards em telas pequenas (abaixo de 1200px)
+        <div className="cards-abertos-container">
+          {chamados.length > 0 ? (
+            chamados.map((chamado) => (
+              <div
+                key={chamado.id}
+                className="chamado-aberto-card espera"
+                onClick={() => handleOpenModal(chamado)}
+                style={{ cursor: "pointer" }}
+              >
+                <div className="card-aberto-main">
+                  <div className="chamado-aberto-info">
+                    <div className="chamado-aberto-codigo">{chamado.codigo || chamado.id}</div>
+                    <div className="chamado-aberto-titulo">{chamado.titulo || chamado.tipo}</div>
+                    <div className="chamado-aberto-descricao">{chamado.descricao}</div>
+                    <div className="chamado-aberto-data">{chamado.data_criacao || chamado.data}</div>
+                  </div>
+                </div>
+                <div className="card-aberto-footer">
+                  <div className="user-info">
+                    <div className="user-avatar">{chamado.avatar}</div>
+                    <span className="user-name">{chamado.cliente_nome || chamado.usuario}</span>
+                    <div className={`status-icon ${chamado.status}`}>
+                      <Clock2 size={16} color="#D03E3E" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="no-calls-message">Nenhum chamado aberto encontrado</div>
+          )}
+        </div>
+      ) : (
+        // Renderiza a Tabela em telas grandes (acima de 1200px)
+        <ListTableTec className="tabelaAbertos" chamados={chamados} />
+      )}
 
       {/* Outlet para rotas filhas, se necessário */}
       <Outlet />
-    </Box>
+    </div>
   );
 }

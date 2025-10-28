@@ -5,14 +5,9 @@ import "../index.scss";
 
 export default function TecnicoLayout() {
   return (
-    <div className="calls-admin">
-      
+    <div>
         <SideBar />
-        <main className="calls-admin-main">
-          
-          <Outlet /> 
-        </main>
-      
+        <Outlet /> 
     </div>
   );
 }

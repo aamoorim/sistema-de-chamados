@@ -7,7 +7,7 @@ function CallAdmin() {
       <>
       
       <h1>Chamados</h1>
-    <div className="calls-admin">
+      <div className="calls-admin">
       <ListTable />
       <div className="">
       <Outlet />  

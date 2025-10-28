@@ -5,6 +5,8 @@ import ModalChamadoDetalhes from "../../components/Modals/DetalhesChamados";
 import chamadoService from "../../services/chamadosService";
 import { useAuth } from "../../context/auth-context";
 import api from "../../services/api";
+import Botao from "../../components/Button.jsx";
+import Spinner from "../../components/LoadingSpinner"; // 🔹 Importando o spinner
 
 export default function ChamadosTecnico() {
   const { token } = useAuth();
@@ -12,28 +14,23 @@ export default function ChamadosTecnico() {
   const [tecnicos, setTecnicos] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const [chamadoSelecionado, setChamadoSelecionado] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [encerrandoId, setEncerrandoId] = useState(null);
 
-  // Função para buscar TODOS os chamados (incluindo encerrados)
   const recarregarChamados = async () => {
     if (!token) return;
     setLoading(true);
-    
+
     try {
-      // Primeiro tenta o endpoint que retorna todos os chamados
       let data;
       try {
         const response = await api.get("/chamados/todos");
         data = response.data;
-        console.log(`✅ Buscou todos os chamados: ${data.length} encontrados`);
-      } catch (error) {
-        // Fallback para o endpoint original se /todos não existir
-        console.log("⚠️ Endpoint /todos não disponível, usando /chamados");
+      } catch {
         data = await chamadoService.getChamadosDoCliente();
       }
-      
+
       setChamados(data);
-      
     } catch (error) {
       console.error("Erro ao buscar chamados:", error);
       setChamados([]);
@@ -49,7 +46,6 @@ export default function ChamadosTecnico() {
   useEffect(() => {
     const fetchUsuarioAtual = async () => {
       if (!token) return;
-
       try {
         const response = await chamadoService.getUsuarioAtual();
         if (response && response.id) setTecnicos([response]);
@@ -62,7 +58,7 @@ export default function ChamadosTecnico() {
       try {
         const response = await chamadoService.getTecnicos();
         setTecnicos(response);
-      } catch (error) {
+      } catch {
         setTecnicos([]);
       }
     };
@@ -70,64 +66,47 @@ export default function ChamadosTecnico() {
     fetchUsuarioAtual();
   }, [token]);
 
-  // Filtros para os chamados
   const andamentoChamados = chamados.filter((c) => {
     const status = c.status?.toLowerCase()?.trim();
-    return status === "em_andamento" || 
-           status === "em andamento" ||
-           status === "andamento" ||
-           status?.includes("andamento");
+    return (
+      status === "em_andamento" ||
+      status === "em andamento" ||
+      status === "andamento" ||
+      status?.includes("andamento")
+    );
   });
 
   const finalizadosChamados = chamados.filter((c) => {
     const status = c.status?.toLowerCase()?.trim();
-    return status === "encerrado" || 
-           status === "finalizado" || 
-           status === "concluido" || 
-           status === "concluído" ||
-           status === "fechado" ||
-           status?.includes("encerr") ||
-           status?.includes("finaliz") ||
-           status?.includes("conclu");
+    return (
+      status === "encerrado" ||
+      status === "finalizado" ||
+      status === "concluido" ||
+      status === "concluído" ||
+      status === "fechado" ||
+      status?.includes("encerr") ||
+      status?.includes("finaliz") ||
+      status?.includes("conclu")
+    );
   });
 
   const handleEncerrar = async (event, chamadoId) => {
     event.stopPropagation();
-
-    const button = event.currentTarget;
-    const ripple = document.createElement("span");
-    ripple.classList.add("ripple");
-    const rect = button.getBoundingClientRect();
-    ripple.style.left = `${event.clientX - rect.left}px`;
-    ripple.style.top = `${event.clientY - rect.top}px`;
-    button.appendChild(ripple);
-    setTimeout(() => ripple.remove(), 800);
+    setEncerrandoId(chamadoId);
 
     try {
-      console.log(`Encerrando chamado ${chamadoId}...`);
-      
-      // Atualiza no backend
       await chamadoService.atualizarChamado(chamadoId, { status: "encerrado" });
-      
-      // Atualiza o estado local
+
       setChamados((prev) =>
         prev.map((chamado) =>
-          chamado.id === chamadoId
-            ? { ...chamado, status: "encerrado" }
-            : chamado
+          chamado.id === chamadoId ? { ...chamado, status: "encerrado" } : chamado
         )
       );
-      
-      console.log(`✅ Chamado ${chamadoId} encerrado com sucesso`);
-      
-      // Recarrega dados para garantir sincronização
-      setTimeout(() => {
-        recarregarChamados();
-      }, 500);
-      
     } catch (error) {
       console.error("Erro ao encerrar chamado:", error);
       alert("Erro ao encerrar chamado. Tente novamente.");
+    } finally {
+      setEncerrandoId(null);
     }
   };
 
@@ -136,140 +115,132 @@ export default function ChamadosTecnico() {
     setOpenModal(true);
   };
 
-  const LoadingSpinner = () => (
+  // Spinner para o botão
+  const ButtonSpinner = () => (
     <div
       style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "100vh",
-        width: "100vw",
-        position: "fixed",
-        top: 0,
-        left: 0,
-        backgroundColor: "rgba(255, 255, 255, 0.7)",
-        zIndex: 9999,
+        border: "3px solid #f3f3f3",
+        borderTop: "3px solid #604FEB",
+        borderRadius: "50%",
+        width: "18px",
+        height: "18px",
+        animation: "spin 1s linear infinite",
+        margin: "0 auto",
       }}
-    >
-      <div
-        style={{
-          border: "6px solid #f3f3f3",
-          borderTop: "6px solid #604FEB",
-          borderRadius: "50%",
-          width: "40px",
-          height: "40px",
-          animation: "spin 1s linear infinite",
-        }}
-      />
-      <style>{`
-        @keyframes spin {
-          0% { transform: rotate(0deg);}
-          100% { transform: rotate(360deg);}
-        }
-      `}</style>
-    </div>
+    />
   );
+
+  // 🔹 Exibição condicional igual ao ChamadosAbertos
+  if (loading) {
+    return (
+      <div style={{ minHeight: "100vh", display: "flex", justifyContent: "center", alignItems: "center" }}>
+        <Spinner />
+      </div>
+    );
+  }
 
   return (
     <div className="tecnico-chamados">
-      <div className="header">
+      <div className="header-tecnico">
         <h1>Meus chamados</h1>
       </div>
 
-      {loading ? (
-        <LoadingSpinner />
-      ) : (
-        <>
-          {/* Em Atendimento */}
-          <div className="section">
-            <div className="section-header andamento">
-              <Clock2 size={16} /> Em atendimento ({andamentoChamados.length})
-            </div>
-            <div className="chamados-list">
-              {andamentoChamados.length > 0 ? (
-                andamentoChamados.map((chamado) => (
-                  <div
-                    key={chamado.id}
-                    className="chamado-card andamento"
-                    onClick={() => handleOpenModal(chamado)}
-                    style={{ cursor: "pointer" }}
+      {/* Em Atendimento */}
+      <div className="section-tecnico">
+        <div className="section-tecnico-header andamento">
+          <Clock2 size={16} className="status" /> Em atendimento ({andamentoChamados.length})
+        </div>
+        <div className="chamados-tecnico-list">
+          {andamentoChamados.length > 0 ? (
+            andamentoChamados.map((chamado) => (
+              <div
+                key={chamado.id}
+                className="chamado-tecnico-card andamento"
+                onClick={() => handleOpenModal(chamado)}
+                style={{ cursor: "pointer" }}
+              >
+                <div className="card-tecnico-main">
+                  <div className="chamado-tecnico-info">
+                    <div className="chamado-tecnico-codigo">{chamado.codigo || chamado.id}</div>
+                    <div className="chamado-tecnico-titulo">{chamado.titulo || chamado.tipo}</div>
+                    <div className="chamado-tecnico-descricao">{chamado.descricao}</div>
+                    <div className="chamado-tecnico-data">{chamado.data_criacao || chamado.data}</div>
+                  </div>
+                  <Botao
+                    onClick={(e) => handleEncerrar(e, chamado.id)}
+                    text={encerrandoId === chamado.id ? "" : "Encerrar"}
+                    icon={encerrandoId === chamado.id ? null : CircleCheckBig}
+                    sx={{
+                      height: 35,
+                      fontSize: "1rem",
+                      "& svg": {
+                        fontSize: 18,
+                      },
+                      borderRadius: "0.5rem",
+                      position: "relative",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
                   >
-                    <div className="card-main">
-                      <div className="chamado-info">
-                        <div className="chamado-codigo">{chamado.codigo || chamado.id}</div>
-                        <div className="chamado-titulo">{chamado.titulo || chamado.tipo}</div>
-                        <div className="chamado-descricao">{chamado.descricao}</div>
-                        <div className="chamado-data">{chamado.data_criacao || chamado.data}</div>
-                      </div>
-                      <button
-                        className="btn-encerrar"
-                        onClick={(e) => handleEncerrar(e, chamado.id)}
-                      >
-                        <CircleCheckBig size={15} style={{ marginRight: "4px" }} />
-                        Encerrar
-                      </button>
-                    </div>
-                    <div className="card-footer">
-                      <div className="user-info">
-                        <div className="user-avatar">{chamado.avatar}</div>
-                        <span className="user-name">{chamado.cliente_nome || chamado.usuario}</span>
-                        <div className={`status-icon ${chamado.status}`}>
-                          <Clock2 size={16} />
-                        </div>
-                      </div>
+                    {encerrandoId === chamado.id && <ButtonSpinner />}
+                  </Botao>
+                </div>
+                <div className="card-tecnico-footer">
+                  <div className="user-info">
+                    <div className="user-avatar">{chamado.avatar}</div>
+                    <span className="user-name">{chamado.cliente_nome || chamado.usuario}</span>
+                    <div className={`status-icon ${chamado.status}`}>
+                      <Clock2 size={16} />
                     </div>
                   </div>
-                ))
-              ) : (
-                <p style={{ color: "#64748b", paddingLeft: "8px" }}>
-                  Nenhum chamado em andamento
-                </p>
-              )}
-            </div>
-          </div>
+                </div>
+              </div>
+            ))
+          ) : (
+            <p style={{ color: "#64748b", paddingLeft: 8 }}>Nenhum chamado em andamento</p>
+          )}
+        </div>
+      </div>
 
-          {/* Encerrados */}
-          <div className="section">
-            <div className="section-header finalizado">
-              <Check size={16} /> Encerrados ({finalizadosChamados.length})
-            </div>
-            <div className="chamados-list">
-              {finalizadosChamados.length > 0 ? (
-                finalizadosChamados.map((chamado) => (
-                  <div
-                    key={chamado.id}
-                    className="chamado-card finalizado"
-                    onClick={() => handleOpenModal(chamado)}
-                    style={{ cursor: "pointer" }}
-                  >
-                    <div className="card-main">
-                      <div className="chamado-info">
-                        <div className="chamado-codigo">{chamado.codigo || chamado.id}</div>
-                        <div className="chamado-titulo">{chamado.titulo || chamado.tipo}</div>
-                        <div className="chamado-descricao">{chamado.descricao}</div>
-                        <div className="chamado-data">{chamado.data_criacao || chamado.data}</div>
-                      </div>
-                    </div>
-                    <div className="card-footer">
-                      <div className="user-info">
-                        <div className="user-avatar">{chamado.avatar}</div>
-                        <span className="user-name">{chamado.cliente_nome || chamado.usuario}</span>
-                        <div className={`status-icon ${chamado.status}`}>
-                          <Check size={16} />
-                        </div>
-                      </div>
+      {/* Encerrados */}
+      <div className="section-tecnico">
+        <div className="section-tecnico-header finalizado">
+          <Check size={16} className="status" /> Encerrados ({finalizadosChamados.length})
+        </div>
+        <div className="chamados-tecnico-list">
+          {finalizadosChamados.length > 0 ? (
+            finalizadosChamados.map((chamado) => (
+              <div
+                key={chamado.id}
+                className="chamado-tecnico-card finalizado"
+                onClick={() => handleOpenModal(chamado)}
+                style={{ cursor: "pointer" }}
+              >
+                <div className="card-tecnico-main">
+                  <div className="chamado-tecnico-info">
+                    <div className="chamado-tecnico-codigo">{chamado.codigo || chamado.id}</div>
+                    <div className="chamado-tecnico-titulo">{chamado.titulo || chamado.tipo}</div>
+                    <div className="chamado-tecnico-descricao">{chamado.descricao}</div>
+                    <div className="chamado-tecnico-data">{chamado.data_criacao || chamado.data}</div>
+                  </div>
+                </div>
+                <div className="card-tecnico-footer">
+                  <div className="user-info">
+                    <div className="user-avatar">{chamado.avatar}</div>
+                    <span className="user-name">{chamado.cliente_nome || chamado.usuario}</span>
+                    <div className={`status-icon ${chamado.status}`}>
+                      <Check size={16} />
                     </div>
                   </div>
-                ))
-              ) : (
-                <p style={{ color: "#64748b", paddingLeft: "8px" }}>
-                  Nenhum chamado encerrado
-                </p>
-              )}
-            </div>
-          </div>
-        </>
-      )}
+                </div>
+              </div>
+            ))
+          ) : (
+            <p style={{ color: "#64748b", paddingLeft: 8 }}>Nenhum chamado encerrado</p>
+          )}
+        </div>
+      </div>
 
       <ModalChamadoDetalhes
         isOpen={openModal}
@@ -277,6 +248,12 @@ export default function ChamadosTecnico() {
         chamado={chamadoSelecionado}
         tecnicos={tecnicos.length > 0 ? tecnicos : []}
       />
+      <style>{`
+        @keyframes spin {
+          0% { transform: rotate(0deg);}
+          100% { transform: rotate(360deg);}
+        }
+      `}</style>
     </div>
   );
 }

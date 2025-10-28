@@ -6,9 +6,7 @@ export default function TecnicosAdmin() {
         <>
 
                 <h1>Técnicos</h1>
-            <div className="calls-admin">
                 <TecnicosTable />
-            </div>
             <Outlet />
 
         </>
