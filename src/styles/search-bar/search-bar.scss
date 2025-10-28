@@ -1,3 +1,79 @@
+// VARIÁVEIS
+
+$color-primary: #3b83f6;
+$color-primary-hover: #2563eb;
+$color-secondary: #64748b;
+$color-success: #caecb1;
+$color-warning: #a5bbeb;
+$color-danger: #ef4444;
+$color-icon: #355ec5;
+$color-espera: #ffd93d;
+
+
+$bg-main: #ffffff;
+$bg-sidebar: #1e293b;
+$bg-card: #ffffff;
+$bg-app: #f1f5f9;
+$bg-hover: #f8fafc;
+
+
+$text-primary: #0f172a;
+$text-secondary: #64748b;
+$text-muted: #94a3b8;
+$text-white: #ffffff;
+
+
+$border-light: #e2e8f0;
+$border-dark: #334155;
+
+
+$spacing-xs: 4px;
+$spacing-sm: 8px;
+$spacing-md: 12px;
+$spacing-lg: 16px;
+$spacing-xl: 20px;
+$spacing-2xl: 24px;
+$spacing-3xl: 32px;
+$spacing-4xl: 40px;
+
+$radius-sm: 6px;
+$radius-md: 8px;
+$radius-lg: 12px;
+$radius-xl: 16px;
+$radius-2xl: 20px;
+$radius-full: 50%;
+
+$shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+$shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+$shadow-lg: 0 8px 25px rgba(0, 0, 0, 0.1);
+$shadow-primary: 0 2px 8px rgba(59, 130, 246, 0.3);
+
+$font-normal: 400;
+$font-medium: 500;
+$font-semibold: 600;
+$font-bold: 700;
+
+
+$text-xs: 12px;
+$text-sm: 13px;
+$text-base: 14px;
+$text-lg: 16px;
+$text-xl: 18px;
+$text-2xl: 20px;
+$text-3xl: 28px;
+
+$transition-fast: 0.15s ease;
+$transition-base: 0.2s ease;
+$transition-slow: 0.3s ease;
+
+$breakpoint-xxs: 360px;
+$breakpoint-xs: 480px;
+$breakpoint-sm: 576px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 992px;
+$breakpoint-xl: 1200px;
+$breakpoint-xxl: 2000px;
+$breakpoint-xxxl: 4000px;
 .search-bar-container {
   display: flex;
   flex-wrap: wrap;
@@ -6,12 +82,13 @@
   width: 100%;
   margin-bottom: 24px;
   max-width: 100%;
+  
 }
 
 
 .search-input-wrapper {
   position: relative;
-  width: 400px;
+  width: 100%;
   flex: 1;
 }
 
@@ -340,3 +417,222 @@
 
 /* Modificação no botão footer para ser clicável */
 
+@media screen and (lg) {
+  .search-bar-container {
+    margin-bottom: 25px !important; 
+  }
+  
+}
+
+/* Responsividade: quando a largura for <= 992px, abaixa um pouco o conteúdo da search-bar */
+@media (max-width: $breakpoint-xl) {
+  .search-bar-container {
+    margin-top: 12px !important;
+    margin-bottom: 20px !important;
+    transform: translateY(8px) !important;
+    transition: transform 0.2s ease, margin 0.2s ease !important;
+    width: 100%;
+    
+  }
+
+  .search-input-wrapper {
+    width: 100% !important;
+  }
+
+  /* Garante ícone alinhado depois do ajuste */
+  .search-icon {
+    left: 12px !important;
+  }
+}
+
+@media (max-width: $breakpoint-md) {
+  .search-bar-container {
+    margin-top: 25px !important;
+    margin-bottom: 20px !important; 
+    transform: translateY(8px) !important;
+    transition: transform 0.2s ease, margin 0.2s ease !important;
+    width: 100% !important;
+  
+  }
+
+  .search-input-wrapper {
+    width: 100% !important;
+  }
+
+  /* Garante ícone alinhado depois do ajuste */
+  .search-icon {
+    left: 12px !important;
+  }
+}
+
+@media (max-width: $breakpoint-xs ) {
+  .search-bar-container {
+    margin-top: 25px !important;
+    margin-bottom: 20px !important;
+    transform: translateY(8px) !important;
+    transition: transform 0.2s ease, margin 0.2s ease !important;
+    width: 100%;
+  }
+
+  .search-input-wrapper {
+    width: 100% !important;
+  }
+
+  /* Garante ícone alinhado depois do ajuste */
+  .search-icon {
+    left: 12px !important;
+  }
+}
+
+// Tablets e notebooks médios
+@media (max-width: $breakpoint-xl) {
+  .search-bar-container {
+    margin-top: 12px !important;
+    margin-bottom: 20px !important;
+    transform: translateY(8px) !important;
+    width: 100% !important;
+  }
+
+  .search-input-wrapper {
+    width: 100% !important;
+  }
+}
+
+// Tablets menores
+@media (max-width: $breakpoint-md) {
+  .search-bar-container {
+    flex-direction: column !important; 
+    align-items: stretch !important;
+    margin-top: 16px !important;
+  }
+
+  .search-input-wrapper {
+    width: 100% !important;
+  }
+
+  .search-input {
+    font-size: 13px !important;
+    padding: 8px 36px !important;
+  }
+}
+
+// Celulares pequenos
+@media (max-width: $breakpoint-sm) {
+  .search-bar-container {
+    flex-direction: column !important;
+    gap: 8px !important;
+    margin-top: 20px !important;
+    margin-bottom: 16px !important;
+  }
+
+  .search-input-wrapper {
+    width: 100% !important;
+  }
+
+  .search-input {
+    font-size: 12px !important;
+    padding: 8px 32px !important;
+    border-radius: 8px !important;
+  }
+
+  .search-icon {
+    left: 10px !important;
+    width: 16px !important;
+    height: 16px !important;
+  }
+
+  .filter-button {
+    font-size: 12px !important;
+    padding: 6px 10px !important;
+  }
+}
+
+// === Ajuste para telas muito grandes ===
+
+// Monitores 2K e ultrawide
+@media (min-width: $breakpoint-xxl) {
+  .search-bar-container {
+    max-width: 1600px !important; // limita o tamanho em telas enormes
+    margin: 0 auto 32px auto !important; // centraliza
+    gap: 20px !important ;
+  }
+
+  .search-input-wrapper {
+    width: 600px !important;  // aumenta a largura do campo
+  }
+
+  .search-input {
+    font-size: 16px !important;
+    padding: 12px 48px !important;
+  }
+
+  .filter-button {
+    font-size: 15px !important;
+    padding: 10px 14px !important;
+  }
+}
+
+// Telas *gigantes* (4K e além)
+@media (min-width: $breakpoint-xxxl) {
+  .search-bar-container {
+    width: 2200px !important;
+    gap: 28px !important;
+  }
+
+  .search-input-wrapper {
+    width: 800px !important;
+  }
+
+  .search-input {
+    font-size: 18px !important;
+    padding: 14px 52px !important;
+  }
+
+  .filter-button {
+    font-size: 16px !important;
+    padding: 12px 18px !important;
+  }
+}
+
+// Telas muito pequenas (320px ou menos)
+@media (max-width: 320px) {
+  .search-bar-container {
+    gap: 4px !important;
+    padding: 0 2px !important;
+  }
+  .search-input-wrapper {
+    width: 100% !important;
+    min-width: 144px !important;
+  }
+  .search-input {
+    font-size: 11px !important;
+    padding: 6px 24px !important;
+    min-width: 144px !important;
+    max-width: 100% !important;
+  }
+  .search-icon {
+    left: 6px !important;
+    width: 14px !important;
+    height: 14px !important;
+  }
+}
+
+// Telas minúsculas (200px ou menos)
+@media (max-width: 200px) {
+  .search-input-wrapper,
+  .search-input {
+    min-width: 100px !important;
+    font-size: 10px !important;
+    padding: 4px 12px !important;
+  }
+}
+
+// Telas extremas (144px ou menos)
+@media (max-width: 144px) {
+  .search-input-wrapper,
+  .search-input {
+    min-width: 60px !important;
+    font-size: 9px !important;
+    padding: 2px 6px !important;
+  }
+}
