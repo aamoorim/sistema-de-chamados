@@ -93,11 +93,11 @@ export default function AdminLayout() {
   const config = getButtonConfig();
 
   return (
-    <div className="calls-admin">
+    <div>
       <SearchProvider>
         <SideBar />
-        <main className="calls-admin-main">
-          <div className="header-admin">
+        <main >
+          <div>
             <SearchBar />
             {config && (
               <Botao icon={Plus} text={config.text} onClick={() => setOpen(true)} />
