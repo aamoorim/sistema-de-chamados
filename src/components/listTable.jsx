@@ -238,17 +238,7 @@ export default function ListTable() {
     return <div style={{ color: "red", fontFamily: "Lato" }}>{error}</div>;
 
   return (
-    <div
-      style={{
-        width: "100%",
-        maxWidth: 1200,
-        margin: "0 auto",
-        padding: "12px 16px",
-        boxSizing: "border-box",
-        overflowX: "auto",
-        fontFamily: "Lato",
-      }}
-    >
+    <div className="tabela">
       <Snackbar
         open={toastOpen}
         autoHideDuration={2000} // Tempo de expiração do toast

@@ -1,6 +1,5 @@
 /* styles.scss para a página ChamadosAdmin */
 
-
 .calls-admin {
   display: flex;
   min-height: 100vh;
@@ -23,12 +22,15 @@
   min-width: 0;
 }
 
-.calls-admin-main h1 {
+.header-chamados-admin {
   font-size: 30px;
   font-weight: bold;
   color: #2E3DA3;
   margin-bottom: 24px;
+  // Provisório, no pc traz o título pra direita
+  margin-left: 21vw;
 }
+
 /* Espaço para o conteúdo principal, se houver */
 /* Barra de busca e filtro */
 .calls-admin-search {
