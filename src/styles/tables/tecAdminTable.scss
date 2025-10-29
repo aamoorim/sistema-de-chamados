@@ -131,7 +131,7 @@ $breakpoint-xxxl: 4000px;
   font-size: calc(#{$size} * 0.36);
 }
 
-@mixin status-border($color, $width: 3px) {
+@mixin status-border($color: $color-warning, $width: 3px) {
   border-left: $width solid $color;
 }
 
@@ -140,6 +140,7 @@ $breakpoint-xxxl: 4000px;
     @content;
   }
 }
+
 
 // RESET E BASE
 * {
@@ -153,7 +154,7 @@ body {
   overflow-x: hidden;
 }
 
-.tabela-chamados-admin{
+.tabela-tecnicos-admin{
   margin-left: 15vw;
 
   // Para telas menores que $breakpoint-xs
@@ -213,25 +214,5 @@ body {
     min-width: 56vw;
     max-width: 90vw;
     margin-left: 8vw;
-  }
-}
-
-.chamados-admin-cards {
-  @include card($spacing-lg, $radius-md, $shadow-sm);
-  width: 100%;
-  padding: 24px 28px;
-  font-size: 14px;
-  line-height: 1.4;
-
-  &.espera {
-    @include status-border(#b91c1cea);
-  }
-
-  &.finalizado {
-    @include status-border($color-success);
-  }
-
-  &.andamento {
-    @include status-border($color-warning);
   }
 }

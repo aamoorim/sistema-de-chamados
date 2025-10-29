@@ -170,35 +170,41 @@ export default function ClientAdminTabe() {
 
   if (loading) return <Spinner />; // Mostra spinner enquanto carrega
 
-  return (
+return (
+  <div className="tabela-clientes-admin">
     <div style={{ fontFamily: "Lato" }}>
       {/* Informações de quantidade */}
       <div style={{ marginBottom: 16, color: "#666", fontSize: 14 }}>
         Mostrando {filteredRows.length} de {clientes.length} clientes
       </div>
 
-      {/* Layout móvel simplificado */}
+      {/* Layout móvel */}
       {isMobile ? (
-        <div className="client-table-mobile">
-          {filteredRows.map((row) => (
-            <div key={row.id} className="client-card">
-              <div><b>Nome:</b> {row.nome}</div>
-              <div><b>Empresa:</b> {row.empresa}</div>
-              <div><b>Setor:</b> {row.setor}</div>
-              <div><b>Email:</b> {row.email}</div>
-              <div className="actions">
-                <IconButton onClick={() => handleOpenEdit(row)}>
-                  <Pencil size={18} />
-                </IconButton>
-                <IconButton color="error" onClick={() => handleOpenDelete(row)}>
-                  <Trash2 size={18} />
-                </IconButton>
+        <div className="client-cards-container">
+          {filteredRows.length > 0 ? (
+            filteredRows.map((row) => (
+              <div key={row.id} className="client-card">
+                <div><b>Nome:</b> {row.nome}</div>
+                <div><b>Empresa:</b> {row.empresa}</div>
+                <div><b>Setor:</b> {row.setor}</div>
+                <div><b>Email:</b> {row.email}</div>
+                <div className="actions">
+                  <IconButton onClick={() => handleOpenEdit(row)}>
+                    <Pencil size={18} />
+                  </IconButton>
+                  <IconButton color="error" onClick={() => handleOpenDelete(row)}>
+                    <Trash2 size={18} />
+                  </IconButton>
+                </div>
               </div>
+            ))
+          ) : (
+            <div style={{ textAlign: "center", color: "#999", padding: 32 }}>
+              Nenhum cliente encontrado com os filtros aplicados
             </div>
-          ))}
+          )}
         </div>
       ) : (
-        // Layout desktop: tabela completa
         <TableContainer
           component={Paper}
           sx={{
@@ -214,6 +220,7 @@ export default function ClientAdminTabe() {
           }}
         >
           <Table aria-label="tabela de clientes">
+            {/* Cabeçalho */}
             <TableHead>
               <TableRow>
                 <TableCell sx={{ color: "#858B99", fontWeight: 600 }}>Nome</TableCell>
@@ -223,10 +230,11 @@ export default function ClientAdminTabe() {
                 <TableCell sx={{ color: "#858B99", fontWeight: 600 }}>Ações</TableCell>
               </TableRow>
             </TableHead>
+
+            {/* Corpo da tabela */}
             <TableBody>
               {filteredRows.length > 0 ? (
                 filteredRows.map((row) => {
-                  // Pega as iniciais para o avatar, máximo 2 letras
                   const initials = row.nome
                     ? row.nome
                         .split(" ")
@@ -238,14 +246,25 @@ export default function ClientAdminTabe() {
 
                   return (
                     <TableRow key={row.id} hover>
+                      {/* Nome com Avatar */}
                       <TableCell>
-                        <Avatar initials={initials} />
-                        {row.nome || "-"}
+                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                          <Avatar initials={initials} />
+                          <span>{row.nome || "-"}</span>
+                        </div>
                       </TableCell>
+
+                      {/* Empresa */}
                       <TableCell>{row.empresa || "-"}</TableCell>
+
+                      {/* Setor */}
                       <TableCell>{row.setor || "-"}</TableCell>
+
+                      {/* E-mail */}
                       <TableCell>{row.email || "-"}</TableCell>
-                      <TableCell>
+
+                      {/* Ações */}
+                      <TableCell onClick={(e) => e.stopPropagation()}>
                         <IconButton onClick={() => handleOpenEdit(row)}>
                           <Pencil size={18} />
                         </IconButton>
@@ -257,15 +276,10 @@ export default function ClientAdminTabe() {
                   );
                 })
               ) : (
-                // Mensagem se nenhum cliente encontrado
                 <TableRow>
                   <TableCell
                     colSpan={5}
-                    style={{
-                      textAlign: "center",
-                      padding: "40px",
-                      color: "#999",
-                    }}
+                    sx={{ textAlign: "center", padding: 4, color: "#999" }}
                   >
                     Nenhum cliente encontrado com os filtros aplicados
                   </TableCell>
@@ -276,7 +290,7 @@ export default function ClientAdminTabe() {
         </TableContainer>
       )}
 
-      {/* Modal para confirmação de exclusão */}
+      {/* Modais */}
       <DeletarPerfil
         isOpen={openDeleteModal}
         onClose={handleCloseDelete}
@@ -284,15 +298,14 @@ export default function ClientAdminTabe() {
         usuario={selectedRow}
       />
 
-      {/* Modal para editar cliente */}
       <ModalEditarCliente
         isOpen={openEditModal}
         onClose={handleCloseEdit}
         cliente={selectedClienteEdit}
-        onSuccess={handleEditSuccess} // Atualiza lista após edição
+        onSuccess={handleEditSuccess}
       />
 
-      {/* Snackbar para toasts */}
+      {/* Snackbar */}
       <Snackbar
         open={toastOpen}
         autoHideDuration={4000}
@@ -308,5 +321,9 @@ export default function ClientAdminTabe() {
         </Alert>
       </Snackbar>
     </div>
-  );
+  </div>
+
+
+);
+
 }
