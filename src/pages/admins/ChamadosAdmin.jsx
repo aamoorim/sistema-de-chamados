@@ -6,7 +6,7 @@ function CallAdmin() {
   return (
       <>
       
-      <h1>Chamados</h1>
+      <h1 className="header-chamados-admin">Chamados</h1>
       <div >
       <ListTable />
       <div >
