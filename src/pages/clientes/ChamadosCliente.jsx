@@ -28,6 +28,7 @@ const ChamadosClienteContent = () => {
 
   const [chamados, setChamados] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [actionLoading, setActionLoading] = useState(false); // spinner de ações específicas
 
   const [openModalCalls, setOpenModalCalls] = useState(false);
   const [openModalDetails, setOpenModalDetails] = useState(false);
@@ -62,9 +63,7 @@ const ChamadosClienteContent = () => {
         const changed = data.filter((novo) => {
           const antigo = chamados.find((c) => c.id === novo.id);
           if (!antigo) return false;
-          if (antigo.status !== novo.status) return true;
-          if (antigo.tecnico !== novo.tecnico) return true;
-          return false;
+          return antigo.status !== novo.status || antigo.tecnico !== novo.tecnico;
         });
 
         const dataString = JSON.stringify(data);
@@ -75,30 +74,21 @@ const ChamadosClienteContent = () => {
 
           changed.forEach((c) => {
             const antigo = chamados.find((x) => x.id === c.id);
-            if (antigo) {
-              if (
-                c.status?.toLowerCase() === "em_andamento" &&
-                antigo.status !== c.status
-              ) {
-                showToast(`Chamado #${c.id} foi atendido por um técnico!`);
-              }
-              if (
-                c.status?.toLowerCase() === "encerrado" &&
-                antigo.status !== c.status
-              ) {
-                showToast(`Chamado #${c.id} finalizado!`);
-              }
+            if (!antigo) return;
+
+            if (c.status?.toLowerCase() === "em_andamento" && antigo.status !== c.status) {
+              showToast(`Chamado #${c.id} foi atendido por um técnico!`);
+            }
+            if (c.status?.toLowerCase() === "encerrado" && antigo.status !== c.status) {
+              showToast(`Chamado #${c.id} finalizado!`);
             }
           });
-
-          if (!showSpinner) setLoading(true);
-          setTimeout(() => setLoading(false), 1000);
-        } else {
-          setLoading(false);
         }
       } catch (err) {
+        console.error("Erro ao buscar chamados:", err);
         setChamados([]);
-        setLoading(false);
+      } finally {
+        setLoading(false); // <-- garante que loading sempre será desativado
       }
     };
 
@@ -130,6 +120,7 @@ const ChamadosClienteContent = () => {
       return;
     }
     try {
+      setActionLoading(true); // mostra spinner
       const novoChamado = await chamadosService.criarChamado(dadosChamado);
       if (novoChamado && novoChamado.id) {
         setChamados((prev) => [novoChamado, ...prev]);
@@ -140,40 +131,42 @@ const ChamadosClienteContent = () => {
       }
     } catch (err) {
       alert(err.response?.data?.erro || "Erro ao criar chamado");
+    } finally {
+      setActionLoading(false); // esconde spinner
     }
   };
 
-  const handleAtualizarChamado = async (dadosAtualizados) => {
-    try {
-      const atualizado = await chamadosService.atualizarChamado(
-        chamadoSelecionado.id,
-        {
-          titulo: dadosAtualizados.title,
-          descricao: dadosAtualizados.description,
+
+    const handleAtualizarChamado = async (dadosAtualizados) => {
+      try {
+        setActionLoading(true); // mostra spinner
+        const atualizado = await chamadosService.atualizarChamado(
+          chamadoSelecionado.id,
+          {
+            titulo: dadosAtualizados.title,
+            descricao: dadosAtualizados.description,
+          }
+        );
+        setChamados((prev) =>
+          prev.map((chamado) =>
+            chamado.id === atualizado.id ? atualizado : chamado
+          )
+        );
+        setOpenModalEditar(false);
+
+        if (["em_andamento", "encerrado"].includes(atualizado.status?.toLowerCase())) {
+          const mensagem =
+            atualizado.status.toLowerCase() === "em_andamento"
+              ? "Chamado atendido!"
+              : "Chamado finalizado!";
+          showToast(mensagem);
         }
-      );
-      setChamados((prev) =>
-        prev.map((chamado) =>
-          chamado.id === atualizado.id ? atualizado : chamado
-        )
-      );
-      setOpenModalEditar(false);
-
-      if (
-        ["em_andamento", "encerrado"].includes(
-          atualizado.status?.toLowerCase()
-        )
-      ) {
-        const mensagem =
-          atualizado.status.toLowerCase() === "em_andamento"
-            ? "Chamado atendido!"
-            : "Chamado finalizado!";
-        showToast(mensagem);
+      } catch {
+        alert("Erro ao atualizar chamado.");
+      } finally {
+        setActionLoading(false); // esconde spinner
       }
-    } catch {
-      alert("Erro ao atualizar chamado.");
-    }
-  };
+    };
 
   // Filtragem otimizada com useMemo
   const chamadosFiltrados = useMemo(() => {
@@ -259,7 +252,7 @@ const ChamadosClienteContent = () => {
           <SearchBar />
         </div>
 
-        {loading ? (
+        {loading || actionLoading? (
           <Spinner />
         ) : (
           <>
