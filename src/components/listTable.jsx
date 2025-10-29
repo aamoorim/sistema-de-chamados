@@ -238,7 +238,7 @@ export default function ListTable() {
     return <div style={{ color: "red", fontFamily: "Lato" }}>{error}</div>;
 
   return (
-    <div className="tabela">
+    <div className="tabela-chamados-admin">
       <Snackbar
         open={toastOpen}
         autoHideDuration={2000} // Tempo de expiração do toast
@@ -260,10 +260,19 @@ export default function ListTable() {
       </div>
 
       {isMobile ? (
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+        <div className="chamados-admin-cards-container" style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           {filteredRows.length > 0 ? (
             filteredRows.map((row) => (
-              <div
+              <div 
+                  className={`chamados-admin-cards ${
+                    row.status === "aberto"
+                      ? "espera"
+                      : row.status === "encerrado"
+                      ? "finalizado"
+                      : row.status === "em_andamento"
+                      ? "andamento"
+                      : ""
+                  }`}
                 key={row.id}
                 style={{
                   background: "#fff",
