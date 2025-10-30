@@ -212,7 +212,8 @@ body {
   @media (min-width: ($breakpoint-xxxl + 1)) {
     min-width: 56vw;
     max-width: 90vw;
-    margin-left: 8vw;
+    padding: 20px;
+    margin-left: 14vw;
   }
 }
 

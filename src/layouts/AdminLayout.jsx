@@ -98,7 +98,6 @@ export default function AdminLayout() {
         <SideBar />
         <main >
           <div>
-            <SearchBar />
             {config && (
               <Botao icon={Plus} text={config.text} onClick={() => setOpen(true)} />
             )}

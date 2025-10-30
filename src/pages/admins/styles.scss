@@ -180,6 +180,7 @@ body {
   font-size: 30px;
   font-weight: bold;
   color: #2E3DA3;
+  padding-top: 2vh;
   margin-bottom: 24px;
 
   // Para telas menores que $breakpoint-xs
@@ -220,11 +221,12 @@ body {
 
   // Para telas maiores que $breakpoint-xxxl
   @media (min-width: ($breakpoint-xxxl + 1)) {
-    margin-left: 8vw;
+    padding-left: 20px;
+    margin-left: 14vw;
   }
 }
 
-/* Espaço para o conteúdo principal, se houver */
+
 /* Barra de busca e filtro */
 .calls-admin-search {
   width: 100%;

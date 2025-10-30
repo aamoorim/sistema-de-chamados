@@ -53,7 +53,6 @@ $font-medium: 500;
 $font-semibold: 600;
 $font-bold: 700;
 
-
 $text-xs: 12px;
 $text-sm: 13px;
 $text-base: 14px;
@@ -74,15 +73,101 @@ $breakpoint-lg: 992px;
 $breakpoint-xl: 1200px;
 $breakpoint-xxl: 2000px;
 $breakpoint-xxxl: 4000px;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: $bg-app;
+  overflow-x: hidden;
+}
+
 .search-bar-container {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 12px;
+  gap: 2vw;
   width: 100%;
   margin-bottom: 24px;
   max-width: 100%;
   
+
+  // Para telas menores que $breakpoint-xs
+  @media (max-width: $breakpoint-xs) {
+    width: auto;
+    min-width: 10rem;
+    max-width: 32rem;
+    padding-right: 6px;
+    margin-left: 2vw;
+  }
+
+  // Para telas maiores que $breakpoint-xs e menores que $breakpoint-sm
+  @media (min-width: ($breakpoint-xs + 1)) and (max-width: $breakpoint-sm) {
+    width: auto;
+    margin-left: 2vw;
+    min-width: 16rem;
+    max-width: 36rem;
+    padding-right: 8px;
+  }
+
+  // Para telas maiores que $breakpoint-sm e menores que $breakpoint-md
+  @media (min-width: ($breakpoint-sm + 1)) and (max-width: $breakpoint-md) {
+    width: auto;
+    min-width: 30rem;
+    max-width: 46rem;
+    padding-right: 4px;
+    margin-left: 2vw;
+  }
+
+  // Para telas maiores que $breakpoint-md e menores que $breakpoint-lg
+  @media (min-width: ($breakpoint-md + 1)) and (max-width: $breakpoint-lg) {
+    width: auto;
+    min-width: 30rem;
+    max-width: 44rem;
+    padding-right: 10px;
+    margin-left: 28vw;
+  }
+
+  // Para telas maiores que $breakpoint-lg e menores que $breakpoint-xl
+  @media (min-width: ($breakpoint-lg + 1)) and (max-width: $breakpoint-xl) {
+    width: auto;
+    min-width: 36rem;
+    max-width: 60rem;
+    padding-left: 10px;
+    padding-right: 8px;
+    margin-left: 22vw;
+  }
+
+  // Para telas maiores que $breakpoint-xl e menores que $breakpoint-xxl
+  @media (min-width: ($breakpoint-xl + 1)) and (max-width: $breakpoint-xxl) {
+    width: auto;
+    max-width: 100rem;
+    padding-right: 20px;
+    padding-left: 20px;
+    margin-left: 20vw;
+  }
+
+  // Para telas maiores que $breakpoint-xxl e menores que $breakpoint-xxxl
+  @media (min-width: ($breakpoint-xxl + 1)) and (max-width: $breakpoint-xxxl) {
+    width: auto;
+    max-width: 200rem;
+    padding-right: 20px;
+    padding-left: 20px;
+    margin-left: 16vw;
+  }
+
+  // Para telas maiores que $breakpoint-xxxl
+  @media (min-width: ($breakpoint-xxxl + 1)) {
+    width: auto;
+    min-width: 200rem;
+    max-width: 360rem;
+    padding-right: 40px;
+    padding-left: 20px;
+    margin-left: 14vw;
+  }
 }
 
 
@@ -123,516 +208,4 @@ $breakpoint-xxxl: 4000px;
   pointer-events: none;
   width: 18px;
   height: 18px;
-}
-
-.filter-button {
-  border: none;
-  background: none;
-  cursor: pointer;
-  padding: 8px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.filter-button:hover {
-  background-color: #e0e0e0;
-}
-
-.filter-button svg {
-  width: 20px;
-  height: 20px;
-  color: #555;
-}
-
-/* Estilos existentes do search-bar mantidos, adicionando novos: */
-
-.filter-container {
-  position: relative;
-}
-
-.filter-button {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  background: white;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.filter-button:hover {
-  background: #f5f5f5;
-}
-
-.filter-button.active {
-  background: #e3f2fd;
-  border-color: #2196f3;
-  color: #1976d2;
-}
-
-.filter-count {
-  background: #2196f3;
-  color: white;
-  font-size: 12px;
-  border-radius: 50%;
-  width: 18px;
-  height: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 600;
-}
-
-.chevron {
-  transition: transform 0.2s ease;
-}
-
-.chevron.open {
-  transform: rotate(180deg);
-}
-
-.dropdown-menu {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  margin-top: 8px;
-  width: 320px;
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
-  max-height: 400px;
-  overflow-y: auto;
-}
-
-.dropdown-header {
-  display: flex;
-  justify-content: between;
-  align-items: center;
-  padding: 16px;
-  border-bottom: 1px solid #eee;
-}
-
-.dropdown-header h3 {
-  margin: 0;
-  font-size: 16px;
-  font-weight: 600;
-  color: #333;
-}
-
-.clear-all-btn {
-  background: none;
-  border: none;
-  color: #2196f3;
-  cursor: pointer;
-  font-size: 14px;
-  padding: 4px 8px;
-  border-radius: 4px;
-  transition: background 0.2s ease;
-}
-
-.clear-all-btn:hover {
-  background: #f0f8ff;
-}
-
-.filter-section {
-  padding: 16px;
-  border-bottom: 1px solid #eee;
-}
-
-.filter-section:last-child {
-  border-bottom: none;
-}
-
-.filter-title {
-  margin: 0 0 12px 0;
-  font-size: 14px;
-  font-weight: 600;
-  color: #555;
-}
-
-.filter-options {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.filter-option {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  padding: 4px;
-  border-radius: 4px;
-  transition: background 0.2s ease;
-}
-
-.filter-option:hover {
-  background: #f8f9fa;
-}
-
-.filter-option input[type="checkbox"] {
-  margin: 0;
-  accent-color: #2196f3;
-}
-
-.filter-option span {
-  font-size: 14px;
-  color: #666;
-}
-
-/* Tags dos filtros ativos */
-.active-filters {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 12px;
-}
-
-.filter-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: #e3f2fd;
-  color: #1976d2;
-  padding: 6px 10px;
-  border-radius: 16px;
-  font-size: 14px;
-  font-weight: 500;
-}
-
-.remove-filter-btn {
-  background: none;
-  border: none;
-  color: #1976d2;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  transition: background 0.2s ease;
-}
-
-.remove-filter-btn:hover {
-  background: rgba(25, 118, 210, 0.1);
-}
-
-.header-admin {
-  display: flex;
-  align-items: center; /* Garante alinhamento vertical */
-  gap: 16px; /* Aumentei o gap para melhor espaçamento */
-  width: 100%;
-  margin-bottom: 24px; /* Adiciona espaçamento inferior consistente */
-  
-  /* Força o SearchBar a ocupar espaço disponível */
-  .search-bar-container {
-    flex: 1; /* Permite que cresça */
-    margin-bottom: 0 !important; /* Remove o margin-bottom problemático */
-    max-width: none !important; /* Remove limitação de largura */
-  }
-  
-  /* Padroniza altura do botão */
-  .MuiButton-root {
-    height: 44px; /* Mesma altura aproximada do input */
-    min-width: 44px;
-    padding: 8px 12px;
-    border-radius: 12px; /* Combina com o input */
-  }
-}
-
-
-/* Container para o footer com dropdown */
-
-
-/* Menu dropdown */
-.user_dropdown_menu {
-  position: absolute;
-  bottom: 100%;
-  left: 0;
-  right: 0;
-  margin-bottom: 8px;
-  background: #374151; /* ou a cor que combina com seu tema */
-  border: 1px solid #4b5563;
-  border-radius: 8px;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  z-index: 50;
-  overflow: hidden;
-  animation: dropdownFadeIn 0.2s ease-out;
-}
-
-/* Animação do dropdown */
-@keyframes dropdownFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Itens do dropdown */
-.dropdown_item {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  background: none;
-  border: none;
-  color: #ffffff; /* ou a cor do seu texto */
-  font-size: 14px;
-  text-align: left;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.dropdown_item:hover {
-  background-color: #4b5563; /* cor de hover */
-}
-
-/* Item de logout (vermelho) */
-.logout_item {
-  color: #ef4444 !important;
-}
-
-.logout_item:hover {
-  background-color: #4b5563;
-}
-
-/* Divider */
-.dropdown_divider {
-  height: 1px;
-  background-color: #4b5563;
-  margin: 4px 0;
-}
-
-/* Modificação no botão footer para ser clicável */
-
-@media screen and (lg) {
-  .search-bar-container {
-    margin-bottom: 25px !important; 
-  }
-  
-}
-
-/* Responsividade: quando a largura for <= 992px, abaixa um pouco o conteúdo da search-bar */
-@media (max-width: $breakpoint-xl) {
-  .search-bar-container {
-    margin-top: 12px !important;
-    margin-bottom: 20px !important;
-    transform: translateY(8px) !important;
-    transition: transform 0.2s ease, margin 0.2s ease !important;
-    width: 100%;
-    
-  }
-
-  .search-input-wrapper {
-    width: 100% !important;
-  }
-
-  /* Garante ícone alinhado depois do ajuste */
-  .search-icon {
-    left: 12px !important;
-  }
-}
-
-@media (max-width: $breakpoint-md) {
-  .search-bar-container {
-    margin-top: 25px !important;
-    margin-bottom: 20px !important; 
-    transform: translateY(8px) !important;
-    transition: transform 0.2s ease, margin 0.2s ease !important;
-    width: 100% !important;
-  
-  }
-
-  .search-input-wrapper {
-    width: 100% !important;
-  }
-
-  /* Garante ícone alinhado depois do ajuste */
-  .search-icon {
-    left: 12px !important;
-  }
-}
-
-@media (max-width: $breakpoint-xs ) {
-  .search-bar-container {
-    margin-top: 25px !important;
-    margin-bottom: 20px !important;
-    transform: translateY(8px) !important;
-    transition: transform 0.2s ease, margin 0.2s ease !important;
-    width: 100%;
-  }
-
-  .search-input-wrapper {
-    width: 100% !important;
-  }
-
-  /* Garante ícone alinhado depois do ajuste */
-  .search-icon {
-    left: 12px !important;
-  }
-}
-
-// Tablets e notebooks médios
-@media (max-width: $breakpoint-xl) {
-  .search-bar-container {
-    margin-top: 12px !important;
-    margin-bottom: 20px !important;
-    transform: translateY(8px) !important;
-    width: 100% !important;
-  }
-
-  .search-input-wrapper {
-    width: 100% !important;
-  }
-}
-
-// Tablets menores
-@media (max-width: $breakpoint-md) {
-  .search-bar-container {
-    flex-direction: column !important; 
-    align-items: stretch !important;
-    margin-top: 16px !important;
-  }
-
-  .search-input-wrapper {
-    width: 100% !important;
-  }
-
-  .search-input {
-    font-size: 13px !important;
-    padding: 8px 36px !important;
-  }
-}
-
-// Celulares pequenos
-@media (max-width: $breakpoint-sm) {
-  .search-bar-container {
-    flex-direction: column !important;
-    gap: 8px !important;
-    margin-top: 20px !important;
-    margin-bottom: 16px !important;
-  }
-
-  .search-input-wrapper {
-    width: 100% !important;
-  }
-
-  .search-input {
-    font-size: 12px !important;
-    padding: 8px 32px !important;
-    border-radius: 8px !important;
-  }
-
-  .search-icon {
-    left: 10px !important;
-    width: 16px !important;
-    height: 16px !important;
-  }
-
-  .filter-button {
-    font-size: 12px !important;
-    padding: 6px 10px !important;
-  }
-}
-
-// === Ajuste para telas muito grandes ===
-
-// Monitores 2K e ultrawide
-@media (min-width: $breakpoint-xxl) {
-  .search-bar-container {
-    max-width: 1600px !important; // limita o tamanho em telas enormes
-    margin: 0 auto 32px auto !important; // centraliza
-    gap: 20px !important ;
-  }
-
-  .search-input-wrapper {
-    width: 600px !important;  // aumenta a largura do campo
-  }
-
-  .search-input {
-    font-size: 16px !important;
-    padding: 12px 48px !important;
-  }
-
-  .filter-button {
-    font-size: 15px !important;
-    padding: 10px 14px !important;
-  }
-}
-
-// Telas *gigantes* (4K e além)
-@media (min-width: $breakpoint-xxxl) {
-  .search-bar-container {
-    width: 2200px !important;
-    gap: 28px !important;
-  }
-
-  .search-input-wrapper {
-    width: 800px !important;
-  }
-
-  .search-input {
-    font-size: 18px !important;
-    padding: 14px 52px !important;
-  }
-
-  .filter-button {
-    font-size: 16px !important;
-    padding: 12px 18px !important;
-  }
-}
-
-// Telas muito pequenas (320px ou menos)
-@media (max-width: 320px) {
-  .search-bar-container {
-    gap: 4px !important;
-    padding: 0 2px !important;
-  }
-  .search-input-wrapper {
-    width: 100% !important;
-    min-width: 144px !important;
-  }
-  .search-input {
-    font-size: 11px !important;
-    padding: 6px 24px !important;
-    min-width: 144px !important;
-    max-width: 100% !important;
-  }
-  .search-icon {
-    left: 6px !important;
-    width: 14px !important;
-    height: 14px !important;
-  }
-}
-
-// Telas minúsculas (200px ou menos)
-@media (max-width: 200px) {
-  .search-input-wrapper,
-  .search-input {
-    min-width: 100px !important;
-    font-size: 10px !important;
-    padding: 4px 12px !important;
-  }
-}
-
-// Telas extremas (144px ou menos)
-@media (max-width: 144px) {
-  .search-input-wrapper,
-  .search-input {
-    min-width: 60px !important;
-    font-size: 9px !important;
-    padding: 2px 6px !important;
-  }
 }
