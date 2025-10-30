@@ -6,10 +6,10 @@ function CallAdmin() {
   return (
       <>
       
-      <h1>Chamados</h1>
-      <div className="calls-admin">
+      <h1 className="header-chamados-admin">Chamados</h1>
+      <div >
       <ListTable />
-      <div className="">
+      <div >
       <Outlet />  
       </div>
     </div>

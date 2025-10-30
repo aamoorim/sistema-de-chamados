@@ -6,6 +6,7 @@ import chamadoService from "../../services/chamadosService";
 import { useAuth } from "../../context/auth-context";
 import api from "../../services/api";
 import Botao from "../../components/Button.jsx";
+import Spinner from "../../components/LoadingSpinner"; // 🔹 Importando o spinner
 
 export default function ChamadosTecnico() {
   const { token } = useAuth();
@@ -129,118 +130,117 @@ export default function ChamadosTecnico() {
     />
   );
 
+  // 🔹 Exibição condicional igual ao ChamadosAbertos
+  if (loading) {
+    return (
+      <div style={{ minHeight: "100vh", display: "flex", justifyContent: "center", alignItems: "center" }}>
+        <Spinner />
+      </div>
+    );
+  }
+
   return (
     <div className="tecnico-chamados">
       <div className="header-tecnico">
         <h1>Meus chamados</h1>
       </div>
 
-      {loading && (
-        <p style={{ paddingLeft: 8, color: "#64748b" }}>
-          Carregando chamados...
-        </p>
-      )}
-
-      {!loading && (
-        <>
-          {/* Em Atendimento */}
-          <div className="section-tecnico">
-            <div className="section-tecnico-header andamento">
-              <Clock2 size={16} className="status"/> Em atendimento ({andamentoChamados.length})
-            </div>
-            <div className="chamados-tecnico-list">
-              {andamentoChamados.length > 0 ? (
-                andamentoChamados.map((chamado) => (
-                  <div
-                    key={chamado.id}
-                    className="chamado-tecnico-card andamento"
-                    onClick={() => handleOpenModal(chamado)}
-                    style={{ cursor: "pointer" }}
+      {/* Em Atendimento */}
+      <div className="section-tecnico">
+        <div className="section-tecnico-header andamento">
+          <Clock2 size={16} className="status" /> Em atendimento ({andamentoChamados.length})
+        </div>
+        <div className="chamados-tecnico-list">
+          {andamentoChamados.length > 0 ? (
+            andamentoChamados.map((chamado) => (
+              <div
+                key={chamado.id}
+                className="chamado-tecnico-card andamento"
+                onClick={() => handleOpenModal(chamado)}
+                style={{ cursor: "pointer" }}
+              >
+                <div className="card-tecnico-main">
+                  <div className="chamado-tecnico-info">
+                    <div className="chamado-tecnico-codigo">{chamado.codigo || chamado.id}</div>
+                    <div className="chamado-tecnico-titulo">{chamado.titulo || chamado.tipo}</div>
+                    <div className="chamado-tecnico-descricao">{chamado.descricao}</div>
+                    <div className="chamado-tecnico-data">{chamado.data_criacao || chamado.data}</div>
+                  </div>
+                  <Botao
+                    onClick={(e) => handleEncerrar(e, chamado.id)}
+                    text={encerrandoId === chamado.id ? "" : "Encerrar"}
+                    icon={encerrandoId === chamado.id ? null : CircleCheckBig}
+                    sx={{
+                      height: 35,
+                      fontSize: "1rem",
+                      "& svg": {
+                        fontSize: 18,
+                      },
+                      borderRadius: "0.5rem",
+                      position: "relative",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
                   >
-                    <div className="card-tecnico-main">
-                      <div className="chamado-tecnico-info">
-                        <div className="chamado-tecnico-codigo">{chamado.codigo || chamado.id}</div>
-                        <div className="chamado-tecnico-titulo">{chamado.titulo || chamado.tipo}</div>
-                        <div className="chamado-tecnico-descricao">{chamado.descricao}</div>
-                        <div className="chamado-tecnico-data">{chamado.data_criacao || chamado.data}</div>
-                      </div>
-                      <Botao
-                        onClick={(e) => handleEncerrar(e, chamado.id)}
-                        text={encerrandoId === chamado.id ? "" : "Encerrar"}
-                        icon={encerrandoId === chamado.id ? null : CircleCheckBig}
-                        sx={{
-                          height: 35,
-                          fontSize: "1rem",
-                          "& svg": {
-                            fontSize: 18,
-                          },
-                          borderRadius: "0.5rem",
-                          position: "relative",
-                          display: "flex",
-                          justifyContent: "center",
-                          alignItems: "center",
-                        }}
-                      >
-                        {encerrandoId === chamado.id && <ButtonSpinner />}
-                      </Botao>
-                    </div>
-                    <div className="card-tecnico-footer">
-                      <div className="user-info">
-                        <div className="user-avatar">{chamado.avatar}</div>
-                        <span className="user-name">{chamado.cliente_nome || chamado.usuario}</span>
-                        <div className={`status-icon ${chamado.status}`}>
-                          <Clock2 size={16} />
-                        </div>
-                      </div>
+                    {encerrandoId === chamado.id && <ButtonSpinner />}
+                  </Botao>
+                </div>
+                <div className="card-tecnico-footer">
+                  <div className="user-info">
+                    <div className="user-avatar">{chamado.avatar}</div>
+                    <span className="user-name">{chamado.cliente_nome || chamado.usuario}</span>
+                    <div className={`status-icon ${chamado.status}`}>
+                      <Clock2 size={16} />
                     </div>
                   </div>
-                ))
-              ) : (
-                <p style={{ color: "#64748b", paddingLeft: 8 }}>Nenhum chamado em andamento</p>
-              )}
-            </div>
-          </div>
+                </div>
+              </div>
+            ))
+          ) : (
+            <p style={{ color: "#64748b", paddingLeft: 8 }}>Nenhum chamado em andamento</p>
+          )}
+        </div>
+      </div>
 
-          {/* Encerrados */}
-          <div className="section-tecnico">
-            <div className="section-tecnico-header finalizado">
-              <Check size={16} className="status" /> Encerrados ({finalizadosChamados.length})
-            </div>
-            <div className="chamados-tecnico-list">
-              {finalizadosChamados.length > 0 ? (
-                finalizadosChamados.map((chamado) => (
-                  <div
-                    key={chamado.id}
-                    className="chamado-tecnico-card finalizado"
-                    onClick={() => handleOpenModal(chamado)}
-                    style={{ cursor: "pointer" }}
-                  >
-                    <div className="card-tecnico-main">
-                      <div className="chamado-tecnico-info">
-                        <div className="chamado-tecnico-codigo">{chamado.codigo || chamado.id}</div>
-                        <div className="chamado-tecnico-titulo">{chamado.titulo || chamado.tipo}</div>
-                        <div className="chamado-tecnico-descricao">{chamado.descricao}</div>
-                        <div className="chamado-tecnico-data">{chamado.data_criacao || chamado.data}</div>
-                      </div>
-                    </div>
-                    <div className="card-tecnico-footer">
-                      <div className="user-info">
-                        <div className="user-avatar">{chamado.avatar}</div>
-                        <span className="user-name">{chamado.cliente_nome || chamado.usuario}</span>
-                        <div className={`status-icon ${chamado.status}`}>
-                          <Check size={16} />
-                        </div>
-                      </div>
+      {/* Encerrados */}
+      <div className="section-tecnico">
+        <div className="section-tecnico-header finalizado">
+          <Check size={16} className="status" /> Encerrados ({finalizadosChamados.length})
+        </div>
+        <div className="chamados-tecnico-list">
+          {finalizadosChamados.length > 0 ? (
+            finalizadosChamados.map((chamado) => (
+              <div
+                key={chamado.id}
+                className="chamado-tecnico-card finalizado"
+                onClick={() => handleOpenModal(chamado)}
+                style={{ cursor: "pointer" }}
+              >
+                <div className="card-tecnico-main">
+                  <div className="chamado-tecnico-info">
+                    <div className="chamado-tecnico-codigo">{chamado.codigo || chamado.id}</div>
+                    <div className="chamado-tecnico-titulo">{chamado.titulo || chamado.tipo}</div>
+                    <div className="chamado-tecnico-descricao">{chamado.descricao}</div>
+                    <div className="chamado-tecnico-data">{chamado.data_criacao || chamado.data}</div>
+                  </div>
+                </div>
+                <div className="card-tecnico-footer">
+                  <div className="user-info">
+                    <div className="user-avatar">{chamado.avatar}</div>
+                    <span className="user-name">{chamado.cliente_nome || chamado.usuario}</span>
+                    <div className={`status-icon ${chamado.status}`}>
+                      <Check size={16} />
                     </div>
                   </div>
-                ))
-              ) : (
-                <p style={{ color: "#64748b", paddingLeft: 8 }}>Nenhum chamado encerrado</p>
-              )}
-            </div>
-          </div>
-        </>
-      )}
+                </div>
+              </div>
+            ))
+          ) : (
+            <p style={{ color: "#64748b", paddingLeft: 8 }}>Nenhum chamado encerrado</p>
+          )}
+        </div>
+      </div>
 
       <ModalChamadoDetalhes
         isOpen={openModal}
