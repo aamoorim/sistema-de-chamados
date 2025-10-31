@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Outlet } from "react-router-dom";
-import SearchBar from "../../components/search-bar";
 import StatusChip from "../../components/StatusChip";
-import { SearchProvider } from "../../context/search-context"
 import { Clock2 } from "lucide-react";
 import ListTableTec from "../../components/tableTec"; // Importando o ListTableTec
 import chamadosService from "../../services/chamadosService";
@@ -13,8 +11,6 @@ import "./ChamadosAbertos.scss";
 export default function ChamadosAbertos() {
   const [loading, setLoading] = useState(true);
   const [chamados, setChamados] = useState([]);
-  // const [openModal, setOpenModal] = useState(false);
-  
 
   // Usando o hook useIsMobile para detectar se a tela é mobile
   const isMobile = useIsMobile(1200);
@@ -45,13 +41,6 @@ export default function ChamadosAbertos() {
       {/* Título */}
       <div className="chamados-abertos-header">
         <h1>Chamados Abertos</h1>
-      </div>
-
-      {/* SearchBar */}
-      <div className="search-bar-abertos-container">
-        <SearchProvider>
-          <SearchBar />
-        </SearchProvider>
       </div>
 
       {/* StatusChip */}

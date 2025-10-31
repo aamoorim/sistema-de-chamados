@@ -6,7 +6,9 @@ import chamadoService from "../../services/chamadosService";
 import { useAuth } from "../../context/auth-context";
 import api from "../../services/api";
 import Botao from "../../components/Button.jsx";
-import Spinner from "../../components/LoadingSpinner"; // 🔹 Importando o spinner
+import { SearchProvider, useSearch } from "../../context/search-context";
+import SearchBar from "../../components/search-bar";
+import Spinner from "../../components/LoadingSpinner"; 
 
 export default function ChamadosTecnico() {
   const { token } = useAuth();
@@ -130,7 +132,6 @@ export default function ChamadosTecnico() {
     />
   );
 
-  // 🔹 Exibição condicional igual ao ChamadosAbertos
   if (loading) {
     return (
       <div style={{ minHeight: "100vh", display: "flex", justifyContent: "center", alignItems: "center" }}>
@@ -144,7 +145,9 @@ export default function ChamadosTecnico() {
       <div className="header-tecnico">
         <h1>Meus chamados</h1>
       </div>
-
+      <div className="search-bar">
+        <SearchBar />
+      </div>
       {/* Em Atendimento */}
       <div className="section-tecnico">
         <div className="section-tecnico-header andamento">

@@ -205,8 +205,6 @@ body {
     margin-right: 5rem;
   }
 
-
-
   @include responsive($breakpoint-md) {
     flex-direction: column;
     align-items: stretch;
