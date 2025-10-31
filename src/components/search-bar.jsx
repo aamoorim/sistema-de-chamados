@@ -1,41 +1,43 @@
 import React, { useState } from 'react';
 import { useSearch } from "../context/search-context";
+import { useAuth } from '../context/auth-context';  // Usando useAuth para acessar o papel do usuário
 import '../styles/search-bar/search-bar.scss';
 import Botao from "./Button";
 import { Search } from 'lucide-react';
 import { Send } from '@mui/icons-material';
 
-const SearchBar = () => {  
-  const { search, setSearch } = useSearch(); // Pegando o valor da pesquisa e a função para alterá-lo
+const SearchBar = () => {
+  const { search, setSearch } = useSearch();
+  const { role } = useAuth();  // Acessando o papel do usuário
   const [error, setError] = useState('');
 
-  // Função chamada quando o formulário é enviado
   const handleSearchSubmit = (e) => {
-    e.preventDefault(); // Previne o comportamento padrão de recarregar a página ao enviar o formulário
-
+    e.preventDefault();
     setError('');
   };
 
+  // Aplique a classe condicionalmente com base no papel do usuário
+  const roleClass = role || 'cliente';  // Caso não tenha role, por padrão é 'cliente'
+
   return (
     <div>
-      <form onSubmit={handleSearchSubmit} className="search-bar-container">
-        <div className="search-input-wrapper">
+      <form onSubmit={handleSearchSubmit} className={`search-bar-container ${roleClass}`}>
+        <div className={`search-input-wrapper ${roleClass}`}>
           <Search className="search-icon" />
           <input
             type="text"
             value={search}
-            onChange={(e) => setSearch(e.target.value)} // Atualiza o valor da pesquisa
+            onChange={(e) => setSearch(e.target.value)}
             placeholder="Pesquisar"
             className="search-input"
           />
         </div>
 
-        <div className="botao-enviar-search">
+        <div className={`botao-enviar-search ${roleClass}`}>
           <Botao type="submit" icon={Send} />
         </div>
       </form>
 
-      {/* Exibindo erro se houver */}
       {error && <div className="error-message">{error}</div>}
     </div>
   );
