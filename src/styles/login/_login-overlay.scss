@@ -1,11 +1,15 @@
+body.login-page{
+  overflow-y: hidden;
+}
+
 // Overlay e Painéis Laterais
 .login-page {
   .overlay-container {
     position: absolute;
     top: 0;
     left: 50%;
-    width: 50%;
-    height: 100%;
+    width: 51%;
+    height: 101%;
     overflow: hidden;
     transition: transform 0.6s ease-in-out;
     z-index: 100;

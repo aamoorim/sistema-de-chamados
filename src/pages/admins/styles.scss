@@ -1,5 +1,158 @@
 /* styles.scss para a página ChamadosAdmin */
+// VARIÁVEIS
 
+$color-primary: #3b83f6;
+$color-primary-hover: #2563eb;
+$color-secondary: #64748b;
+$color-success: #caecb1;
+$color-warning: #a5bbeb;
+$color-danger: #ef4444;
+$color-icon: #355ec5;
+$color-espera: #ffd93d;
+
+
+$bg-main: #ffffff;
+$bg-sidebar: #1e293b;
+$bg-card: #ffffff;
+$bg-app: #f1f5f9;
+$bg-hover: #f8fafc;
+
+
+$text-primary: #0f172a;
+$text-secondary: #64748b;
+$text-muted: #94a3b8;
+$text-white: #ffffff;
+
+
+$border-light: #e2e8f0;
+$border-dark: #334155;
+
+
+$spacing-xs: 4px;
+$spacing-sm: 8px;
+$spacing-md: 12px;
+$spacing-lg: 16px;
+$spacing-xl: 20px;
+$spacing-2xl: 24px;
+$spacing-3xl: 32px;
+$spacing-4xl: 40px;
+
+$radius-sm: 6px;
+$radius-md: 8px;
+$radius-lg: 12px;
+$radius-xl: 16px;
+$radius-2xl: 20px;
+$radius-full: 50%;
+
+$shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+$shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+$shadow-lg: 0 8px 25px rgba(0, 0, 0, 0.1);
+$shadow-primary: 0 2px 8px rgba(59, 130, 246, 0.3);
+
+$font-normal: 400;
+$font-medium: 500;
+$font-semibold: 600;
+$font-bold: 700;
+
+
+$text-xs: 12px;
+$text-sm: 13px;
+$text-base: 14px;
+$text-lg: 16px;
+$text-xl: 18px;
+$text-2xl: 20px;
+$text-3xl: 28px;
+
+$transition-fast: 0.15s ease;
+$transition-base: 0.2s ease;
+$transition-slow: 0.3s ease;
+
+
+$breakpoint-xs: 480px;
+$breakpoint-sm: 576px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 992px;
+$breakpoint-xl: 1200px;
+$breakpoint-xxl: 2000px;
+$breakpoint-xxxl: 4000px;
+
+// MIXINS
+@mixin flex($direction: row, $align: center, $justify: flex-start, $gap: 0) {
+  display: flex;
+  flex-direction: $direction;
+  align-items: $align;
+  justify-content: $justify;
+  gap: $gap;
+}
+
+@mixin card($padding: $spacing-2xl, $radius: $radius-xl, $shadow: $shadow-sm) {
+  background: $bg-card;
+  border: 1px solid $border-light;
+  border-radius: $radius;
+  padding: $padding;
+  box-shadow: $shadow;
+  transition: all $transition-base;
+}
+
+@mixin hover-lift() {
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: $shadow-lg;
+  }
+}
+
+@mixin button(
+  $bg: $color-primary,
+  $color: $text-white,
+  $padding: $spacing-sm $spacing-lg
+) {
+  background: $bg;
+  color: $color;
+  border: none;
+  padding: $padding;
+  border-radius: $radius-md;
+  font-weight: $font-medium;
+  cursor: pointer;
+  transition: all $transition-base;
+
+  &:hover {
+    background: darken($bg, 10%);
+    transform: translateY(-1px);
+  }
+}
+
+@mixin avatar($size: 36px, $bg: $color-primary) {
+  width: $size;
+  height: $size;
+  border-radius: $radius-full;
+  background: $bg;
+  color: $text-white;
+  @include flex(row, center, center);
+  font-weight: $font-semibold;
+  font-size: calc(#{$size} * 0.36);
+}
+
+@mixin status-border($color: $color-warning, $width: 3px) {
+  border-left: $width solid $color;
+}
+
+@mixin responsive($breakpoint) {
+  @media (max-width: $breakpoint) {
+    @content;
+  }
+}
+
+// RESET E BASE
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: $bg-app;
+  overflow-x: hidden;
+}
 
 .calls-admin {
   display: flex;
@@ -23,13 +176,59 @@
   min-width: 0;
 }
 
-.calls-admin-main h1 {
+.header-chamados-admin,
+.header-clientes-admin,
+.header-tecnicos-admin {
   font-size: 30px;
   font-weight: bold;
   color: #2E3DA3;
+  padding-top: 2vh;
   margin-bottom: 24px;
+
+  // Para telas menores que $breakpoint-xs
+  @media (max-width: $breakpoint-xs) {
+    margin-left: 2vw;
+  }
+
+  // Para telas maiores que $breakpoint-xs e menores que $breakpoint-sm
+  @media (min-width: ($breakpoint-xs + 1)) and (max-width: $breakpoint-sm) {
+    margin-left: 2vw;
+  }
+
+  // Para telas maiores que $breakpoint-sm e menores que $breakpoint-md
+  @media (min-width: ($breakpoint-sm + 1)) and (max-width: $breakpoint-md) {
+    margin-left: 2vw;
+  }
+
+  // Para telas maiores que $breakpoint-md e menores que $breakpoint-lg
+  @media (min-width: ($breakpoint-md + 1)) and (max-width: $breakpoint-lg) {
+    margin-left: 28vw;
+  }
+
+  // Para telas maiores que $breakpoint-lg e menores que $breakpoint-xl
+  @media (min-width: ($breakpoint-lg + 1)) and (max-width: $breakpoint-xl) {
+    margin-left: 23vw;
+  }
+
+  // Para telas maiores que $breakpoint-xl e menores que $breakpoint-xxl
+  @media (min-width: ($breakpoint-xl + 1)) and (max-width: $breakpoint-xxl) {
+    margin-left: 21vw;
+  }
+
+  // Para telas maiores que $breakpoint-xxl e menores que $breakpoint-xxxl
+  @media (min-width: ($breakpoint-xxl + 1)) and (max-width: $breakpoint-xxxl) {
+    margin-left: 16vw;
+    padding-left: 0.5vw;
+  }
+
+  // Para telas maiores que $breakpoint-xxxl
+  @media (min-width: ($breakpoint-xxxl + 1)) {
+    padding-left: 20px;
+    margin-left: 14vw;
+  }
 }
-/* Espaço para o conteúdo principal, se houver */
+
+
 /* Barra de busca e filtro */
 .calls-admin-search {
   width: 100%;
@@ -119,3 +318,92 @@
   }
 }
 
+.header-container {
+  display: flex;
+  justify-content: space-between; // coloca header à esquerda e botão à direita
+  align-items: center; // alinha verticalmente
+}
+
+.header-container .botao-novo-tecnico{
+    // Para telas menores que $breakpoint-xs
+  @media (max-width: $breakpoint-xs) {
+    margin-right: 1vw;
+  }
+
+  // Para telas maiores que $breakpoint-xs e menores que $breakpoint-sm
+  @media (min-width: ($breakpoint-xs + 1)) and (max-width: $breakpoint-sm) {
+    margin-right: 1vw;
+  }
+
+  // Para telas maiores que $breakpoint-sm e menores que $breakpoint-md
+  @media (min-width: ($breakpoint-sm + 1)) and (max-width: $breakpoint-md) {
+    margin-right: 1vw;
+  }
+
+  // Para telas maiores que $breakpoint-md e menores que $breakpoint-lg
+  @media (min-width: ($breakpoint-md + 1)) and (max-width: $breakpoint-lg) {
+    margin-right: 1vw;
+  }
+
+  // Para telas maiores que $breakpoint-lg e menores que $breakpoint-xl
+  @media (min-width: ($breakpoint-lg + 1)) and (max-width: $breakpoint-xl) {
+    margin-right: 1vw;
+  }
+
+  // Para telas maiores que $breakpoint-xl e menores que $breakpoint-xxl
+  @media (min-width: ($breakpoint-xl + 1)) and (max-width: $breakpoint-xxl) {
+    margin-right: 1vw;
+  }
+
+  // Para telas maiores que $breakpoint-xxl e menores que $breakpoint-xxxl
+  @media (min-width: ($breakpoint-xxl + 1)) and (max-width: $breakpoint-xxxl) {
+    margin-right: 1vw;
+  }
+
+  // Para telas maiores que $breakpoint-xxxl
+  @media (min-width: ($breakpoint-xxxl + 1)) {
+    margin-right: 1vw;
+  }
+}
+
+.header-container .botao-novo-cliente{
+    // Para telas menores que $breakpoint-xs
+  @media (max-width: $breakpoint-xs) {
+    margin-right: 1vw;
+  }
+
+  // Para telas maiores que $breakpoint-xs e menores que $breakpoint-sm
+  @media (min-width: ($breakpoint-xs + 1)) and (max-width: $breakpoint-sm) {
+    margin-right: 1vw;
+  }
+
+  // Para telas maiores que $breakpoint-sm e menores que $breakpoint-md
+  @media (min-width: ($breakpoint-sm + 1)) and (max-width: $breakpoint-md) {
+    margin-right: 1vw;
+  }
+
+  // Para telas maiores que $breakpoint-md e menores que $breakpoint-lg
+  @media (min-width: ($breakpoint-md + 1)) and (max-width: $breakpoint-lg) {
+    margin-right: 1vw;
+  }
+
+  // Para telas maiores que $breakpoint-lg e menores que $breakpoint-xl
+  @media (min-width: ($breakpoint-lg + 1)) and (max-width: $breakpoint-xl) {
+    margin-right: 1vw;
+  }
+
+  // Para telas maiores que $breakpoint-xl e menores que $breakpoint-xxl
+  @media (min-width: ($breakpoint-xl + 1)) and (max-width: $breakpoint-xxl) {
+    margin-right: 1vw;
+  }
+
+  // Para telas maiores que $breakpoint-xxl e menores que $breakpoint-xxxl
+  @media (min-width: ($breakpoint-xxl + 1)) and (max-width: $breakpoint-xxxl) {
+    margin-right: 1vw;
+  }
+
+  // Para telas maiores que $breakpoint-xxxl
+  @media (min-width: ($breakpoint-xxxl + 1)) {
+    margin-right: 1vw;
+  }
+}

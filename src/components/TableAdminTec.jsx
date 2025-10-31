@@ -16,7 +16,7 @@ import { ModalEditarTecnico } from "./Modals/EditarTecnico";
 import useIsMobile from "../hooks/useIsMobile";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
-import "../styles/tables/listTable.scss";
+import "../styles/tables/tecAdminTable.scss";
 import Spinner from "./LoadingSpinner";
 
 // Avatar com iniciais
@@ -63,7 +63,7 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 
 export default function TableAdminTec() {
   const isMobile = useIsMobile(1200);
-  const { search } = useSearch();
+  const { search, filters } = useSearch();
   const { tecnicos, deleteTecnico, fetchTecnicos, createTecnico } = useTecnicos();
   const { token } = useAuth(); // Token de autenticação
 
@@ -185,133 +185,135 @@ export default function TableAdminTec() {
   if (loading) return <Spinner />;
 
   return (
-    <div style={{ fontFamily: "Lato" }}>
-      <div style={{ marginBottom: 16, color: "#666", fontSize: 14 }}>
-        Mostrando {filteredTecnicos.length} de {tecnicos.length} técnicos
-      </div>
-
-      {isMobile ? (
-        <div className="client-table-mobile">
-          {filteredTecnicos.length > 0 ? (
-            filteredTecnicos.map((tec) => (
-              <div key={tec.id} className="client-card">
-                <div><b>Nome:</b> {tec.nome || "-"}</div>
-                <div><b>Cargo:</b> {tec.cargo || "-"}</div>
-                <div><b>Email:</b> {tec.email || "-"}</div>
-                <div className="actions">
-                  <IconButton onClick={() => handleOpenEdit(tec)}>
-                    <Pencil size={18} />
-                  </IconButton>
-                  <IconButton color="error" onClick={() => handleOpenDelete(tec)}>
-                    <Trash2 size={18} />
-                  </IconButton>
-                </div>
-              </div>
-            ))
-          ) : (
-            <div className="client-card-empty">
-              Nenhum técnico encontrado com os filtros aplicados
-            </div>
-          )}
+    <div className="tabela-tecnicos-admin">
+      <div style={{ fontFamily: "Lato" }}>
+        <div style={{ marginBottom: 16, color: "#666", fontSize: 14 }}>
+          Mostrando {filteredTecnicos.length} de {tecnicos.length} técnicos
         </div>
-      ) : (
-        <TableContainer
-          component={Paper}
-          sx={{
-            borderRadius: 2,
-            boxShadow: "0 2px 8px rgba(44,62,80,0.04)",
-            marginBottom: 4,
-            overflowX: "auto",
-            "@media (max-width: 768px)": {
-              "& table": { minWidth: "700px" },
-            },
-          }}
-        >
-          <Table aria-label="Tabela de técnicos">
-            <TableHead>
-              <TableRow>
-                <TableCell sx={{ color: "#858B99", fontWeight: 600 }}>Nome</TableCell>
-                <TableCell sx={{ color: "#858B99", fontWeight: 600 }}>Cargo</TableCell>
-                <TableCell sx={{ color: "#858B99", fontWeight: 600 }}>E-mail</TableCell>
-                <TableCell sx={{ color: "#858B99", fontWeight: 600 }}>Ações</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {filteredTecnicos.length > 0 ? (
-                filteredTecnicos.map((tec) => {
-                  const initials = tec.nome
-                    ? tec.nome
-                        .split(" ")
-                        .map((n) => (n && n.length > 0 ? n[0] : ""))
-                        .join("")
-                        .slice(0, 2)
-                        .toUpperCase()
-                    : "??";
-                  return (
-                    <TableRow key={tec.id} hover>
-                      <TableCell>
-                        <Avatar initials={initials} />
-                        {tec.nome || "-"}
-                      </TableCell>
-                      <TableCell>{tec.cargo || "-"}</TableCell>
-                      <TableCell>{tec.email || "-"}</TableCell>
-                      <TableCell>
-                        <IconButton onClick={() => handleOpenEdit(tec)}>
-                          <Pencil size={18} />
-                        </IconButton>
-                        <IconButton color="error" onClick={() => handleOpenDelete(tec)}>
-                          <Trash2 size={18} />
-                        </IconButton>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })
-              ) : (
-                <TableRow>
-                  <TableCell
-                    colSpan={4}
-                    style={{ textAlign: "center", padding: "40px", color: "#999" }}
-                  >
-                    Nenhum técnico encontrado com os filtros aplicados
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      )}
 
-      {/* Modal para confirmação de exclusão */}
-            <DeletarPerfil
-              isOpen={openDeleteModal}
-              onClose={handleCloseDelete}
-              onDelete={handleDeleteConfirmed}
-              usuario={selectedRow}
-            />
-      
-            {/* Modal para editar tecnico */}
-            <ModalEditarTecnico
-              isOpen={openEditModal}
-              onClose={handleCloseEdit}
-              tecnico={selectedTecnicoEdit}
-              onSuccess={handleEditSuccess} // Atualiza lista após edição
-            />
-      
-            {/* Snackbar para toasts */}
-            <Snackbar
-              open={toastOpen}
-              autoHideDuration={4000}
-              onClose={handleToastClose}
-              anchorOrigin={{ vertical: "top", horizontal: "right" }}
-            >
-              <Alert
+        {isMobile ? (
+          <div className="tecnico-cards-container">
+            {filteredTecnicos.length > 0 ? (
+              filteredTecnicos.map((tec) => (
+                <div key={tec.id} className="tecnico-card">
+                  <div><b>Nome:</b> {tec.nome || "-"}</div>
+                  <div><b>Cargo:</b> {tec.cargo || "-"}</div>
+                  <div><b>Email:</b> {tec.email || "-"}</div>
+                  <div className="actions">
+                    <IconButton onClick={() => handleOpenEdit(tec)}>
+                      <Pencil size={18} />
+                    </IconButton>
+                    <IconButton color="error" onClick={() => handleOpenDelete(tec)}>
+                      <Trash2 size={18} />
+                    </IconButton>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="tecnico-card-empty">
+                Nenhum técnico encontrado com os filtros aplicados
+              </div>
+            )}
+          </div>
+        ) : (
+          <TableContainer
+            component={Paper}
+            sx={{
+              borderRadius: 2,
+              boxShadow: "0 2px 8px rgba(44,62,80,0.04)",
+              marginBottom: 4,
+              overflowX: "auto",
+              "@media (max-width: 768px)": {
+                "& table": { minWidth: "700px" },
+              },
+            }}
+          >
+            <Table aria-label="Tabela de técnicos">
+              <TableHead>
+                <TableRow>
+                  <TableCell sx={{ color: "#858B99", fontWeight: 600 }}>Nome</TableCell>
+                  <TableCell sx={{ color: "#858B99", fontWeight: 600 }}>Cargo</TableCell>
+                  <TableCell sx={{ color: "#858B99", fontWeight: 600 }}>E-mail</TableCell>
+                  <TableCell sx={{ color: "#858B99", fontWeight: 600 }}>Ações</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {filteredTecnicos.length > 0 ? (
+                  filteredTecnicos.map((tec) => {
+                    const initials = tec.nome
+                      ? tec.nome
+                          .split(" ")
+                          .map((n) => (n && n.length > 0 ? n[0] : ""))
+                          .join("")
+                          .slice(0, 2)
+                          .toUpperCase()
+                      : "??";
+                    return (
+                      <TableRow key={tec.id} hover>
+                        <TableCell>
+                          <Avatar initials={initials} />
+                          {tec.nome || "-"}
+                        </TableCell>
+                        <TableCell>{tec.cargo || "-"}</TableCell>
+                        <TableCell>{tec.email || "-"}</TableCell>
+                        <TableCell>
+                          <IconButton onClick={() => handleOpenEdit(tec)}>
+                            <Pencil size={18} />
+                          </IconButton>
+                          <IconButton color="error" onClick={() => handleOpenDelete(tec)}>
+                            <Trash2 size={18} />
+                          </IconButton>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })
+                ) : (
+                  <TableRow>
+                    <TableCell
+                      colSpan={4}
+                      style={{ textAlign: "center", padding: "40px", color: "#999" }}
+                    >
+                      Nenhum técnico encontrado com os filtros aplicados
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
+
+        {/* Modal para confirmação de exclusão */}
+              <DeletarPerfil
+                isOpen={openDeleteModal}
+                onClose={handleCloseDelete}
+                onDelete={handleDeleteConfirmed}
+                usuario={selectedRow}
+              />
+        
+              {/* Modal para editar tecnico */}
+              <ModalEditarTecnico
+                isOpen={openEditModal}
+                onClose={handleCloseEdit}
+                tecnico={selectedTecnicoEdit}
+                onSuccess={handleEditSuccess} // Atualiza lista após edição
+              />
+        
+              {/* Snackbar para toasts */}
+              <Snackbar
+                open={toastOpen}
+                autoHideDuration={4000}
                 onClose={handleToastClose}
-                severity={toastSeverity}
-                sx={{ width: "100%", bgcolor: "#604FEB", color: "#fff" }}
+                anchorOrigin={{ vertical: "top", horizontal: "right" }}
               >
-                {toastMessage}
-              </Alert>
-            </Snackbar>
+                <Alert
+                  onClose={handleToastClose}
+                  severity={toastSeverity}
+                  sx={{ width: "100%", bgcolor: "#604FEB", color: "#fff" }}
+                >
+                  {toastMessage}
+                </Alert>
+              </Snackbar>
+      </div>
     </div>
   );
 }
