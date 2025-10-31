@@ -78,6 +78,8 @@ $breakpoint-sm: 576px;
 $breakpoint-md: 768px;
 $breakpoint-lg: 992px;
 $breakpoint-xl: 1200px;
+$breakpoint-xxl: 2000px;
+$breakpoint-xxxl: 4000px;
 
 // MIXINS
 @mixin flex($direction: row, $align: center, $justify: flex-start, $gap: 0) {
@@ -144,7 +146,6 @@ $breakpoint-xl: 1200px;
     @content;
   }
 }
-
 // RESET E BASE
 * {
   margin: 0;
@@ -159,14 +160,48 @@ body {
 
 // Página de Chamados Abertos do Técnico
 .chamadosAbertos {
-    margin-left: 16vw;
-    padding-top: 2vh;
-    margin-right: 1vw;
+  padding-top: 2vh;
+  margin-right: 1vw;
 
-    @media (max-width: $breakpoint-md) {
-        margin-left: 2vw;
-        margin-right: 2vw;
-    } 
+  // Para telas menores que $breakpoint-xs
+  @media (max-width: $breakpoint-xs) {
+    margin-left: 2vw;
+  }
+
+  // Para telas maiores que $breakpoint-xs e menores que $breakpoint-sm
+  @media (min-width: ($breakpoint-xs + 1)) and (max-width: $breakpoint-sm) {
+    margin-left: 2vw;
+  }
+
+  // Para telas maiores que $breakpoint-sm e menores que $breakpoint-md
+  @media (min-width: ($breakpoint-sm + 1)) and (max-width: $breakpoint-md) {
+    margin-left: 2vw;
+  }
+
+  // Para telas maiores que $breakpoint-md e menores que $breakpoint-lg
+  @media (min-width: ($breakpoint-md + 1)) and (max-width: $breakpoint-lg) {
+    margin-left: 28vw;
+  }
+
+  // Para telas maiores que $breakpoint-lg e menores que $breakpoint-xl
+  @media (min-width: ($breakpoint-lg + 1)) and (max-width: $breakpoint-xl) {
+    margin-left: 24vw;
+  }
+
+  // Para telas maiores que $breakpoint-xl e menores que $breakpoint-xxl
+  @media (min-width: ($breakpoint-xl + 1)) and (max-width: $breakpoint-xxl) {
+    margin-left: 20vw;
+  }
+
+  // Para telas maiores que $breakpoint-xxl e menores que $breakpoint-xxxl
+  @media (min-width: ($breakpoint-xxl + 1)) and (max-width: $breakpoint-xxxl) {
+    margin-left: 16vw;
+  }
+
+  // Para telas maiores que $breakpoint-xxxl
+  @media (min-width: ($breakpoint-xxxl + 1)) {
+    margin-left: 14vw;
+  }
 }
 
 // HEADER
@@ -187,10 +222,6 @@ body {
         margin-bottom: 2vh;
         letter-spacing: -0.025em;
     }
-}
-
-.search-bar-abertos-container{
-    margin-left: 1vw;
 }
 
 // Estilos para os cards
