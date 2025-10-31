@@ -4,9 +4,9 @@ import ClientTable from "../../components/ClientAdminTabe";
 export default function ClientesAdmin() {
     return (
         <>
-                <h1>Clientes</h1>
+                <h1 className="header-clientes-admin">Clientes</h1>
                 <ClientTable />
-            <Outlet />
+                <Outlet />
 
         </>
     )

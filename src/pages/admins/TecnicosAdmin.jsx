@@ -5,9 +5,9 @@ export default function TecnicosAdmin() {
     return (
         <>
 
-                <h1>Técnicos</h1>
+                <h1 className="header-tecnicos-admin">Técnicos</h1>
                 <TecnicosTable />
-            <Outlet />
+                <Outlet />
 
         </>
     )

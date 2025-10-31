@@ -63,7 +63,7 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 
 export default function TableAdminTec() {
   const isMobile = useIsMobile(1200);
-  const { search } = useSearch();
+  const { search, filters } = useSearch();
   const { tecnicos, deleteTecnico, fetchTecnicos, createTecnico } = useTecnicos();
   const { token } = useAuth(); // Token de autenticação
 

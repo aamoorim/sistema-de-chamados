@@ -30,7 +30,7 @@ function Avatar({ initials }) {
         width: 28,
         height: 28,
         borderRadius: "50%",
-        background: "#604FEB", // tom roxo
+        background: "rgb(46, 61, 163)", // tom roxo
         color: "#fff",
         fontWeight: 600,
         fontSize: 14,

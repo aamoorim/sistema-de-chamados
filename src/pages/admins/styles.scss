@@ -176,7 +176,9 @@ body {
   min-width: 0;
 }
 
-.header-chamados-admin {
+.header-chamados-admin,
+.header-clientes-admin,
+.header-tecnicos-admin {
   font-size: 30px;
   font-weight: bold;
   color: #2E3DA3;
