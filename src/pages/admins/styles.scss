@@ -318,3 +318,92 @@ body {
   }
 }
 
+.header-container {
+  display: flex;
+  justify-content: space-between; // coloca header à esquerda e botão à direita
+  align-items: center; // alinha verticalmente
+}
+
+.header-container .botao-novo-tecnico{
+    // Para telas menores que $breakpoint-xs
+  @media (max-width: $breakpoint-xs) {
+    margin-right: 1vw;
+  }
+
+  // Para telas maiores que $breakpoint-xs e menores que $breakpoint-sm
+  @media (min-width: ($breakpoint-xs + 1)) and (max-width: $breakpoint-sm) {
+    margin-right: 1vw;
+  }
+
+  // Para telas maiores que $breakpoint-sm e menores que $breakpoint-md
+  @media (min-width: ($breakpoint-sm + 1)) and (max-width: $breakpoint-md) {
+    margin-right: 1vw;
+  }
+
+  // Para telas maiores que $breakpoint-md e menores que $breakpoint-lg
+  @media (min-width: ($breakpoint-md + 1)) and (max-width: $breakpoint-lg) {
+    margin-right: 1vw;
+  }
+
+  // Para telas maiores que $breakpoint-lg e menores que $breakpoint-xl
+  @media (min-width: ($breakpoint-lg + 1)) and (max-width: $breakpoint-xl) {
+    margin-right: 1vw;
+  }
+
+  // Para telas maiores que $breakpoint-xl e menores que $breakpoint-xxl
+  @media (min-width: ($breakpoint-xl + 1)) and (max-width: $breakpoint-xxl) {
+    margin-right: 1vw;
+  }
+
+  // Para telas maiores que $breakpoint-xxl e menores que $breakpoint-xxxl
+  @media (min-width: ($breakpoint-xxl + 1)) and (max-width: $breakpoint-xxxl) {
+    margin-right: 1vw;
+  }
+
+  // Para telas maiores que $breakpoint-xxxl
+  @media (min-width: ($breakpoint-xxxl + 1)) {
+    margin-right: 1vw;
+  }
+}
+
+.header-container .botao-novo-cliente{
+    // Para telas menores que $breakpoint-xs
+  @media (max-width: $breakpoint-xs) {
+    margin-right: 1vw;
+  }
+
+  // Para telas maiores que $breakpoint-xs e menores que $breakpoint-sm
+  @media (min-width: ($breakpoint-xs + 1)) and (max-width: $breakpoint-sm) {
+    margin-right: 1vw;
+  }
+
+  // Para telas maiores que $breakpoint-sm e menores que $breakpoint-md
+  @media (min-width: ($breakpoint-sm + 1)) and (max-width: $breakpoint-md) {
+    margin-right: 1vw;
+  }
+
+  // Para telas maiores que $breakpoint-md e menores que $breakpoint-lg
+  @media (min-width: ($breakpoint-md + 1)) and (max-width: $breakpoint-lg) {
+    margin-right: 1vw;
+  }
+
+  // Para telas maiores que $breakpoint-lg e menores que $breakpoint-xl
+  @media (min-width: ($breakpoint-lg + 1)) and (max-width: $breakpoint-xl) {
+    margin-right: 1vw;
+  }
+
+  // Para telas maiores que $breakpoint-xl e menores que $breakpoint-xxl
+  @media (min-width: ($breakpoint-xl + 1)) and (max-width: $breakpoint-xxl) {
+    margin-right: 1vw;
+  }
+
+  // Para telas maiores que $breakpoint-xxl e menores que $breakpoint-xxxl
+  @media (min-width: ($breakpoint-xxl + 1)) and (max-width: $breakpoint-xxxl) {
+    margin-right: 1vw;
+  }
+
+  // Para telas maiores que $breakpoint-xxxl
+  @media (min-width: ($breakpoint-xxxl + 1)) {
+    margin-right: 1vw;
+  }
+}
