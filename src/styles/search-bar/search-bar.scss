@@ -346,6 +346,7 @@ body {
   // Para telas menores que $breakpoint-xs
   @media (max-width: $breakpoint-xs) {
     width: auto;
+    margin-top: 2vw;
     min-width: 10rem;
     max-width: 32rem;
   }
@@ -353,6 +354,7 @@ body {
   // Para telas maiores que $breakpoint-xs e menores que $breakpoint-sm
   @media (min-width: ($breakpoint-xs + 1)) and (max-width: $breakpoint-sm) {
     width: auto;
+    margin-top: 2vw;
     min-width: 16rem;
     max-width: 36rem;
   }
@@ -360,6 +362,7 @@ body {
   // Para telas maiores que $breakpoint-sm e menores que $breakpoint-md
   @media (min-width: ($breakpoint-sm + 1)) and (max-width: $breakpoint-md) {
     width: auto;
+    margin-top: 2vw;
     min-width: 30rem;
     max-width: 46rem;
   }

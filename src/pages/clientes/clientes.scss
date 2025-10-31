@@ -185,9 +185,9 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap;
 
   h1 {
+    display: inline-block;
     font-size: $text-3xl;
     font-weight: $font-semibold;
     color: #2e3da3;
@@ -196,31 +196,61 @@ body {
     margin-left: 2px;
   }
 
-  .MuiButton-root,
-  button,
-  .botao,
-  .btn-encerrar {
-    min-width: 120px;
-    max-width: 100%;
-    margin-right: 5rem;
-  }
-
   @include responsive($breakpoint-md) {
-    flex-direction: column;
-    align-items: stretch;
     gap: 12px;
 
     h1 {
       font-size: 1.5rem;
-      margin-bottom: 0;
+    }
+  }
+
+  .botao-novo{
+    padding-bottom: 2rem;
+    display: inline-block;
+
+    // Para telas menores que $breakpoint-xs
+    @media (max-width: $breakpoint-xs) {
+      width: auto;
+      min-width: 2vw;
+      max-width: 10rem !important;
     }
 
-    button,
-    .MuiButton-root,
-    .botao {
-      width: 100%;
-      min-width: 0;
+    // Para telas maiores que $breakpoint-xs e menores que $breakpoint-sm
+    @media (min-width: ($breakpoint-xs + 1)) and (max-width: $breakpoint-sm) {
+      // margin-right: 2vw;
+      width: auto;
+      min-width: 2vw;
+      max-width: 20rem;
+    }
 
+    // Para telas maiores que $breakpoint-sm e menores que $breakpoint-md
+    @media (min-width: ($breakpoint-sm + 1)) and (max-width: $breakpoint-md) {
+      // margin-right: 2vw;
+    }
+
+    // Para telas maiores que $breakpoint-md e menores que $breakpoint-lg
+    @media (min-width: ($breakpoint-md + 1)) and (max-width: $breakpoint-lg) {
+      // margin-right: 2vw;
+    }
+
+    // Para telas maiores que $breakpoint-lg e menores que $breakpoint-xl
+    @media (min-width: ($breakpoint-lg + 1)) and (max-width: $breakpoint-xl) {
+      // margin-right: 2vw;
+    }
+
+    // Para telas maiores que $breakpoint-xl e menores que $breakpoint-xxl
+    @media (min-width: ($breakpoint-xl + 1)) and (max-width: $breakpoint-xxl) {
+      margin-right: 2vw;
+    }
+
+    // Para telas maiores que $breakpoint-xxl e menores que $breakpoint-xxxl
+    @media (min-width: ($breakpoint-xxl + 1)) and (max-width: $breakpoint-xxxl) {
+      margin-right: 2vw;
+    }
+
+    // Para telas maiores que $breakpoint-xxxl
+    @media (min-width: ($breakpoint-xxxl + 1)) {
+      margin-right: 2vw;
     }
   }
 }
@@ -342,7 +372,7 @@ body {
   }
 
   @include responsive($breakpoint-xs) {
-    padding: $spacing-sm;
+    padding: $spacing-lg;
     border-radius: $radius-sm;
   }
 }
