@@ -1,14 +1,15 @@
 @use "sass:color";
+
 // VARIÁVEIS
 
-// Colors
 $color-primary: #3b83f6;
 $color-primary-hover: #2563eb;
-$color-secondary: #64748b;  
+$color-secondary: #64748b;
 $color-success: #caecb1;
 $color-warning: #a5bbeb;
 $color-danger: #ef4444;
-$color-icon:#355EC5 ;
+$color-icon: #355ec5;
+$color-espera: #ffd93d;
 
 // Background Colors
 $bg-main: #ffffff;
@@ -81,7 +82,6 @@ $breakpoint-xxl: 2000px;
 $breakpoint-xxxl: 4000px;
 
 // MIXINS
-
 @mixin flex($direction: row, $align: center, $justify: flex-start, $gap: 0) {
   display: flex;
   flex-direction: $direction;
@@ -106,7 +106,11 @@ $breakpoint-xxxl: 4000px;
   }
 }
 
-@mixin button($bg: $color-primary, $color: $text-white, $padding: $spacing-sm $spacing-lg) {
+@mixin button(
+  $bg: $color-primary,
+  $color: $text-white,
+  $padding: $spacing-sm $spacing-lg
+) {
   background: $bg;
   color: $color;
   border: none;
@@ -115,9 +119,9 @@ $breakpoint-xxxl: 4000px;
   font-weight: $font-medium;
   cursor: pointer;
   transition: all $transition-base;
-  
+
   &:hover {
-    background: color.adjust($bg, $lightness: -10%);
+    background: darken($bg, 10%);
     transform: translateY(-1px);
   }
 }
@@ -157,58 +161,141 @@ body {
 }
 
 // LAYOUT PRINCIPAL
-
 .app-container {
   display: flex;
   min-height: 100vh;
   background: $bg-app;
 }
 
-.main-content {
-  flex: 1;
-  background:#0e5dc5; 
-  padding: 20px;
-
-  @include responsive($breakpoint-xl) { padding: $spacing-2xl $spacing-3xl; }
-  @include responsive($breakpoint-lg) { padding: $spacing-2xl; }
-  @include responsive($breakpoint-md) { padding: $spacing-xl; }
-  @include responsive($breakpoint-xs) { padding: $spacing-lg; }
-}
-
 // HEADER
-.header {
-  margin-bottom: $spacing-3xl;  
+.header-tecnico {
+  padding-top: 2vh;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+
+  // Para telas menores que $breakpoint-xs
+  @media (max-width: $breakpoint-xs) {
+    margin-left: 2vw;
+  }
+
+  // Para telas maiores que $breakpoint-xs e menores que $breakpoint-sm
+  @media (min-width: ($breakpoint-xs + 1)) and (max-width: $breakpoint-sm) {
+    margin-left: 2vw;
+  }
+
+  // Para telas maiores que $breakpoint-sm e menores que $breakpoint-md
+  @media (min-width: ($breakpoint-sm + 1)) and (max-width: $breakpoint-md) {
+    margin-left: 2vw;
+  }
+
+  // Para telas maiores que $breakpoint-md e menores que $breakpoint-lg
+  @media (min-width: ($breakpoint-md + 1)) and (max-width: $breakpoint-lg) {
+    margin-left: 28vw;
+  }
+
+  // Para telas maiores que $breakpoint-lg e menores que $breakpoint-xl
+  @media (min-width: ($breakpoint-lg + 1)) and (max-width: $breakpoint-xl) {
+    margin-left: 22vw;
+  }
+
+  // Para telas maiores que $breakpoint-xl e menores que $breakpoint-xxl
+  @media (min-width: ($breakpoint-xl + 1)) and (max-width: $breakpoint-xxl) {
+    margin-left: 20vw;
+  }
+
+  // Para telas maiores que $breakpoint-xxl e menores que $breakpoint-xxxl
+  @media (min-width: ($breakpoint-xxl + 1)) and (max-width: $breakpoint-xxxl) {
+    margin-left: 16vw;
+  }
+
+  // Para telas maiores que $breakpoint-xxxl
+  @media (min-width: ($breakpoint-xxxl + 1)) {
+    margin-left: 14vw;
+  }
 
   h1 {
     font-size: $text-3xl;
     font-weight: $font-semibold;
-    color:#2E3DA3;
-    margin-bottom: $spacing-2xl;
+    color: #2e3da3;
+    margin-bottom: 2vh;
     letter-spacing: -0.025em;
+    margin-left: 1vw;
+
+    @media(min-width: $breakpoint-xxl) {
+      font-size: 2.5rem;
+      font-weight: $font-bold;
+    }
+
+    @media(min-width: $breakpoint-xxxl) {
+      font-size: 3rem;
+      font-weight: $font-bold;
+    }
   }
 }
 
 // SEÇÕES (Em atendimento / Encerrados)
-.section {
-  margin-bottom: $spacing-4xl;
+.section-tecnico {
+  margin-bottom: 3vh;
+  flex: 1;
   display: flex;
   flex-direction: column;
+  padding: 10px;
   transition: margin-left 0.3s ease;
-  margin-left: 18rem; // margem padrão para telas grandes
+  margin-left: 15vw; // margem padrão para telas grandes
 
-  // Remover margem em telas menores que 768px
-  @include responsive($breakpoint-md) {
-    margin-left: 0;
+  // Para telas menores que $breakpoint-xs
+  @media (max-width: $breakpoint-xs) {
+    margin-left: 2vw;
+  }
+
+  // Para telas maiores que $breakpoint-xs e menores que $breakpoint-sm
+  @media (min-width: ($breakpoint-xs + 1)) and (max-width: $breakpoint-sm) {
+    margin-left: 2vw;
+  }
+
+  // Para telas maiores que $breakpoint-sm e menores que $breakpoint-md
+  @media (min-width: ($breakpoint-sm + 1)) and (max-width: $breakpoint-md) {
+    margin-left: 2vw;
+  }
+
+  // Para telas maiores que $breakpoint-md e menores que $breakpoint-lg
+  @media (min-width: ($breakpoint-md + 1)) and (max-width: $breakpoint-lg) {
+    margin-left: 28vw;
+  }
+
+  // Para telas maiores que $breakpoint-lg e menores que $breakpoint-xl
+  @media (min-width: ($breakpoint-lg + 1)) and (max-width: $breakpoint-xl) {
+    margin-left: 22vw;
+  }
+
+  // Para telas maiores que $breakpoint-xl e menores que $breakpoint-xxl
+  @media (min-width: ($breakpoint-xl + 1)) and (max-width: $breakpoint-xxl) {
+    margin-left: 20vw;
+  }
+
+  // Para telas maiores que $breakpoint-xxl e menores que $breakpoint-xxxl
+  @media (min-width: ($breakpoint-xxl + 1)) and (max-width: $breakpoint-xxxl) {
+    margin-left: 16vw;
+  }
+
+  // Para telas maiores que $breakpoint-xxxl
+  @media (min-width: ($breakpoint-xxxl + 1)) {
+    margin-left: 14vw;
   }
 }
 
-.section-header {
-  display: inline-flex;        // mantém comportamento de conteúdo
+.section-tecnico-header {
+  font-size: $text-base;
+  font-weight: $font-normal;
+  display: inline-flex;
   align-items: center;
   align-self: flex-start;      // impede de esticar no container flex
   width: auto;                 // garante que o tamanho siga o conteúdo
   gap: 8px;
-  margin-bottom: $spacing-xl;
+  align-self: flex-start;
+  margin-bottom: 3vh;
   padding: 6px 14px;
   border-radius: 24px;
   font-size: $text-base;
@@ -229,23 +316,46 @@ body {
     background: $color-success;
     color: #508b26;
   }
-}
 
+    @media(min-width: $breakpoint-xxl) {
+      font-size: 1.5rem;
+      font-weight: $font-medium;
+       .status{
+        width: 26px;
+        height: 26px;
+       }
+    }
+
+    @media(min-width: $breakpoint-xxxl) {
+      font-size: 2rem;
+      font-weight: $font-medium;
+       .status{
+        width: 32px;
+        height: 32px;
+       }
+    }
+}
 
 // LISTA DE CHAMADOS
-.chamados-list {
+.chamados-tecnico-list {
+  width: 100%;
   display: flex;
-  gap: $spacing-lg;
-  
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 13px;
+  align-items: flex-start;
 }
 
-.chamado-card {
+.chamado-tecnico-card {
   @include card($spacing-lg, $radius-md, $shadow-sm);
   width: 100%;
   padding: 24px 28px;
   font-size: 14px;
   line-height: 1.4;
-  
+
+  &.espera {
+    @include status-border(#b91c1cea);
+  }
 
   &.finalizado {
     @include status-border($color-success);
@@ -256,132 +366,152 @@ body {
   }
 
   @include responsive($breakpoint-md) {
-    max-width: 100%;
-    width: 100%;
     padding: 18px 22px;
   }
 
-  @include responsive($breakpoint-xs){
-    padding: $spacing-sm;
+  @include responsive($breakpoint-xs) {
+    padding: $spacing-lg;
     border-radius: $radius-sm;
   }
   }
 
-  @media (min-width: $breakpoint-md) {
-    .chamado-card {
-      flex: 1;
-      width: 100%;
-      min-width: 32rem !important;
-      max-width: 46rem !important;
-    }
+@media (max-width: $breakpoint-xs) {
+  .chamado-tecnico-card {
+    min-width: 50vw;
+    max-width: 94vw;
   }
+}
 
-  @media (min-width: 769px) {
-    .chamado-card {
-      min-width: 28rem !important;
-    }
+@media (min-width: $breakpoint-md) {
+  .chamado-tecnico-card {
+    flex: 1;
+    min-width: 32rem !important;
+    max-width: 46rem !important;
   }
+}
 
-  @media (min-width: $breakpoint-lg) {
-      .chamado-card {
-        min-width: 42rem !important;
-        max-width: 58rem !important;
-      }
-    }
-
-  @media (min-width: $breakpoint-xl) {
-      .chamado-card {
-        min-width: 28vw !important;
-        max-width: 42vw !important;
-      }
+@media (min-width: 769px) {
+  .chamado-tecnico-card {
+    min-width: 28rem !important;
   }
+}
+
+@media (min-width: $breakpoint-lg) {
+  .chamado-tecnico-card {
+    min-width: 42rem !important;
+    max-width: 58rem !important;
+  }
+}
+
+@media (min-width: $breakpoint-xl) {
+  .chamado-tecnico-card {
+    min-width: 28vw !important;
+    max-width: 42vw !important;
+  }
+}
 
 @media (min-width: $breakpoint-xxl) {
-    .chamado-card {
-      min-width: 32vw !important;
-      max-width: 46vw !important;
-    }
+  .chamado-tecnico-card {
+    min-width: 32vw !important;
+    max-width: 46vw !important;
+  }
 }
 
 @media (min-width: $breakpoint-xxxl) {
-    .chamado-card {
-      min-width: 42vw !important;
-      max-width: 56vw !important;
-    }
+  .chamado-tecnico-card {
+    min-width: 42vw !important;
+    max-width: 82vw !important;
+  }
 }
 
 // CARD MAIN
-
-.card-main {
+.card-tecnico-main {
   @include flex(row, flex-start, space-between);
   margin-bottom: $spacing-md;
+
+  @include responsive($breakpoint-md) {
+    flex-direction: row;
+    gap: 16px;
+  }
 }
 
-.chamado-info {
+.chamado-tecnico-info {
   flex: 1;
-  
-  .chamado-codigo {
+
+  .chamado-tecnico-codigo {
     font-size: $text-xs;
     color: $text-secondary;
     margin-bottom: 4px;
     font-weight: $font-medium;
-  } 
 
-  .chamado-titulo {
+    @media(min-width: $breakpoint-xxl) {
+      font-size: 1.2rem;
+      font-weight: $font-medium;
+    }
+
+    @media(min-width: $breakpoint-xxxl) {
+      font-size: 1.5rem;
+      font-weight: $font-medium;
+    }
+  }
+
+  .chamado-tecnico-titulo {
     font-size: $text-lg;
     font-weight: $font-semibold;
     color: $text-primary;
     margin-bottom: 4px;
     line-height: 1.3;
+
+    @media(min-width: $breakpoint-xxl) {
+      font-size: 1.6rem;
+      font-weight: $font-bold;
+    } 
+
+    @media(min-width: $breakpoint-xxxl) {
+      font-size: 2rem;
+      font-weight: $font-bold;
+    }
   }
 
-  .chamado-descricao {
+  .chamado-tecnico-descricao {
     font-size: $text-sm;
     color: $text-secondary;
     line-height: 1.4;
     margin-bottom: 18px;
 
-      display: -webkit-box;
-      #{-webkit-line-clamp}: 2; // número de linhas máximas
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-      text-overflow: ellipsis;
+    @media(min-width: $breakpoint-xxl) {
+      font-size: 1.2rem;
+      font-weight: $font-medium;
+    }
+
+    @media(min-width: $breakpoint-xxxl) {
+      font-size: 2rem;
+      font-weight: $font-medium;
+    }
   }
 
-  .chamado-data {
+  .chamado-tecnico-data {
     font-size: $text-xs;
     color: $text-muted;
     font-weight: $font-semibold;
+
+      @media(min-width: $breakpoint-xxl) {
+        font-size: 1.2rem;
+        font-weight: $font-medium;
+      }
+
+      @media(min-width: $breakpoint-xxxl) {
+        font-size: 1.6rem;
+        font-weight: $font-medium;
+      }
   }
 }
 
-.card-right {
-  @include flex(row, center, flex-end, $spacing-sm);
-}
-
-.btn-encerrar {
-  @include button(#000, $text-white, 6px $spacing-lg);
-  font-size: $text-xs;
-  font-weight: $font-medium;
-  border-radius: 6px;
-  width: 6rem;
-  height: 31px;
-
-  @include flex(row, center, center);
-
-  position: relative;
-  overflow: hidden;
-
-  &:hover { background: #1f2937; }
-}
-
 // CARD FOOTER
-
-.card-footer {
+.card-tecnico-footer {
   border-top: 1px solid $border-light;
   padding-top: 16px;
   margin-top: 32px;
-
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -391,13 +521,25 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-  flex: 1
+  flex: 1;
 }
 
 .user-avatar {
   @include avatar(26px, $color-primary);
   font-size: 11px;
   font-weight: $font-bold;
+
+  @media(min-width: $breakpoint-xxl) {
+    @include avatar(2rem, $color-primary);
+      font-size: 1.2rem;
+      font-weight: $font-bold;
+  }
+
+  @media(min-width: $breakpoint-xxxl) {
+    @include avatar(3rem, $color-primary);
+      font-size: 1.4rem;
+      font-weight: $font-bold;
+  }
 }
 
 .user-name {
@@ -405,6 +547,16 @@ body {
   color: $text-primary;
   font-weight: $font-medium;
   flex: 1;
+
+  @media(min-width: $breakpoint-xxl) {
+    font-size: 1.3rem;
+    font-weight: $font-medium;
+  }
+
+  @media(min-width: $breakpoint-xxxl) {
+    font-size: 2rem;
+    font-weight: $font-medium;
+  }
 }
 
 .check-icon {
@@ -417,54 +569,7 @@ body {
   margin-left: auto;
 }
 
-// RESPONSIVE AJUSTES
-
-@include responsive($breakpoint-md) {
-  .card-main {
-    flex-direction: column;
-    gap: 16px;
-  }
-    
-  .card-right {
-    justify-content: flex-start;
-  }
-
-  .chamado-info {
-    margin-right: 0;
-  }
-}
-
-@include responsive($breakpoint-xs) {
-  .user-avatar {
-    @include avatar(28px, $color-primary);
-    font-size: 12px;
-  }
-  
-  .btn-encerrar {
-    padding: 6px 16px;
-    font-size: 12px;
-    width: 110px;
-    height: 36px;
-  }
-  
-  .check-icon {
-    width: 24px;
-    height: 24px;
-  }
-
-  .chamado-info {
-    .chamado-titulo {
-      font-size: $text-lg;
-    }
-    
-    .chamado-descricao {
-      font-size: $text-sm;
-    }
-  }
-}
-
 // RIPPLE EFFECT
-
 $ripple-duration: 0.8s;
 $ripple-size: 200px;
 $ripple-color: rgba(255, 255, 255, 0.4);
@@ -473,11 +578,11 @@ $ripple-easing: cubic-bezier(0.4, 0, 0.2, 1);
 .btn-encerrar {
   position: relative;
   overflow: hidden;
-  
+
   &:active {
     transform: translateY(0px) scale(0.98);
   }
-  
+
   .ripple {
     position: absolute;
     border-radius: 50%;
@@ -495,11 +600,11 @@ $ripple-easing: cubic-bezier(0.4, 0, 0.2, 1);
     opacity: 0.6;
     transform: translate(-50%, -50%) scale(0);
   }
-  
+
   50% {
     opacity: 0.4;
   }
-  
+
   100% {
     width: $ripple-size;
     height: $ripple-size;
@@ -521,166 +626,6 @@ $ripple-easing: cubic-bezier(0.4, 0, 0.2, 1);
 
   &.finalizado {
     background: color.adjust($color-success, $lightness: 10%);
-    color: #2E7D32;
-  }
-}
-
-
-    // BREAKPOINTS PARA AJUSTES FINOS
-  
-  // até 480px (mobile pequeno)
-  @include responsive($breakpoint-xs) {
-  .chamado-card {
-    width: 23rem;        // ocupa toda a largura disponível
-    max-width: 17rem;    // evita travar o tamanho
-    padding: $spacing-lg; 
-    min-height: auto;
-    border-radius: $radius-sm;   // deixa altu ra se ajustar ao conteúdo
-  }
-  
-
-  .card-main {
-    flex-direction: column;
-    gap: $spacing-sm;
-  }
-
-  .btn-encerrar {
-    width: 100%;          // botão ocupa toda a largura
-    height: auto;
-    padding: 8px;                                                                           
-    font-size: $text-sm;
-  }                            
-
-  .chamado-info {
-    .chamado-titulo {
-      font-size: $text-base;
-    }
-
-    .chamado-descricao {
-      font-size: $text-xs;
-    }
-  }
-
-  .card-footer {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: $spacing-sm;
-    margin-top: $spacing-md;
-  }
-}
-
- // até 992px (notebook/tablet grande)
-@include responsive($breakpoint-lg) { 
-  .chamados-list {
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  }
-
-  .chamado-card {
-    padding: 18px 22px;
-  }
-}
-
-// até 768px (tablet)
-@include responsive($breakpoint-md) { 
-  .chamados-list {
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); // empilha no tablet/celular
-  }
-
-  .chamado-card {
-    padding: $spacing-md; 
-  }
-}
-
-
-
-
-// RESPONSIVIDADE FINAL
-
-// até 480px (mobile pequeno)
-@include responsive($breakpoint-xs) {
-  .chamado-card {
-    width: 100%;
-    max-width: 100%;
-    padding: $spacing-sm; 
-    min-height: auto;
-    border-radius: $radius-sm;
-  }
-
-  .card-main {
-    flex-direction: column;
-    gap: $spacing-sm;
-  }
-
-  .btn-encerrar {
-    width: 100%;          
-    height: auto;
-    padding: 8px;                                                                           
-    font-size: $text-sm;
-  }                            
-
-  .chamado-info {
-    .chamado-titulo { font-size: $text-base; }
-    .chamado-descricao { font-size: $text-xs; }
-  }
-
-  .card-footer {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: $spacing-sm;
-    margin-top: $spacing-md;
-  }
-}
-
-// até 576px (celulares médios)
-@include responsive($breakpoint-sm) {
-  .chamados-list {
-    grid-template-columns: 1fr; // força apenas 1 card por linha
-  }
-
-  .chamado-card {
-    max-width: 100%;
-    padding: $spacing-md;
-  }
-
-  .chamado-info {
-    .chamado-titulo { font-size: $text-lg; }
-    .chamado-descricao { font-size: $text-sm; }
-  }
-}
-
-// até 768px (tablet)
-@include responsive($breakpoint-md) { 
-  .chamados-list {
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
-  }
-
-  .chamado-card {
-    padding: $spacing-md; 
-  }
-
-  .main-content {
-    padding: $spacing-xl;
-  }
-}
-
-// até 992px (notebooks pequenos)
-@include responsive($breakpoint-lg) { 
-  .chamados-list {
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  }
-
-  .chamado-card {
-    padding: 18px 22px;
-  }
-}
-
-// até 1200px (telas grandes)
-@include responsive($breakpoint-xl) {
-  .main-content {
-    padding: $spacing-3xl $spacing-4xl; // mais respiro lateral
-  }
-
-  .chamados-list {
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    color: #2e7d32;
   }
 }

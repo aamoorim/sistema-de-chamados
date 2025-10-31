@@ -6,8 +6,7 @@ import {
 import { ClipboardList } from "lucide-react";
 import { ChamadosAbertosTecnicosContext } from "../context/ChamadosAbertosTecnicosContext";
 import ModalAtenderChamado from "./Modals/AtenderChamado";
-import useIsMobile from "../hooks/useIsMobile";
-import api from "../services/api"; // ← usado no polling direto
+import api from "../services/api"; // usado no polling direto
 import "../styles/tables/listTable.scss";
 import Spinner from "./LoadingSpinner";
 
@@ -62,7 +61,7 @@ export default function ListTableTec() {
   if (error) return <div style={{ color: "red" }}>{error}</div>;
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: 2 }}>
       <ModalAtenderChamado
         isOpen={open}
         onClose={handleCloseModal}

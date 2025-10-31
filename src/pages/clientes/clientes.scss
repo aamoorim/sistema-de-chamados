@@ -9,24 +9,24 @@ $color-danger: #ef4444;
 $color-icon: #355ec5;
 $color-espera: #ffd93d;
 
-// Background Colors
+
 $bg-main: #ffffff;
 $bg-sidebar: #1e293b;
 $bg-card: #ffffff;
 $bg-app: #f1f5f9;
 $bg-hover: #f8fafc;
 
-// Text Colors
+
 $text-primary: #0f172a;
 $text-secondary: #64748b;
 $text-muted: #94a3b8;
 $text-white: #ffffff;
 
-// Border Colors
+
 $border-light: #e2e8f0;
 $border-dark: #334155;
 
-// Spacing
+
 $spacing-xs: 4px;
 $spacing-sm: 8px;
 $spacing-md: 12px;
@@ -36,7 +36,6 @@ $spacing-2xl: 24px;
 $spacing-3xl: 32px;
 $spacing-4xl: 40px;
 
-// Border Radius
 $radius-sm: 6px;
 $radius-md: 8px;
 $radius-lg: 12px;
@@ -44,19 +43,17 @@ $radius-xl: 16px;
 $radius-2xl: 20px;
 $radius-full: 50%;
 
-// Shadows
 $shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
 $shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
 $shadow-lg: 0 8px 25px rgba(0, 0, 0, 0.1);
 $shadow-primary: 0 2px 8px rgba(59, 130, 246, 0.3);
 
-// Font Weights
 $font-normal: 400;
 $font-medium: 500;
 $font-semibold: 600;
 $font-bold: 700;
 
-// Font Sizes
+
 $text-xs: 12px;
 $text-sm: 13px;
 $text-base: 14px;
@@ -65,12 +62,11 @@ $text-xl: 18px;
 $text-2xl: 20px;
 $text-3xl: 28px;
 
-// Transitions
 $transition-fast: 0.15s ease;
 $transition-base: 0.2s ease;
 $transition-slow: 0.3s ease;
 
-// Breakpoints
+
 $breakpoint-xs: 480px;
 $breakpoint-sm: 576px;
 $breakpoint-md: 768px;
@@ -189,9 +185,9 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap;
 
   h1 {
+    display: inline-block;
     font-size: $text-3xl;
     font-weight: $font-semibold;
     color: #2e3da3;
@@ -200,29 +196,61 @@ body {
     margin-left: 2px;
   }
 
-  .MuiButton-root,
-  button,
-  .botao,
-  .btn-encerrar {
-    min-width: 120px;
-    max-width: 100%;
-  }
-
   @include responsive($breakpoint-md) {
-    flex-direction: column;
-    align-items: stretch;
     gap: 12px;
 
     h1 {
       font-size: 1.5rem;
-      margin-bottom: 0;
+    }
+  }
+
+  .botao-novo{
+    padding-bottom: 2rem;
+    display: inline-block;
+
+    // Para telas menores que $breakpoint-xs
+    @media (max-width: $breakpoint-xs) {
+      width: auto;
+      min-width: 2vw;
+      max-width: 10rem !important;
     }
 
-    button,
-    .MuiButton-root,
-    .botao {
-      width: 100%;
-      min-width: 0;
+    // Para telas maiores que $breakpoint-xs e menores que $breakpoint-sm
+    @media (min-width: ($breakpoint-xs + 1)) and (max-width: $breakpoint-sm) {
+      // margin-right: 2vw;
+      width: auto;
+      min-width: 2vw;
+      max-width: 20rem;
+    }
+
+    // Para telas maiores que $breakpoint-sm e menores que $breakpoint-md
+    @media (min-width: ($breakpoint-sm + 1)) and (max-width: $breakpoint-md) {
+      // margin-right: 2vw;
+    }
+
+    // Para telas maiores que $breakpoint-md e menores que $breakpoint-lg
+    @media (min-width: ($breakpoint-md + 1)) and (max-width: $breakpoint-lg) {
+      // margin-right: 2vw;
+    }
+
+    // Para telas maiores que $breakpoint-lg e menores que $breakpoint-xl
+    @media (min-width: ($breakpoint-lg + 1)) and (max-width: $breakpoint-xl) {
+      // margin-right: 2vw;
+    }
+
+    // Para telas maiores que $breakpoint-xl e menores que $breakpoint-xxl
+    @media (min-width: ($breakpoint-xl + 1)) and (max-width: $breakpoint-xxl) {
+      margin-right: 2vw;
+    }
+
+    // Para telas maiores que $breakpoint-xxl e menores que $breakpoint-xxxl
+    @media (min-width: ($breakpoint-xxl + 1)) and (max-width: $breakpoint-xxxl) {
+      margin-right: 2vw;
+    }
+
+    // Para telas maiores que $breakpoint-xxxl
+    @media (min-width: ($breakpoint-xxxl + 1)) {
+      margin-right: 2vw;
     }
   }
 }
@@ -236,16 +264,45 @@ body {
   transition: margin-left 0.3s ease;
   margin-left: 15vw; // margem padrão para telas grandes
 
-  // Remover margem em telas menores que 768px
-  @include responsive($breakpoint-md) {
-    margin-left: 0;
+  // Para telas menores que $breakpoint-xs
+  @media (max-width: $breakpoint-xs) {
+    margin-left: 2vw;
   }
-}
 
+  // Para telas maiores que $breakpoint-xs e menores que $breakpoint-sm
+  @media (min-width: ($breakpoint-xs + 1)) and (max-width: $breakpoint-sm) {
+    margin-left: 2vw;
+  }
 
-// SEARCH BAR
-.search-bar {
-  margin-top: -20px;
+  // Para telas maiores que $breakpoint-sm e menores que $breakpoint-md
+  @media (min-width: ($breakpoint-sm + 1)) and (max-width: $breakpoint-md) {
+    margin-left: 2vw;
+  }
+
+  // Para telas maiores que $breakpoint-md e menores que $breakpoint-lg
+  @media (min-width: ($breakpoint-md + 1)) and (max-width: $breakpoint-lg) {
+    margin-left: 28vw;
+  }
+
+  // Para telas maiores que $breakpoint-lg e menores que $breakpoint-xl
+  @media (min-width: ($breakpoint-lg + 1)) and (max-width: $breakpoint-xl) {
+    margin-left: 22vw;
+  }
+
+  // Para telas maiores que $breakpoint-xl e menores que $breakpoint-xxl
+  @media (min-width: ($breakpoint-xl + 1)) and (max-width: $breakpoint-xxl) {
+    margin-left: 20vw;
+  }
+
+  // Para telas maiores que $breakpoint-xxl e menores que $breakpoint-xxxl
+  @media (min-width: ($breakpoint-xxl + 1)) and (max-width: $breakpoint-xxxl) {
+    margin-left: 16vw;
+  }
+
+  // Para telas maiores que $breakpoint-xxxl
+  @media (min-width: ($breakpoint-xxxl + 1)) {
+    margin-left: 8vw;
+  }
 }
 
 // SEÇÕES
@@ -284,7 +341,6 @@ body {
 .chamados-list {
   width: 100%;
   display: flex;
-  flex-direction: row;
   flex-wrap: wrap;
   gap: 13px;
   align-items: flex-start;
@@ -311,13 +367,12 @@ body {
   }
 
   @include responsive($breakpoint-md) {
-    max-width: 100%;
     width: 100%;
     padding: 18px 22px;
   }
 
-  @include responsive($breakpoint-xs){
-    padding: $spacing-sm;
+  @include responsive($breakpoint-xs) {
+    padding: $spacing-lg;
     border-radius: $radius-sm;
   }
   }
@@ -361,7 +416,7 @@ body {
 @media (min-width: $breakpoint-xxxl) {
     .chamado-card {
       min-width: 42vw !important;
-      max-width: 56vw !important;
+      max-width: 82vw !important;
     }
 }
 
@@ -369,6 +424,7 @@ body {
 .card-main {
   @include flex(row, flex-start, space-between);
   margin-bottom: $spacing-md;
+  width: 230px;
 
   @include responsive($breakpoint-md) {
     flex-direction: column;
