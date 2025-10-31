@@ -3,6 +3,7 @@ import { Outlet } from "react-router";
 import TecnicosTable from "../../components/TableAdminTec";
 import Botao from "../../components/Button";
 import { Plus } from "lucide-react";
+import SearchBar from "../../components/search-bar";
 import { ModalCriarTecnico } from "../../components/Modals/CriarTecnico";
 import './styles.scss';
 
@@ -20,7 +21,7 @@ export default function TecnicosAdmin() {
           onClick={() => setOpen(true)}
         />
       </div>
-
+      <SearchBar/>
       <TecnicosTable />
       <Outlet />
 

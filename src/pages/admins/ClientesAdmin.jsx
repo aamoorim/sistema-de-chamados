@@ -4,6 +4,7 @@ import Botao from "../../components/Button";
 import { Plus } from "lucide-react";
 import { ModalCriarCliente } from "../../components/Modals/CriarCliente";
 import ClientTable from "../../components/ClientAdminTabe";
+import SearchBar from "../../components/search-bar";
 import './styles.scss';
 
 export default function ClientesAdmin() {
@@ -20,6 +21,7 @@ export default function ClientesAdmin() {
           onClick={() => setOpen(true)}
         />
       </div>
+      <SearchBar/>
 
       <ClientTable />
       <Outlet />
