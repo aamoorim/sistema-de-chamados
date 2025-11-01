@@ -215,3 +215,22 @@ body {
     margin-left: 8vw;
   }
 }
+
+.client-card {
+  @include card($spacing-lg, $radius-md, $shadow-sm);
+  width: 100%;
+  padding: 24px 28px;
+  font-size: 16px;
+  line-height: 1.6;
+  border-left: 3px solid #2E3DA3;
+}
+
+.client-cards-container{
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.actions-cards{
+  margin-top: 0.5rem;
+}

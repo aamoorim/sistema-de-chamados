@@ -188,7 +188,7 @@ return (
                 <div><b>Empresa:</b> {row.empresa}</div>
                 <div><b>Setor:</b> {row.setor}</div>
                 <div><b>Email:</b> {row.email}</div>
-                <div className="actions">
+                <div className="actions-cards">
                   <IconButton onClick={() => handleOpenEdit(row)}>
                     <Pencil size={18} />
                   </IconButton>
