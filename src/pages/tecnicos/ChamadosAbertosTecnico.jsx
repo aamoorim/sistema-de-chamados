@@ -1,16 +1,40 @@
 import React, { useState, useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import StatusChip from "../../components/StatusChip";
-import { Clock2 } from "lucide-react";
+import { Clock2, ClipboardList} from "lucide-react";
+import { Tooltip, IconButton } from "@mui/material";
 import ListTableTec from "../../components/tableTec"; // Importando o ListTableTec
 import chamadosService from "../../services/chamadosService";
 import Spinner from "../../components/LoadingSpinner";
 import useIsMobile from "../../hooks/useIsMobile"; // Hook de responsividade
+import ModalAtenderChamado from "../../components/Modals/AtenderChamado";
 import "./ChamadosAbertos.scss";
 
 export default function ChamadosAbertos() {
   const [loading, setLoading] = useState(true);
   const [chamados, setChamados] = useState([]);
+  const [open, setOpen] = useState(false);
+  const [selectedChamado, setSelectedChamado] = useState(null);
+  
+
+  // Modal
+  const handleOpenModal = (chamado) => {
+    const chamadoFormatado = {
+      id: chamado.id,
+      titulo: chamado.titulo,
+      descricao: chamado.descricao,
+      criado: new Date(chamado.data_criacao).toLocaleDateString("pt-BR"),
+      cliente: chamado.cliente_nome,
+      status: chamado.status,
+    };
+    setSelectedChamado(chamadoFormatado);
+    setOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setOpen(false);
+    setSelectedChamado(null);
+  };
 
   // Usando o hook useIsMobile para detectar se a tela é mobile
   const isMobile = useIsMobile(1200);
@@ -38,6 +62,11 @@ export default function ChamadosAbertos() {
   }
   return (
     <div className="chamadosAbertos" style={{ minHeight: "100vh" }}>
+      <ModalAtenderChamado
+        isOpen={open}
+        onClose={handleCloseModal}
+        chamado={selectedChamado}
+      />
       {/* Título */}
       <div className="chamados-abertos-header">
         <h1>Chamados Abertos</h1>
@@ -72,6 +101,27 @@ export default function ChamadosAbertos() {
                   <div className="user-info">
                     <div className="user-avatar">{chamado.avatar}</div>
                     <span className="user-name">{chamado.cliente_nome || chamado.usuario}</span>
+                    <span className="botao-atender">
+                     <Tooltip title="Atender chamado" arrow placement="top">
+                        <IconButton
+                          size="small"
+                          sx={{
+                            bgcolor: "#dcfce7",
+                            color: "#15803d",
+                            border: "1px solid #bbf7d0",
+                            "&:hover": {
+                              bgcolor: "#bbf7d0",
+                              transform: "scale(1.05)",
+                              boxShadow: "0 2px 8px rgba(21, 128, 61, 0.2)",
+                            },
+                            transition: "all 0.2s ease-in-out",
+                          }}
+                          onClick={() => handleOpenModal(row)}
+                        >
+                          <ClipboardList size={16} />
+                        </IconButton>
+                      </Tooltip>
+                    </span>
                     <div className={`status-icon ${chamado.status}`}>
                       <Clock2 size={16} color="#D03E3E" />
                     </div>
