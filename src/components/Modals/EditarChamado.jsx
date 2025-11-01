@@ -52,7 +52,7 @@ const EditTicketModal = ({ open = false, onClose, ticket, onSave }) => {
             borderRadius: 2,
             overflow: 'hidden',
             boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
-            maxWidth: 480,
+            maxWidth: 600,
           },
         },
       }}

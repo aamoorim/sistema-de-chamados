@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
+import { Widgets } from "@mui/icons-material";
 
 export default function DeletarChamado({ isOpen, onClose, onDelete, chamado }) {
   const style = {
@@ -18,7 +19,9 @@ export default function DeletarChamado({ isOpen, onClose, onDelete, chamado }) {
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    width: 400,
+    width: "90%",
+    minWidth: 300,
+    maxWidth: 420,
     bgcolor: "background.paper",
     boxShadow: 24,
     borderRadius: 3,
