@@ -192,7 +192,9 @@ export default function TableAdminTec() {
         </div>
 
         {isMobile ? (
-          <div className="tecnico-cards-container">
+          <div className="tecnico-cards-container
+          
+          ">
             {filteredTecnicos.length > 0 ? (
               filteredTecnicos.map((tec) => (
                 <div key={tec.id} className="tecnico-card">

@@ -141,7 +141,6 @@ $breakpoint-xxxl: 4000px;
   }
 }
 
-
 // RESET E BASE
 * {
   margin: 0;
@@ -155,8 +154,6 @@ body {
 }
 
 .tabela-tecnicos-admin{
-  margin-left: 15vw;
-
   // Para telas menores que $breakpoint-xs
   @media (max-width: $breakpoint-xs) {
     min-width: 52vw;
@@ -213,6 +210,22 @@ body {
   @media (min-width: ($breakpoint-xxxl + 1)) {
     min-width: 56vw;
     max-width: 90vw;
-    margin-left: 8vw;
+    margin-left: 14vw;
+    padding: 20px;
   }
+}
+
+.tecnico-card {
+  @include card($spacing-lg, $radius-md, $shadow-sm);
+  width: 100%;
+  padding: 24px 28px;
+  font-size: 16px;
+  line-height: 1.6;
+  border-left: 3px solid #2E3DA3;
+}
+
+.tecnico-cards-container{
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
