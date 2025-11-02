@@ -186,6 +186,32 @@ body {
   justify-content: space-between;
   align-items: center;
 
+  .menu-toggle{
+    margin-right: 4vw;
+  }
+
+  // Para telas menores que $breakpoint-xs
+  @media (max-width: $breakpoint-xs) {
+    padding-top: 1vh;
+    padding-left: 2vw;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid rgb(207, 207, 207);
+  }
+
+  // Para telas maiores que $breakpoint-xs e menores que $breakpoint-sm
+  @media (min-width: ($breakpoint-xs + 1)) and (max-width: $breakpoint-sm) {
+    padding-left: 2vw;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid rgb(207, 207, 207);
+  }
+
+  // Para telas maiores que $breakpoint-sm e menores que $breakpoint-md
+  @media (min-width: ($breakpoint-sm + 1)) and (max-width: $breakpoint-md) {
+    padding-left: 2vw;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid rgb(207, 207, 207);
+  }
+
   h1 {
     font-size: $text-3xl;
     font-weight: $font-semibold;
@@ -205,26 +231,28 @@ body {
   flex-direction: column;
   padding: 10px;
   transition: margin-left 0.3s ease;
-  margin-left: 15vw; // margem padrão para telas grandes
 
   // Para telas menores que $breakpoint-xs
   @media (max-width: $breakpoint-xs) {
-    margin-left: 2vw;
+    margin-left: 0;
+    padding: 0;
   }
 
   // Para telas maiores que $breakpoint-xs e menores que $breakpoint-sm
   @media (min-width: ($breakpoint-xs + 1)) and (max-width: $breakpoint-sm) {
-    margin-left: 2vw;
+    margin-left: 0;
+    padding: 0;
   }
 
   // Para telas maiores que $breakpoint-sm e menores que $breakpoint-md
   @media (min-width: ($breakpoint-sm + 1)) and (max-width: $breakpoint-md) {
-    margin-left: 2vw;
+    margin-left: 0;
+    padding: 0;
   }
 
   // Para telas maiores que $breakpoint-md e menores que $breakpoint-lg
   @media (min-width: ($breakpoint-md + 1)) and (max-width: $breakpoint-lg) {
-    margin-left: 28vw;
+    margin-left: 26vw;
   }
 
   // Para telas maiores que $breakpoint-lg e menores que $breakpoint-xl
@@ -250,6 +278,7 @@ body {
 
 // SEÇÕES
 .section {
+  padding: 10px;
   margin-bottom: $spacing-4xl;
 }
 
@@ -512,10 +541,11 @@ body {
   @media(max-width: $breakpoint-md){
     position: static;
     margin-bottom: 0;
+    padding: 4px;
     .botao-novo-chamado{
       width: 100%;
       min-width: 12rem;
-      max-width: 46rem;
+      max-width: 48rem;
       margin-right: 1vw;
     }
   }
@@ -554,4 +584,8 @@ body {
       right: 1vw;
       margin-left: 12.5vw;
     }
+}
+
+.search-bar{
+  padding: 4px;
 }
