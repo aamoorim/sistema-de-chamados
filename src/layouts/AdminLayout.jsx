@@ -2,6 +2,7 @@ import { Outlet } from "react-router-dom";
 import { SearchProvider } from "../context/search-context";
 import SideBar from "../components/SideBar";
 import { useClientes } from "../context/ClientesContext";
+import useIsMobile from "../hooks/useIsMobile"; 
 
 // Spinner simples
 const LoadingSpinner = () => (
@@ -40,15 +41,27 @@ const LoadingSpinner = () => (
 
 export default function AdminLayout() {
   const { loading } = useClientes();
+  const isMobile = useIsMobile();
 
   return (
     <div>
       <SearchProvider>
-        <SideBar />
-        <main>
-          <Outlet />
-          {loading && <LoadingSpinner />}
-        </main>
+        <div className="layout-container">
+          {/* Renderizando a sidebar normalmente em telas grandes */}
+          <SideBar />
+
+          {/* Renderizar a Sidebar apenas para dispositivos móveis, se necessário */}
+          {isMobile && (
+            <div className="mobile-sidebar">
+              <SideBar />
+            </div>
+          )}
+
+          <main>
+            <Outlet />
+            {loading && <LoadingSpinner />}
+          </main>
+        </div>
       </SearchProvider>
     </div>
   );

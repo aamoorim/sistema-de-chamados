@@ -12,6 +12,7 @@ import {
 import { useAuth } from '../context/auth-context';
 import { useModal } from '../context/modal-context';
 import { ModalSairPerfil } from './Modals/Sair';
+import useIsMobile from '../hooks/useIsMobile'; // Importando o hook
 import '../styles/SideBar/sidebar.scss';
 
 const SideBar = () => {
@@ -19,6 +20,7 @@ const SideBar = () => {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false); // dropdown usuário
   const [sidebarOpen, setSidebarOpen] = useState(false); // controle da sidebar mobile
   
+  const isMobile = useIsMobile(); // Usando o hook para verificar se é mobile
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const { openProfileModal } = useModal();
@@ -54,45 +56,50 @@ const SideBar = () => {
           { path: '/admin/tecnicos', icon: <BriefcaseBusiness size={20} />, label: 'Técnicos' },
           { path: '/admin/clientes', icon: <Users size={20} />, label: 'Clientes' },
         ];
-        case 'cliente':
-          return [
-            { path: '/cliente', icon: <MessageSquare size={20} />, label: 'Chamados' }
-          ];
-          case 'tecnico':
-            return [
-              { path: '/tecnico', icon: <MessageSquare size={20} />, label: 'Chamados', end: true },
-              { path: '/tecnico/espera', icon: <Headphones size={20} />, label: 'Em Espera' }
-            ];
-            default:
-              return [];
-            }
-          };
-          
-          const menuItems = getMenuItems();
-          
-          useEffect(() => {
-          if (sidebarOpen) {
-            document.body.style.overflow = 'hidden';
-          } else {
-            document.body.style.overflow = 'auto';
-          }
-        
-          return () => {
-            document.body.style.overflow = 'auto';
-          };
-        }, [sidebarOpen]);
-          return (
+      case 'cliente':
+        return [
+          { path: '/cliente', icon: <MessageSquare size={20} />, label: 'Chamados' }
+        ];
+      case 'tecnico':
+        return [
+          { path: '/tecnico', icon: <MessageSquare size={20} />, label: 'Chamados', end: true },
+          { path: '/tecnico/espera', icon: <Headphones size={20} />, label: 'Em Espera' }
+        ];
+      default:
+        return [];
+    }
+  };
+  
+  const menuItems = getMenuItems();
+  
+  useEffect(() => {
+    if (sidebarOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'auto';
+    }
+  
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, [sidebarOpen]);
+
+  return (
     <>
-      {/* Botão de menu (hambúrguer) visível apenas no mobile */}
-      <button className="menu-toggle" onClick={() => setSidebarOpen(!sidebarOpen)}>
-        ☰
-      </button>
-      
-      {sidebarOpen && (
+      {/* Mostrar o botão de menu (hambúrguer) apenas em telas mobile */}
+      {isMobile && (
+        <button className="menu-toggle" onClick={() => setSidebarOpen(!sidebarOpen)}>
+          ☰
+        </button>
+      )}
+
+      {/* Overlay para fechar a sidebar quando clicado (somente mobile) */}
+      {sidebarOpen && isMobile && (
         <div className="sidebar-overlay" onClick={closeSidebar}></div>
       )}
 
-      <aside className={`aside ${sidebarOpen ? 'active' : ''}`}>
+      {/* Sidebar normal para desktop ou mobile */}
+      <aside className={`aside ${sidebarOpen && isMobile ? 'active' : ''}`}>
         <div className="logo">
           <img src="/squad_favicon.svg" alt="Squad BI Logo" />
           <div className="name_user">
@@ -110,9 +117,7 @@ const SideBar = () => {
                 <NavLink
                   to={item.path}
                   end={item.end}
-                  className={({ isActive }) =>
-                    `nav-button ${isActive ? 'active' : ''}`
-                  }
+                  className={({ isActive }) => `nav-button ${isActive ? 'active' : ''}`}
                   onClick={closeSidebar} // fecha sidebar ao clicar em item
                 >
                   <span>{item.icon}</span>
@@ -125,7 +130,6 @@ const SideBar = () => {
 
         {/* Footer com dropdown */}
         <div className="aside_footer" style={{ position: 'relative' }}>
-          
           {/* Menu dropdown */}
           {isUserMenuOpen && (
             <div className="user_dropdown_menu">
