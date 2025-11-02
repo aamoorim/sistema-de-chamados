@@ -320,6 +320,19 @@ body {
   display: flex;
   justify-content: space-between; // coloca header à esquerda e botão à direita
   align-items: center; // alinha verticalmente
+
+  @media (max-width: $breakpoint-md){
+    flex-direction: column;
+    align-items: start;
+      h1{
+        margin-top: 2vh;
+        margin-bottom: 2vh;
+      }
+      .botao-novo-cliente, .botao-novo-tecnico{
+        margin-left: 2vw;
+        margin-bottom: 2vh !important;
+      }
+  }
 }
 
 .header-container .botao-novo-tecnico{
