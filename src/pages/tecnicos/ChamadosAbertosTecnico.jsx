@@ -16,7 +16,6 @@ export default function ChamadosAbertos() {
   const [open, setOpen] = useState(false);
   const [selectedChamado, setSelectedChamado] = useState(null);
   
-
   // Modal
   const handleOpenModal = (chamado) => {
     const chamadoFormatado = {
