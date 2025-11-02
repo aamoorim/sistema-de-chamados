@@ -1,8 +1,9 @@
-import { Outlet } from "react-router-dom";
+import { useState } from "react";
+import { Outlet, useLocation } from "react-router-dom"; // Importando useLocation
 import { SearchProvider } from "../context/search-context";
 import SideBar from "../components/SideBar";
 import { useClientes } from "../context/ClientesContext";
-import useIsMobile from "../hooks/useIsMobile"; 
+import useIsMobile from "../hooks/useIsMobile";
 
 // Spinner simples
 const LoadingSpinner = () => (
@@ -32,8 +33,8 @@ const LoadingSpinner = () => (
     />
     <style>{`
       @keyframes spin {
-        0% { transform: rotate(0deg);}
-        100% { transform: rotate(360deg);}
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
       }
     `}</style>
   </div>
@@ -42,20 +43,53 @@ const LoadingSpinner = () => (
 export default function AdminLayout() {
   const { loading } = useClientes();
   const isMobile = useIsMobile();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Hook para pegar a rota atual
+  const location = useLocation();
+
+  // Função para definir o título com base na rota atual
+  const getPageTitle = () => {
+    switch (location.pathname) {
+      case "/admin":
+        return "Chamados"; // Página de Chamados
+      case "/admin/clientes":
+        return "Clientes"; // Página de Clientes
+      case "/admin/tecnicos":
+        return "Técnicos"; // Página de Técnicos
+      default:
+        return "Administração"; // Página padrão
+    }
+  };
+
+  // Função para alternar o estado da sidebar
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
 
   return (
     <div>
       <SearchProvider>
         <div className="layout-container">
-          {/* Renderizando a sidebar normalmente em telas grandes */}
-          <SideBar />
-
-          {/* Renderizar a Sidebar apenas para dispositivos móveis, se necessário */}
-          {isMobile && (
-            <div className="mobile-sidebar">
-              <SideBar />
+          <header className="header-admin">
+            <div className="header-title">
+              <h1>{getPageTitle()}</h1> {/* Passa o título dinâmico */}
             </div>
-          )}
+
+            {/* Exibe o botão de menu hamburger apenas no mobile */}
+            {isMobile && (
+              <button className="menu-toggle" onClick={toggleSidebar}>
+                ☰ {/* Ícone do menu */}
+              </button>
+            )}
+          </header>
+
+          {/* Renderize a Sidebar uma vez, com controle de visibilidade */}
+          <SideBar
+            sidebarOpen={sidebarOpen}
+            closeSidebar={() => setSidebarOpen(false)} // Passando função para fechar a sidebar
+            isMobile={isMobile}
+          />
 
           <main>
             <Outlet />

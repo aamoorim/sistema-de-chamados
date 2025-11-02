@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import {
   LogOut,
   Users,
@@ -12,42 +12,34 @@ import {
 import { useAuth } from '../context/auth-context';
 import { useModal } from '../context/modal-context';
 import { ModalSairPerfil } from './Modals/Sair';
-import useIsMobile from '../hooks/useIsMobile'; // Importando o hook
 import '../styles/SideBar/sidebar.scss';
 
-const SideBar = () => {
-  const [open, setOpen] = useState(false); // modal sair
-  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false); // dropdown usuário
-  const [sidebarOpen, setSidebarOpen] = useState(false); // controle da sidebar mobile
-  
-  const isMobile = useIsMobile(); // Usando o hook para verificar se é mobile
-  const navigate = useNavigate();
+const SideBar = ({ sidebarOpen, closeSidebar }) => {
+  const [open, setOpen] = useState(false); // Modal sair
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false); // Dropdown usuário
   const { user, logout } = useAuth();
   const { openProfileModal } = useModal();
-  
+
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    // Redirect to login page or any other page
   };
-  
+
   const toggleUserMenu = () => {
     setIsUserMenuOpen(!isUserMenuOpen);
   };
-  
+
   const handleProfileClick = () => {
     openProfileModal();
     setIsUserMenuOpen(false);
   };
-  
+
   const handleLogoutFromMenu = () => {
     setIsUserMenuOpen(false);
     handleLogout();
   };
-  
-  const closeSidebar = () => {
-    setSidebarOpen(false);
-  };
-  
+
+  // Função getMenuItems para retornar os itens de menu com base no papel do usuário
   const getMenuItems = () => {
     switch (user?.role) {
       case 'admin':
@@ -69,16 +61,18 @@ const SideBar = () => {
         return [];
     }
   };
-  
+
+  // Menu items agora é gerado com a função getMenuItems
   const menuItems = getMenuItems();
-  
+
+  // Impede o scroll da página quando a sidebar estiver aberta
   useEffect(() => {
     if (sidebarOpen) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = 'auto';
     }
-  
+
     return () => {
       document.body.style.overflow = 'auto';
     };
@@ -86,27 +80,13 @@ const SideBar = () => {
 
   return (
     <>
-      {/* Mostrar o botão de menu (hambúrguer) apenas em telas mobile */}
-      {isMobile && (
-        <button className="menu-toggle" onClick={() => setSidebarOpen(!sidebarOpen)}>
-          ☰
-        </button>
-      )}
-
-      {/* Overlay para fechar a sidebar quando clicado (somente mobile) */}
-      {sidebarOpen && isMobile && (
-        <div className="sidebar-overlay" onClick={closeSidebar}></div>
-      )}
-
-      {/* Sidebar normal para desktop ou mobile */}
-      <aside className={`aside ${sidebarOpen && isMobile ? 'active' : ''}`}>
+      {/* Sidebar */}
+      <aside className={`aside ${sidebarOpen ? 'active' : ''}`}>
         <div className="logo">
           <img src="/squad_favicon.svg" alt="Squad BI Logo" />
           <div className="name_user">
             <span className="aside_company">SquadBi</span>
-            <span className="aside_user">
-              {(user?.role || 'Visitante').toUpperCase()}
-            </span>
+            <span className="aside_user">{(user?.role || 'Visitante').toUpperCase()}</span>
           </div>
         </div>
 
@@ -118,7 +98,7 @@ const SideBar = () => {
                   to={item.path}
                   end={item.end}
                   className={({ isActive }) => `nav-button ${isActive ? 'active' : ''}`}
-                  onClick={closeSidebar} // fecha sidebar ao clicar em item
+                  onClick={closeSidebar} // Fecha a sidebar ao clicar no item
                 >
                   <span>{item.icon}</span>
                   <span>{item.label}</span>
@@ -130,7 +110,6 @@ const SideBar = () => {
 
         {/* Footer com dropdown */}
         <div className="aside_footer" style={{ position: 'relative' }}>
-          {/* Menu dropdown */}
           {isUserMenuOpen && (
             <div className="user_dropdown_menu">
               <button className="dropdown_item" onClick={handleProfileClick}>
@@ -146,7 +125,6 @@ const SideBar = () => {
             </div>
           )}
 
-          {/* Botão clicável para abrir o menu do usuário */}
           <button className="aside_footer" onClick={toggleUserMenu}>
             <div className="avatar">
               <span>{user?.name?.charAt(0)?.toUpperCase() || 'U'}</span>

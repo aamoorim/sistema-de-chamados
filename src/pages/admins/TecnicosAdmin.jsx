@@ -13,7 +13,7 @@ export default function TecnicosAdmin() {
   return (
     <>
       <div className="header-container">
-        <h1 className="header-tecnicos-admin">Técnicos</h1>
+        {/*Título da página vem do AdminLayout> */}
         <Botao
           className="botao-novo-tecnico"
           icon={Plus}
