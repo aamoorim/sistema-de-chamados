@@ -330,8 +330,10 @@ body {
 
 .header-container {
   display: flex;
+  position: absolute;
 
   @media(max-width: $breakpoint-xs){
+    position: static;
     .botao-novo-cliente, .botao-novo-tecnico {
       width: 100%;
       min-width: 12rem;
@@ -341,6 +343,7 @@ body {
   }
 
   @media (min-width: ($breakpoint-xs + 1)) and (max-width: $breakpoint-sm) {
+    position: static;
     .botao-novo-cliente, .botao-novo-tecnico {
       width: 100%;
       min-width: 12rem;
@@ -351,6 +354,7 @@ body {
 
     // Para telas maiores que $breakpoint-sm e menores que $breakpoint-md
     @media (min-width: ($breakpoint-sm + 1)) and (max-width: $breakpoint-md) {
+      position: static;
       margin-right: 1vw;
 
       .botao-novo-cliente, .botao-novo-tecnico {
@@ -363,25 +367,35 @@ body {
     // Para telas maiores que $breakpoint-md e menores que $breakpoint-lg
     @media (min-width: ($breakpoint-md + 1)) and (max-width: $breakpoint-lg) {
       margin-left: 26vw;
+      top: 1rem;
+      right: 1vw;
     }
 
     // Para telas maiores que $breakpoint-lg e menores que $breakpoint-xl
     @media (min-width: ($breakpoint-lg + 1)) and (max-width: $breakpoint-xl) {
+      top: 1rem;
+      right: 1vw;
       margin-left: 21vw;
     }
 
     // Para telas maiores que $breakpoint-xl e menores que $breakpoint-xxl
     @media (min-width: ($breakpoint-xl + 1)) and (max-width: $breakpoint-xxl) {
+      top: 1rem;
+      right: 1vw;
       margin-left: 19vw;
     }
 
     // Para telas maiores que $breakpoint-xxl e menores que $breakpoint-xxxl
     @media (min-width: ($breakpoint-xxl + 1)) and (max-width: $breakpoint-xxxl) {
+      top: 1rem;
+      right: 1vw;
       margin-left: 15vw;
     }
 
     // Para telas maiores que $breakpoint-xxxl
     @media (min-width: ($breakpoint-xxxl + 1)) {
+      top: 1rem;
+      right: 1vw;
       margin-left: 12.5vw;
     }
 
