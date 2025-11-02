@@ -16,6 +16,7 @@ import { IconButton } from "@mui/material";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
 import "../../styles/SideBar/sidebar.scss";
+import useIsMobile from "../../hooks/useIsMobile";
 
 const Alert = forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -37,6 +38,14 @@ const ChamadosClienteContent = () => {
 
   const [toastOpen, setToastOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
+
+  const isMobile = useIsMobile();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Função para alternar o estado da sidebar
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
 
   // Normaliza texto (remove acentos e deixa minúsculo)
   const normalizar = (txt = "") =>
@@ -135,8 +144,6 @@ const ChamadosClienteContent = () => {
       setActionLoading(false); // esconde spinner
     }
   };
-
-
     const handleAtualizarChamado = async (dadosAtualizados) => {
       try {
         setActionLoading(true); // mostra spinner
@@ -205,7 +212,7 @@ const ChamadosClienteContent = () => {
 
   if (!user) {
     return (
-      <div className="tecnico-chamados">
+      <div>
         <div className="main-content-wrapper">
           <p>Você precisa estar logado para ver seus chamados.</p>
         </div>
@@ -216,8 +223,9 @@ const ChamadosClienteContent = () => {
     );
   }
 
+
   return (
-    <div className="tecnico-chamados">
+    <div>
       <Snackbar
         open={toastOpen}
         autoHideDuration={4000}
@@ -234,20 +242,20 @@ const ChamadosClienteContent = () => {
       </Snackbar>
 
       <div className="main-content-wrapper">
-        <div className="header">
+        <div className="header-cliente">
           <h1>Meus chamados</h1>
+            {/* Exibe o botão de menu hamburger apenas no mobile */}
+            {isMobile && (
+              <button className="menu-toggle" onClick={toggleSidebar}>
+                ☰ {/* Ícone do menu */}
+              </button>
+            )}
+          </div>
           <div className="botao-novo">
-            <Botao icon={Plus} onClick={() => setOpenModalCalls(true)}>
+            <Botao className="botao-novo-chamado" icon={Plus} onClick={() => setOpenModalCalls(true)}>
               Novo Chamado
             </Botao>
           </div>
-          <ModalCriarChamado
-            isOpen={openModalCalls}
-            onClose={() => setOpenModalCalls(false)}
-            onSalvar={criarChamadoHandler}
-          />
-        </div>
-
         <div className="search-bar">
           <SearchBar />
         </div>
@@ -342,8 +350,19 @@ const ChamadosClienteContent = () => {
       </div>
 
       <div className="sidebar-container">
-        <SideBar />
+          {/* Renderize a Sidebar uma vez, com controle de visibilidade */}
+          <SideBar
+            sidebarOpen={sidebarOpen}
+            closeSidebar={() => setSidebarOpen(false)} // Passando função para fechar a sidebar
+            isMobile={isMobile}
+          />
       </div>
+
+      <ModalCriarChamado
+        isOpen={openModalCalls}
+        onClose={() => setOpenModalCalls(false)}
+        onSalvar={criarChamadoHandler}
+      />
 
       <ModalChamadoDetalhes
         isOpen={openModalDetails}
