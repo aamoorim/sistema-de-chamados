@@ -5,7 +5,7 @@ import "../clientes/clientes.scss";
 import Botao from "../../components/Button";
 import { ModalCriarChamado } from "../../components/Modals/CriarChamado";
 import ModalChamadoDetalhes from "../../components/Modals/DetalhesChamados";
-import EditTicketModal from "../../components/Modals/EditarChamado";
+import EditTicketModal from "../../components/Modals/EditarChamadoCliente";
 import { SearchProvider, useSearch } from "../../context/search-context";
 import SearchBar from "../../components/search-bar";
 import { useAuth } from "../../context/auth-context";
@@ -150,8 +150,8 @@ const ChamadosClienteContent = () => {
         const atualizado = await chamadosService.atualizarChamado(
           chamadoSelecionado.id,
           {
-            titulo: dadosAtualizados.title,
-            descricao: dadosAtualizados.description,
+            titulo: dadosAtualizados.titulo,
+            descricao: dadosAtualizados.descricao,
           }
         );
         setChamados((prev) =>

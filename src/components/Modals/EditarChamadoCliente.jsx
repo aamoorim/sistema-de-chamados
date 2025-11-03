@@ -1,0 +1,136 @@
+import React, { useState, useEffect } from 'react';
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  IconButton,
+  Box,
+  Typography,
+  Stack,
+} from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
+import EditIcon from '@mui/icons-material/Edit';
+import StatusChip from '../StatusChip.jsx';
+import Botao from '../Button.jsx';
+
+const EditTicketModalCliente = ({ open = false, onClose, ticket, onSave }) => {
+  const [ticketData, setTicketData] = useState({
+    titulo: '',
+    descricao: '',
+  });
+
+  useEffect(() => {
+    if (ticket) {
+      setTicketData({
+        titulo: ticket.titulo || '',
+        descricao: ticket.descricao || '',
+      });
+    }
+  }, [ticket]);
+
+  const handleChange = (field) => (event) => {
+    setTicketData((prev) => ({ ...prev, [field]: event.target.value }));
+  };
+
+  const handleSave = () => {
+    if (onSave) {
+      onSave(ticketData);
+    }
+  };
+
+  return (
+    <Dialog
+      open={open}
+      onClose={onClose}
+      fullWidth
+      maxWidth="sm"
+      slotProps={{
+        paper: {
+          sx: {
+            borderRadius: 2,
+            overflow: 'hidden',
+            boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+            maxWidth: 600,
+          },
+        },
+      }}
+    >
+      {/* Header */}
+      <DialogTitle
+        sx={{
+          px: 3,
+          py: 2.5,
+          borderBottom: '1px solid #eee',
+          position: 'relative',
+        }}
+      >
+        <Stack
+          direction="row"
+          alignItems="center"
+          justifyContent="space-between"
+          spacing={2}
+        >
+          <Box>
+            <Typography variant="h6" fontWeight={600}>
+              Editar Chamado
+            </Typography>
+            {/* Para cliente, não mostramos o status ou outros dados administrativos */}
+          </Box>
+
+          <IconButton
+            onClick={onClose}
+            sx={{ color: '#555', position: 'absolute', top: 12, right: 12 }}
+            aria-label="Fechar"
+          >
+            <CloseIcon />
+          </IconButton>
+        </Stack>
+      </DialogTitle>
+
+      {/* Conteúdo */}
+      <DialogContent dividers sx={{ px: 3, py: 3 }}>
+        <Stack spacing={3}>
+          {/* Cliente pode editar título */}
+          <TextField
+            label="Título"
+            value={ticketData.titulo}
+            onChange={handleChange('titulo')}
+            fullWidth
+            variant="standard"
+            size="small"
+            sx={{
+              backgroundColor: '#fafafa',
+              borderRadius: 1,
+            }}
+          />
+
+          {/* Cliente pode editar descrição */}
+          <TextField
+            label="Descrição"
+            value={ticketData.descricao}
+            onChange={handleChange('descricao')}
+            fullWidth
+            size="small"
+            variant="standard"
+            multiline
+            minRows={4}
+            sx={{
+              backgroundColor: '#fafafa',
+              borderRadius: 1,
+            }}
+          />
+        </Stack>
+      </DialogContent>
+
+      {/* Ações */}
+      <DialogActions sx={{ px: 3, py: 2.5, borderTop: '1px solid #eee' }}>
+        <Botao text="Cancelar" icon={CloseIcon} onClick={onClose} />
+        <Botao text="Salvar" icon={EditIcon} onClick={handleSave} />
+      </DialogActions>
+    </Dialog>
+  );
+};
+
+export default EditTicketModalCliente;
