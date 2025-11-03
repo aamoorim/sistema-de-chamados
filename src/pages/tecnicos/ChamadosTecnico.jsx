@@ -8,10 +8,12 @@ import api from "../../services/api";
 import Botao from "../../components/Button.jsx";
 import { SearchProvider, useSearch } from "../../context/search-context";
 import SearchBar from "../../components/search-bar";
-import Spinner from "../../components/LoadingSpinner"; 
+import Spinner from "../../components/LoadingSpinner";
 
-export default function ChamadosTecnico() {
+function ChamadosTecnicoInner() {
   const { token } = useAuth();
+  const { search } = useSearch(); // ✅ pega texto digitado na barra de busca
+
   const [chamados, setChamados] = useState([]);
   const [tecnicos, setTecnicos] = useState([]);
   const [openModal, setOpenModal] = useState(false);
@@ -68,29 +70,29 @@ export default function ChamadosTecnico() {
     fetchUsuarioAtual();
   }, [token]);
 
-  const andamentoChamados = chamados.filter((c) => {
-    const status = c.status?.toLowerCase()?.trim();
+  // ✅ Filtro aplicado com base no search
+  const termo = search?.toLowerCase() || "";
+
+  const chamadosFiltrados = chamados.filter((c) => {
     return (
-      status === "em_andamento" ||
-      status === "em andamento" ||
-      status === "andamento" ||
-      status?.includes("andamento")
+      termo === "" ||
+      c.id?.toString().includes(termo) ||
+      c.codigo?.toLowerCase().includes(termo) ||
+      c.titulo?.toLowerCase().includes(termo) ||
+      c.descricao?.toLowerCase().includes(termo) ||
+      c.cliente_nome?.toLowerCase().includes(termo) ||
+      c.data_criacao?.toLowerCase().includes(termo)
     );
   });
 
-  const finalizadosChamados = chamados.filter((c) => {
-    const status = c.status?.toLowerCase()?.trim();
-    return (
-      status === "encerrado" ||
-      status === "finalizado" ||
-      status === "concluido" ||
-      status === "concluído" ||
-      status === "fechado" ||
-      status?.includes("encerr") ||
-      status?.includes("finaliz") ||
-      status?.includes("conclu")
-    );
-  });
+  // Separa por status
+  const andamentoChamados = chamadosFiltrados.filter((c) =>
+    ["em_andamento", "em andamento", "andamento"].some(s => c.status?.toLowerCase().includes(s))
+  );
+
+  const finalizadosChamados = chamadosFiltrados.filter((c) =>
+    ["encerr", "finaliz", "conclu", "fech"].some(s => c.status?.toLowerCase().includes(s))
+  );
 
   const handleEncerrar = async (event, chamadoId) => {
     event.stopPropagation();
@@ -117,7 +119,6 @@ export default function ChamadosTecnico() {
     setOpenModal(true);
   };
 
-  // Spinner para o botão
   const ButtonSpinner = () => (
     <div
       style={{
@@ -145,11 +146,13 @@ export default function ChamadosTecnico() {
       <div className="search-bar">
         <SearchBar />
       </div>
+
       {/* Em Atendimento */}
       <div className="section-tecnico">
         <div className="section-tecnico-header andamento">
           <Clock2 size={16} className="status" /> Em atendimento ({andamentoChamados.length})
         </div>
+
         <div className="chamados-tecnico-list">
           {andamentoChamados.length > 0 ? (
             andamentoChamados.map((chamado) => (
@@ -170,30 +173,9 @@ export default function ChamadosTecnico() {
                     onClick={(e) => handleEncerrar(e, chamado.id)}
                     text={encerrandoId === chamado.id ? "" : "Encerrar"}
                     icon={encerrandoId === chamado.id ? null : CircleCheckBig}
-                    sx={{
-                      height: 35,
-                      fontSize: "1rem",
-                      "& svg": {
-                        fontSize: 18,
-                      },
-                      borderRadius: "0.5rem",
-                      position: "relative",
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                    }}
                   >
                     {encerrandoId === chamado.id && <ButtonSpinner />}
                   </Botao>
-                </div>
-                <div className="card-tecnico-footer">
-                  <div className="user-info">
-                    <div className="user-avatar">{chamado.avatar}</div>
-                    <span className="user-name">{chamado.cliente_nome || chamado.usuario}</span>
-                    <div className={`status-icon ${chamado.status}`}>
-                      <Clock2 size={16} />
-                    </div>
-                  </div>
                 </div>
               </div>
             ))
@@ -208,6 +190,7 @@ export default function ChamadosTecnico() {
         <div className="section-tecnico-header finalizado">
           <Check size={16} className="status" /> Encerrados ({finalizadosChamados.length})
         </div>
+
         <div className="chamados-tecnico-list">
           {finalizadosChamados.length > 0 ? (
             finalizadosChamados.map((chamado) => (
@@ -225,15 +208,6 @@ export default function ChamadosTecnico() {
                     <div className="chamado-tecnico-data">{chamado.data_criacao || chamado.data}</div>
                   </div>
                 </div>
-                <div className="card-tecnico-footer">
-                  <div className="user-info">
-                    <div className="user-avatar">{chamado.avatar}</div>
-                    <span className="user-name">{chamado.cliente_nome || chamado.usuario}</span>
-                    <div className={`status-icon ${chamado.status}`}>
-                      <Check size={16} />
-                    </div>
-                  </div>
-                </div>
               </div>
             ))
           ) : (
@@ -248,12 +222,15 @@ export default function ChamadosTecnico() {
         chamado={chamadoSelecionado}
         tecnicos={tecnicos.length > 0 ? tecnicos : []}
       />
-      <style>{`
-        @keyframes spin {
-          0% { transform: rotate(0deg);}
-          100% { transform: rotate(360deg);}
-        }
-      `}</style>
     </div>
+  );
+}
+
+// ✅ Agora o componente final envolve tudo com SearchProvider
+export default function ChamadosTecnico() {
+  return (
+    <SearchProvider>
+      <ChamadosTecnicoInner />
+    </SearchProvider>
   );
 }
