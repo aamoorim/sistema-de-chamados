@@ -142,9 +142,6 @@ export default function ChamadosTecnico() {
 
   return (
     <div className="tecnico-chamados">
-      <div className="header-tecnico">
-        <h1>Meus chamados</h1>
-      </div>
       <div className="search-bar">
         <SearchBar />
       </div>

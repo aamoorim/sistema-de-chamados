@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Outlet, useLocation } from "react-router-dom"; // Importando useLocation
+import { Outlet, useLocation } from "react-router-dom"; 
 import { SearchProvider } from "../context/search-context";
 import SideBar from "../components/SideBar";
 import { useClientes } from "../context/ClientesContext";

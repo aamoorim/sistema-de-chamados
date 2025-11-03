@@ -66,10 +66,6 @@ export default function ChamadosAbertos() {
         onClose={handleCloseModal}
         chamado={selectedChamado}
       />
-      {/* Título */}
-      <div className="chamados-abertos-header">
-        <h1>Chamados Abertos</h1>
-      </div>
 
       {/* StatusChip */}
       <div className="status-chip-container">

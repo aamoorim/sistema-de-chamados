@@ -13,7 +13,6 @@ import ClientesAdmin from "../pages/admins/ClientesAdmin";
 import TecnicosAdmin from "../pages/admins/TecnicosAdmin";
 import AdminLayout  from "../layouts/AdminLayout";
 import TecnicoLayout from "../layouts/TecnicoLayout";
-import ChamadosCliente from "../pages/clientes/ChamadosCliente";
 
 export default function AppRoutes() {
   return (

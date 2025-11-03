@@ -166,31 +166,37 @@ body {
   // Para telas menores que $breakpoint-xs
   @media (max-width: $breakpoint-xs) {
     margin-left: 2vw;
+    margin-top: 2vw;
   }
 
   // Para telas maiores que $breakpoint-xs e menores que $breakpoint-sm
   @media (min-width: ($breakpoint-xs + 1)) and (max-width: $breakpoint-sm) {
     margin-left: 2vw;
+    margin-top: 2vw;
   }
 
   // Para telas maiores que $breakpoint-sm e menores que $breakpoint-md
   @media (min-width: ($breakpoint-sm + 1)) and (max-width: $breakpoint-md) {
     margin-left: 2vw;
+    margin-top: 2vw;
   }
 
   // Para telas maiores que $breakpoint-md e menores que $breakpoint-lg
   @media (min-width: ($breakpoint-md + 1)) and (max-width: $breakpoint-lg) {
     margin-left: 28vw;
+    margin-top: 2vw;
   }
 
   // Para telas maiores que $breakpoint-lg e menores que $breakpoint-xl
   @media (min-width: ($breakpoint-lg + 1)) and (max-width: $breakpoint-xl) {
     margin-left: 24vw;
+    margin-top: 2vw;
   }
 
   // Para telas maiores que $breakpoint-xl e menores que $breakpoint-xxl
   @media (min-width: ($breakpoint-xl + 1)) and (max-width: $breakpoint-xxl) {
     margin-left: 20vw;
+    margin-top: 2vw;
   }
 
   // Para telas maiores que $breakpoint-xxl e menores que $breakpoint-xxxl
