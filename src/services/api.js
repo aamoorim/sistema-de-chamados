@@ -3,7 +3,7 @@ import { jwtDecode } from "jwt-decode";
 
 // Cria instância do axios com baseURL da API
 const api = axios.create({
-  baseURL: "https://api-sdc.onrender.com",
+  baseURL: "https://log-teste.onrender.com/",
 });
 
 // Adiciona token em toda requisição, se existir
