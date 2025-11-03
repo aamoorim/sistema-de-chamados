@@ -3,7 +3,7 @@ import { jwtDecode } from "jwt-decode";
 
 // Cria instância do axios com baseURL da API
 const api = axios.create({
-  baseURL: "https://api-sdc.onrender.com",
+  baseURL: "https://api-sdc.onrender.com/",
 });
 
 // Adiciona token em toda requisição, se existir
@@ -43,8 +43,14 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response && error.response.status === 401) {
-      // Token inválido, expirado ou acesso negado
+    const originalRequest = error.config;
+
+    // Só redireciona em 401 se NÃO for a rota de login
+    if (
+      error.response &&
+      error.response.status === 401 &&
+      !originalRequest?.url?.includes("/auth/login")
+    ) {
       localStorage.removeItem("user");
       localStorage.removeItem("token");
       window.location.href = "/login";

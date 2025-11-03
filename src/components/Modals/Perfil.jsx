@@ -21,8 +21,8 @@ const StyledDialog = styled(Dialog)(() => ({
   '& .MuiDialog-paper': {
     borderRadius: '12px',
     padding: '8px',
-    minWidth: '400px',
-    maxWidth: '500px',
+    minWidth: '12rem',
+    maxWidth: '36rem',
   }
 }));
 

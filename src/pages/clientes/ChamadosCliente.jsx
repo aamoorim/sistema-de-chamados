@@ -5,7 +5,7 @@ import "../clientes/clientes.scss";
 import Botao from "../../components/Button";
 import { ModalCriarChamado } from "../../components/Modals/CriarChamado";
 import ModalChamadoDetalhes from "../../components/Modals/DetalhesChamados";
-import EditTicketModal from "../../components/Modals/EditarChamado";
+import EditTicketModal from "../../components/Modals/EditarChamadoCliente";
 import { SearchProvider, useSearch } from "../../context/search-context";
 import SearchBar from "../../components/search-bar";
 import { useAuth } from "../../context/auth-context";
@@ -16,6 +16,7 @@ import { IconButton } from "@mui/material";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
 import "../../styles/SideBar/sidebar.scss";
+import useIsMobile from "../../hooks/useIsMobile";
 
 const Alert = forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -28,6 +29,7 @@ const ChamadosClienteContent = () => {
 
   const [chamados, setChamados] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [actionLoading, setActionLoading] = useState(false); // spinner de ações específicas
 
   const [openModalCalls, setOpenModalCalls] = useState(false);
   const [openModalDetails, setOpenModalDetails] = useState(false);
@@ -36,6 +38,14 @@ const ChamadosClienteContent = () => {
 
   const [toastOpen, setToastOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
+
+  const isMobile = useIsMobile();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Função para alternar o estado da sidebar
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
 
   // Normaliza texto (remove acentos e deixa minúsculo)
   const normalizar = (txt = "") =>
@@ -62,9 +72,7 @@ const ChamadosClienteContent = () => {
         const changed = data.filter((novo) => {
           const antigo = chamados.find((c) => c.id === novo.id);
           if (!antigo) return false;
-          if (antigo.status !== novo.status) return true;
-          if (antigo.tecnico !== novo.tecnico) return true;
-          return false;
+          return antigo.status !== novo.status || antigo.tecnico !== novo.tecnico;
         });
 
         const dataString = JSON.stringify(data);
@@ -75,30 +83,21 @@ const ChamadosClienteContent = () => {
 
           changed.forEach((c) => {
             const antigo = chamados.find((x) => x.id === c.id);
-            if (antigo) {
-              if (
-                c.status?.toLowerCase() === "em_andamento" &&
-                antigo.status !== c.status
-              ) {
-                showToast(`Chamado #${c.id} foi atendido por um técnico!`);
-              }
-              if (
-                c.status?.toLowerCase() === "encerrado" &&
-                antigo.status !== c.status
-              ) {
-                showToast(`Chamado #${c.id} finalizado!`);
-              }
+            if (!antigo) return;
+
+            if (c.status?.toLowerCase() === "em_andamento" && antigo.status !== c.status) {
+              showToast(`Chamado #${c.id} foi atendido por um técnico!`);
+            }
+            if (c.status?.toLowerCase() === "encerrado" && antigo.status !== c.status) {
+              showToast(`Chamado #${c.id} finalizado!`);
             }
           });
-
-          if (!showSpinner) setLoading(true);
-          setTimeout(() => setLoading(false), 1000);
-        } else {
-          setLoading(false);
         }
       } catch (err) {
+        console.error("Erro ao buscar chamados:", err);
         setChamados([]);
-        setLoading(false);
+      } finally {
+        setLoading(false); // <-- garante que loading sempre será desativado
       }
     };
 
@@ -130,6 +129,7 @@ const ChamadosClienteContent = () => {
       return;
     }
     try {
+      setActionLoading(true); // mostra spinner
       const novoChamado = await chamadosService.criarChamado(dadosChamado);
       if (novoChamado && novoChamado.id) {
         setChamados((prev) => [novoChamado, ...prev]);
@@ -140,40 +140,40 @@ const ChamadosClienteContent = () => {
       }
     } catch (err) {
       alert(err.response?.data?.erro || "Erro ao criar chamado");
+    } finally {
+      setActionLoading(false); // esconde spinner
     }
   };
+    const handleAtualizarChamado = async (dadosAtualizados) => {
+      try {
+        setActionLoading(true); // mostra spinner
+        const atualizado = await chamadosService.atualizarChamado(
+          chamadoSelecionado.id,
+          {
+            titulo: dadosAtualizados.titulo,
+            descricao: dadosAtualizados.descricao,
+          }
+        );
+        setChamados((prev) =>
+          prev.map((chamado) =>
+            chamado.id === atualizado.id ? atualizado : chamado
+          )
+        );
+        setOpenModalEditar(false);
 
-  const handleAtualizarChamado = async (dadosAtualizados) => {
-    try {
-      const atualizado = await chamadosService.atualizarChamado(
-        chamadoSelecionado.id,
-        {
-          titulo: dadosAtualizados.title,
-          descricao: dadosAtualizados.description,
+        if (["em_andamento", "encerrado"].includes(atualizado.status?.toLowerCase())) {
+          const mensagem =
+            atualizado.status.toLowerCase() === "em_andamento"
+              ? "Chamado atualizado!"
+              : "Chamado atualizado";
+          showToast(mensagem);
         }
-      );
-      setChamados((prev) =>
-        prev.map((chamado) =>
-          chamado.id === atualizado.id ? atualizado : chamado
-        )
-      );
-      setOpenModalEditar(false);
-
-      if (
-        ["em_andamento", "encerrado"].includes(
-          atualizado.status?.toLowerCase()
-        )
-      ) {
-        const mensagem =
-          atualizado.status.toLowerCase() === "em_andamento"
-            ? "Chamado atendido!"
-            : "Chamado finalizado!";
-        showToast(mensagem);
+      } catch {
+        alert("Erro ao atualizar chamado.");
+      } finally {
+        setActionLoading(false); // esconde spinner
       }
-    } catch {
-      alert("Erro ao atualizar chamado.");
-    }
-  };
+    };
 
   // Filtragem otimizada com useMemo
   const chamadosFiltrados = useMemo(() => {
@@ -212,7 +212,7 @@ const ChamadosClienteContent = () => {
 
   if (!user) {
     return (
-      <div className="tecnico-chamados">
+      <div>
         <div className="main-content-wrapper">
           <p>Você precisa estar logado para ver seus chamados.</p>
         </div>
@@ -223,8 +223,9 @@ const ChamadosClienteContent = () => {
     );
   }
 
+
   return (
-    <div className="tecnico-chamados">
+    <div>
       <Snackbar
         open={toastOpen}
         autoHideDuration={4000}
@@ -241,25 +242,25 @@ const ChamadosClienteContent = () => {
       </Snackbar>
 
       <div className="main-content-wrapper">
-        <div className="header">
+        <div className="header-cliente">
           <h1>Meus chamados</h1>
+            {/* Exibe o botão de menu hamburger apenas no mobile */}
+            {isMobile && (
+              <button className="menu-toggle" onClick={toggleSidebar}>
+                ☰ {/* Ícone do menu */}
+              </button>
+            )}
+          </div>
           <div className="botao-novo">
-            <Botao icon={Plus} onClick={() => setOpenModalCalls(true)}>
+            <Botao className="botao-novo-chamado" icon={Plus} onClick={() => setOpenModalCalls(true)}>
               Novo Chamado
             </Botao>
           </div>
-          <ModalCriarChamado
-            isOpen={openModalCalls}
-            onClose={() => setOpenModalCalls(false)}
-            onSalvar={criarChamadoHandler}
-          />
-        </div>
-
         <div className="search-bar">
           <SearchBar />
         </div>
 
-        {loading ? (
+        {loading || actionLoading? (
           <Spinner />
         ) : (
           <>
@@ -349,8 +350,19 @@ const ChamadosClienteContent = () => {
       </div>
 
       <div className="sidebar-container">
-        <SideBar />
+          {/* Renderize a Sidebar uma vez, com controle de visibilidade */}
+          <SideBar
+            sidebarOpen={sidebarOpen}
+            closeSidebar={() => setSidebarOpen(false)} // Passando função para fechar a sidebar
+            isMobile={isMobile}
+          />
       </div>
+
+      <ModalCriarChamado
+        isOpen={openModalCalls}
+        onClose={() => setOpenModalCalls(false)}
+        onSalvar={criarChamadoHandler}
+      />
 
       <ModalChamadoDetalhes
         isOpen={openModalDetails}

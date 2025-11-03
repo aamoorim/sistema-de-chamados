@@ -4,7 +4,6 @@ import {
   Modal,
   Typography,
   TextField,
-  Button,
   IconButton,
   InputAdornment,
 } from "@mui/material";
@@ -12,7 +11,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { useTecnicos } from "../../context/TecnicosContext";
-import Botao from "../Button.jsx"
+import Botao from "../Button.jsx";
 import { Plus } from "lucide-react";
 
 export function ModalCriarTecnico({ isOpen, onClose }) {
@@ -30,6 +29,31 @@ export function ModalCriarTecnico({ isOpen, onClose }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  // ===== validador (mesmo do backend) =====
+  const validarSenha = (s) => ({
+    comprimento: s.length >= 8,
+    espacos: !/\s/.test(s),
+    maiuscula: /[A-Z]/.test(s),
+    minuscula: /[a-z]/.test(s),
+    numero: /[0-9]/.test(s),
+    especial: /[\W_]/.test(s),
+  });
+
+  const validacoes = validarSenha(senha);
+  const senhasCoincidem = senha === confirmarSenha && senha.length > 0;
+
+  const senhaValida =
+    validacoes.comprimento &&
+    validacoes.espacos &&
+    validacoes.maiuscula &&
+    validacoes.minuscula &&
+    validacoes.numero &&
+    validacoes.especial &&
+    senhasCoincidem;
+
+  // permite submeter se senha vazia (gera no backend) OU senhaValida === true
+  const podeSubmeter = !loading && (senha.trim() === "" || senhaValida);
+
   const senhasNaoConferem = senha && confirmarSenha && senha !== confirmarSenha;
 
   const style = {
@@ -37,7 +61,8 @@ export function ModalCriarTecnico({ isOpen, onClose }) {
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    width: 500,
+    minWidth: 300,
+    maxWidth: 700,
     bgcolor: "#fafafa",
     borderRadius: "12px",
     boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)",
@@ -46,38 +71,66 @@ export function ModalCriarTecnico({ isOpen, onClose }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setError(null);
 
     if (senhasNaoConferem) {
       setError("As senhas não coincidem");
-      setLoading(false);
       return;
     }
 
+    if (senha.trim() && !senhaValida) {
+      setError("A senha não atende aos requisitos mínimos.");
+      return;
+    }
+
+    if (!nome.trim() || !email.trim() || !cargo.trim()) {
+      setError("Preencha todos os campos obrigatórios.");
+      return;
+    }
+
+    setLoading(true);
+
     try {
-      await addTecnico({ nome, email, cargo, senha });
+      // envia senha somente se preenchida
+      await addTecnico({
+        nome: nome.trim(),
+        email: email.trim(),
+        cargo: cargo.trim(),
+        ...(senha.trim() ? { senha: senha.trim() } : {}),
+      });
+
       // Limpa o formulário
       setNome("");
       setEmail("");
       setCargo("");
       setSenha("");
       setConfirmarSenha("");
+      setError(null);
+
       onClose();
     } catch (err) {
-      setError(err.message || "Erro ao criar técnico");
+      console.error("Erro ao criar técnico:", err);
+      setError(err?.response?.data?.message || err?.message || "Erro ao criar técnico");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Modal open={isOpen} onClose={onClose}>
+    <Modal
+      open={isOpen}
+      onClose={() => {
+        if (!loading) onClose();
+      }}
+    >
       <Box sx={style}>
         <IconButton
-          onClick={onClose}
+          onClick={() => {
+            if (!loading) onClose();
+          }}
           sx={{ position: "absolute", right: 12, top: 12 }}
           disabled={loading}
+          aria-label="Fechar modal"
         >
           <CloseIcon />
         </IconButton>
@@ -152,20 +205,68 @@ export function ModalCriarTecnico({ isOpen, onClose }) {
             variant="standard"
             placeholder="Senha"
             sx={{ mb: 3 }}
-            required
             value={senha}
             onChange={(e) => setSenha(e.target.value)}
             disabled={loading}
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
-                  <IconButton onClick={() => setShowSenha(!showSenha)}>
+                  <IconButton
+                    onClick={() => setShowSenha(!showSenha)}
+                    edge="end"
+                    disabled={loading}
+                    aria-label={showSenha ? "Ocultar senha" : "Mostrar senha"}
+                  >
                     {showSenha ? <VisibilityOff /> : <Visibility />}
                   </IconButton>
                 </InputAdornment>
               ),
             }}
           />
+
+
+          {/* Requisitos da senha em tempo real (aparece somente se usuário digitou algo em senha) */}
+          {senha && (
+            <Box sx={{ mb: 2, mt: -1 }}>
+              <Typography
+                variant="body2"
+                color={validacoes.comprimento ? "success.main" : "error"}
+              >
+                • Mínimo 8 caracteres
+              </Typography>
+              <Typography
+                variant="body2"
+                color={validacoes.maiuscula ? "success.main" : "error"}
+              >
+                • Pelo menos 1 letra maiúscula
+              </Typography>
+              <Typography
+                variant="body2"
+                color={validacoes.minuscula ? "success.main" : "error"}
+              >
+                • Pelo menos 1 letra minúscula
+              </Typography>
+              <Typography
+                variant="body2"
+                color={validacoes.numero ? "success.main" : "error"}
+              >
+                • Pelo menos 1 número
+              </Typography>
+              <Typography
+                variant="body2"
+                color={validacoes.especial ? "success.main" : "error"}
+              >
+                • Pelo menos 1 caractere especial
+              </Typography>
+              <Typography
+                variant="body2"
+                color={senhasCoincidem ? "success.main" : "error"}
+              >
+                • As senhas coincidem
+              </Typography>
+            </Box>
+          )}
+
 
           {/* Confirmar Senha */}
           <Typography variant="caption" fontWeight="bold" color="text.secondary">
@@ -176,8 +277,7 @@ export function ModalCriarTecnico({ isOpen, onClose }) {
             type={showConfirmarSenha ? "text" : "password"}
             variant="standard"
             placeholder="Confirme a senha"
-            sx={{ mb: 4 }}
-            required
+            sx={{ mb: 2 }}
             value={confirmarSenha}
             onChange={(e) => setConfirmarSenha(e.target.value)}
             disabled={loading}
@@ -188,6 +288,9 @@ export function ModalCriarTecnico({ isOpen, onClose }) {
                 <InputAdornment position="end">
                   <IconButton
                     onClick={() => setShowConfirmarSenha(!showConfirmarSenha)}
+                    edge="end"
+                    disabled={loading}
+                    aria-label={showConfirmarSenha ? "Ocultar senha" : "Mostrar senha"}
                   >
                     {showConfirmarSenha ? <VisibilityOff /> : <Visibility />}
                   </IconButton>
@@ -196,6 +299,7 @@ export function ModalCriarTecnico({ isOpen, onClose }) {
             }}
           />
 
+
           {error && (
             <Typography color="error" sx={{ mb: 2 }}>
               {error}
@@ -203,12 +307,8 @@ export function ModalCriarTecnico({ isOpen, onClose }) {
           )}
 
           <Box display="flex" justifyContent="center">
-            <Botao
-              type="submit"
-              disabled={loading || senhasNaoConferem}
-              icon={Plus}
-            >
-              {loading ? "Criando....." : "Criar Técnico"}
+            <Botao type="submit" disabled={!podeSubmeter} icon={Plus}>
+              {loading ? "Criando..." : "Criar Técnico"}
             </Botao>
           </Box>
         </form>

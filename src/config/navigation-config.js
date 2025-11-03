@@ -31,9 +31,9 @@ export const NAVIGATION_CONFIG = [
         ]
       },
       {
-        label: 'Configurações',
-        icon: Settings,
-        path: '/admin/config'
+        label: 'Registros',
+        icon: NotepadText,
+        path: '/admin/logs'
       }
     ]
   },

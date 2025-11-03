@@ -1,14 +1,9 @@
-import { Outlet, useLocation } from "react-router-dom";
-import { SearchProvider } from "../context/search-context";
-import SearchBar from "../components/search-bar";
-import SideBar from "../components/SideBar";
-import Botao from "../components/Button";
-import "../pages/admins/styles.scss";
-import { ModalCriarTecnico } from "../components/Modals/CriarTecnico";
 import { useState } from "react";
-import { ModalCriarCliente } from "../components/Modals/CriarCliente";
+import { Outlet, useLocation } from "react-router-dom"; 
+import { SearchProvider } from "../context/search-context";
+import SideBar from "../components/SideBar";
 import { useClientes } from "../context/ClientesContext";
-import { Plus } from "lucide-react";
+import useIsMobile from "../hooks/useIsMobile";
 
 // Spinner simples
 const LoadingSpinner = () => (
@@ -38,75 +33,71 @@ const LoadingSpinner = () => (
     />
     <style>{`
       @keyframes spin {
-        0% { transform: rotate(0deg);}
-        100% { transform: rotate(360deg);}
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
       }
     `}</style>
   </div>
 );
 
 export default function AdminLayout() {
+  const { loading } = useClientes();
+  const isMobile = useIsMobile();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Hook para pegar a rota atual
   const location = useLocation();
 
-  const [open, setOpen] = useState(false);
-  const { loading, fetchClientes, setLoading } = useClientes();
-
-  // Função chamada pelo modal após criação do cliente
-  const handleClienteCriado = async () => {
-    try {
-      await fetchClientes();
-    } catch (err) {
-      console.error("Erro ao atualizar clientes:", err);
-    } finally {
-      setLoading(false); // desativa loading global depois da atualização
-    }
-  };
-
-  const getButtonConfig = () => {
-    const path = location.pathname;
-
-    switch (path) {
-      case "/admin/tecnicos":
-        return {
-          text: "Novo Técnico",
-          modal: (
-            <ModalCriarTecnico isOpen={open} onClose={() => setOpen(false)} />
-          ),
-        };
+  // Função para definir o título com base na rota atual
+  const getPageTitle = () => {
+    switch (location.pathname) {
+      case "/admin":
+        return "Chamados"; // Página de Chamados
       case "/admin/clientes":
-        return {
-          text: "Novo Cliente",
-          modal: (
-            <ModalCriarCliente
-              isOpen={open}
-              onClose={() => setOpen(false)}
-              onCreateSuccess={handleClienteCriado}
-              setLoadingGlobal={setLoading}
-            />
-          ),
-        };
+        return "Clientes"; // Página de Clientes
+      case "/admin/tecnicos":
+        return "Técnicos"; // Página de Técnicos
+      case "/admin/logs": 
+        return "Logs de Auditoria";
       default:
-        return null;
+        return "Administração"; // Página padrão
     }
   };
 
-  const config = getButtonConfig();
+  // Função para alternar o estado da sidebar
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
 
   return (
-    <div className="calls-admin">
+    <div>
       <SearchProvider>
-        <SideBar />
-        <main className="calls-admin-main">
-          <div className="header-admin">
-            <SearchBar />
-            {config && (
-              <Botao icon={Plus} text={config.text} onClick={() => setOpen(true)} />
+        <div className="layout-container">
+          <header className="header-admin">
+            <div className="header-title">
+              <h1>{getPageTitle()}</h1> {/* Passa o título dinâmico */}
+            </div>
+
+            {/* Exibe o botão de menu hamburger apenas no mobile */}
+            {isMobile && (
+              <button className="menu-toggle" onClick={toggleSidebar}>
+                ☰ {/* Ícone do menu */}
+              </button>
             )}
-          </div>
-          <Outlet />
-          {open && config?.modal}
-          {loading && <LoadingSpinner />}
-        </main>
+          </header>
+
+          {/* Renderize a Sidebar uma vez, com controle de visibilidade */}
+          <SideBar
+            sidebarOpen={sidebarOpen}
+            closeSidebar={() => setSidebarOpen(false)} // Passando função para fechar a sidebar
+            isMobile={isMobile}
+          />
+
+          <main>
+            <Outlet />
+            {loading && <LoadingSpinner />}
+          </main>
+        </div>
       </SearchProvider>
     </div>
   );

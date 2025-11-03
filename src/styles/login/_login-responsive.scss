@@ -26,9 +26,9 @@
     }
 
     .form-logo-signup {
-      display: block;
       margin: 0 auto 1rem auto;
-      max-width: 40vw;
+      top: 1rem;
+      max-width: 30vw;
       min-width: 20vw;
       height: auto;
     }
@@ -42,7 +42,7 @@
     }
 
     .form-logo-signup {
-      top: -3rem;
+      top: -4rem;
       max-width: 40vw;
       min-width: 20vw;
     }
@@ -52,9 +52,8 @@
   @media (max-width: 768px) {
     .login-container {
       background-color: #ffffff;
-      border-radius: 10px;
       box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25),
-        0 10px 10px rgba(0, 0, 0, 0.22);
+      0 10px 10px rgba(0, 0, 0, 0.22);
       position: relative;
       overflow: hidden;
       width: 100vw;
@@ -154,7 +153,6 @@
   @media (max-width: 576px) {
     .login-container {
       background-color: #ffffff;
-      border-radius: 10px;
       box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25),
         0 10px 10px rgba(0, 0, 0, 0.22);
       position: relative;
@@ -177,5 +175,16 @@
     .form-signup {
       padding: 0rem 1rem 1rem;
     }
+  }
+}
+
+
+@media(max-width: 768px){
+  .login-page{
+    padding: 0;
+  }
+
+  .login-container{
+    border-radius: 0 !important;
   }
 }

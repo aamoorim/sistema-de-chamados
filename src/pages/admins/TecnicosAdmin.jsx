@@ -1,14 +1,31 @@
+import { useState } from "react";
 import { Outlet } from "react-router";
 import TecnicosTable from "../../components/TableAdminTec";
+import Botao from "../../components/Button";
+import { Plus } from "lucide-react";
+import SearchBar from "../../components/search-bar";
+import { ModalCriarTecnico } from "../../components/Modals/CriarTecnico";
 import './styles.scss';
+
 export default function TecnicosAdmin() {
-    return (
-        <>
+  const [open, setOpen] = useState(false);
 
-                <h1>Técnicos</h1>
-                <TecnicosTable />
-            <Outlet />
+  return (
+    <>
+      <div className="header-container">
+        {/*Título da página vem do AdminLayout> */}
+        <Botao
+          className="botao-novo-tecnico"
+          icon={Plus}
+          text="Novo Técnico"
+          onClick={() => setOpen(true)}
+        />
+      </div>
+      <SearchBar/>
+      <TecnicosTable />
+      <Outlet />
 
-        </>
-    )
+      <ModalCriarTecnico isOpen={open} onClose={() => setOpen(false)} />
+    </>
+  );
 }

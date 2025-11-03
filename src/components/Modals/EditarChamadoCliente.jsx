@@ -12,10 +12,10 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import EditIcon from '@mui/icons-material/Edit';
-import StatusChip from '../StatusChip';
-import Botao from '../Button.jsx'; 
+import StatusChip from '../StatusChip.jsx';
+import Botao from '../Button.jsx';
 
-const EditTicketModal = ({ open = false, onClose, ticket, onSave }) => {
+const EditTicketModalCliente = ({ open = false, onClose, ticket, onSave }) => {
   const [ticketData, setTicketData] = useState({
     titulo: '',
     descricao: '',
@@ -76,11 +76,7 @@ const EditTicketModal = ({ open = false, onClose, ticket, onSave }) => {
             <Typography variant="h6" fontWeight={600}>
               Editar Chamado
             </Typography>
-            {ticket?.status && (
-              <Box mt={1} ml={-2}>
-                <StatusChip label={ticket.status} />
-              </Box>
-            )}
+            {/* Para cliente, não mostramos o status ou outros dados administrativos */}
           </Box>
 
           <IconButton
@@ -96,6 +92,7 @@ const EditTicketModal = ({ open = false, onClose, ticket, onSave }) => {
       {/* Conteúdo */}
       <DialogContent dividers sx={{ px: 3, py: 3 }}>
         <Stack spacing={3}>
+          {/* Cliente pode editar título */}
           <TextField
             label="Título"
             value={ticketData.titulo}
@@ -109,6 +106,7 @@ const EditTicketModal = ({ open = false, onClose, ticket, onSave }) => {
             }}
           />
 
+          {/* Cliente pode editar descrição */}
           <TextField
             label="Descrição"
             value={ticketData.descricao}
@@ -128,20 +126,11 @@ const EditTicketModal = ({ open = false, onClose, ticket, onSave }) => {
 
       {/* Ações */}
       <DialogActions sx={{ px: 3, py: 2.5, borderTop: '1px solid #eee' }}>
-        <Botao
-          text="Cancelar"
-          icon={CloseIcon}
-          onClick={onClose}
-        />
-
-        <Botao
-          text="Salvar"
-          icon={EditIcon}
-          onClick={handleSave}
-        />
+        <Botao text="Cancelar" icon={CloseIcon} onClick={onClose} />
+        <Botao text="Salvar" icon={EditIcon} onClick={handleSave} />
       </DialogActions>
     </Dialog>
   );
 };
 
-export default EditTicketModal;
+export default EditTicketModalCliente;

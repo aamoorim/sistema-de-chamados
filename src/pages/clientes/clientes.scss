@@ -180,12 +180,37 @@ body {
 }
 
 // HEADER
-.header {
-  margin-top: 40px;
+.header-cliente {
   display: flex;
+  flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap;
+
+  .menu-toggle{
+    margin-right: 4vw;
+  }
+
+  // Para telas menores que $breakpoint-xs
+  @media (max-width: $breakpoint-xs) {
+    padding-top: 1vh;
+    padding-left: 2vw;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid rgb(207, 207, 207);
+  }
+
+  // Para telas maiores que $breakpoint-xs e menores que $breakpoint-sm
+  @media (min-width: ($breakpoint-xs + 1)) and (max-width: $breakpoint-sm) {
+    padding-left: 2vw;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid rgb(207, 207, 207);
+  }
+
+  // Para telas maiores que $breakpoint-sm e menores que $breakpoint-md
+  @media (min-width: ($breakpoint-sm + 1)) and (max-width: $breakpoint-md) {
+    padding-left: 2vw;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid rgb(207, 207, 207);
+  }
 
   h1 {
     font-size: $text-3xl;
@@ -194,36 +219,8 @@ body {
     margin-bottom: $spacing-2xl;
     letter-spacing: -0.025em;
     margin-left: 2px;
-  }
-
-  .MuiButton-root,
-  button,
-  .botao,
-  .btn-encerrar {
-    min-width: 120px;
-    max-width: 100%;
-    margin-right: 5rem;
-  }
-
-
-
-  @include responsive($breakpoint-md) {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 12px;
-
-    h1 {
-      font-size: 1.5rem;
-      margin-bottom: 0;
-    }
-
-    button,
-    .MuiButton-root,
-    .botao {
-      width: 100%;
-      min-width: 0;
-
-    }
+    max-width: fit-content;
+    margin-top: 1vh;
   }
 }
 
@@ -234,24 +231,54 @@ body {
   flex-direction: column;
   padding: 10px;
   transition: margin-left 0.3s ease;
-  margin-left: 15vw; // margem padrão para telas grandes
 
-  // Remover margem em telas menores que 768px
-  @include responsive($breakpoint-md) {
+  // Para telas menores que $breakpoint-xs
+  @media (max-width: $breakpoint-xs) {
     margin-left: 0;
+    padding: 0;
   }
-}
 
+  // Para telas maiores que $breakpoint-xs e menores que $breakpoint-sm
+  @media (min-width: ($breakpoint-xs + 1)) and (max-width: $breakpoint-sm) {
+    margin-left: 0;
+    padding: 0;
+  }
 
-// SEARCH BAR
-.search-bar {
-  margin-top: -20px;
-  display: flex;
-  justify-content: center;
+  // Para telas maiores que $breakpoint-sm e menores que $breakpoint-md
+  @media (min-width: ($breakpoint-sm + 1)) and (max-width: $breakpoint-md) {
+    margin-left: 0;
+    padding: 0;
+  }
+
+  // Para telas maiores que $breakpoint-md e menores que $breakpoint-lg
+  @media (min-width: ($breakpoint-md + 1)) and (max-width: $breakpoint-lg) {
+    margin-left: 26vw;
+  }
+
+  // Para telas maiores que $breakpoint-lg e menores que $breakpoint-xl
+  @media (min-width: ($breakpoint-lg + 1)) and (max-width: $breakpoint-xl) {
+    margin-left: 22vw;
+  }
+
+  // Para telas maiores que $breakpoint-xl e menores que $breakpoint-xxl
+  @media (min-width: ($breakpoint-xl + 1)) and (max-width: $breakpoint-xxl) {
+    margin-left: 20vw;
+  }
+
+  // Para telas maiores que $breakpoint-xxl e menores que $breakpoint-xxxl
+  @media (min-width: ($breakpoint-xxl + 1)) and (max-width: $breakpoint-xxxl) {
+    margin-left: 16vw;
+  }
+
+  // Para telas maiores que $breakpoint-xxxl
+  @media (min-width: ($breakpoint-xxxl + 1)) {
+    margin-left: 8vw;
+  }
 }
 
 // SEÇÕES
 .section {
+  padding: 10px;
   margin-bottom: $spacing-4xl;
 }
 
@@ -317,10 +344,10 @@ body {
   }
 
   @include responsive($breakpoint-xs) {
-    padding: $spacing-sm;
+    padding: $spacing-lg;
     border-radius: $radius-sm;
   }
-}
+  }
 
   @media (min-width: $breakpoint-md) {
     .chamado-card {
@@ -361,7 +388,7 @@ body {
 @media (min-width: $breakpoint-xxxl) {
     .chamado-card {
       min-width: 42vw !important;
-      max-width: 56vw !important;
+      max-width: 82vw !important;
     }
 }
 
@@ -506,4 +533,59 @@ body {
     flex-direction: column;
   }
 }
-  
+
+.botao-novo{
+  position: absolute;
+  margin-bottom: 2vh;
+
+  @media(max-width: $breakpoint-md){
+    position: static;
+    margin-bottom: 0;
+    padding: 4px;
+    .botao-novo-chamado{
+      width: 100%;
+      min-width: 12rem;
+      max-width: 48rem;
+      margin-right: 1vw;
+    }
+  }
+
+    // Para telas maiores que $breakpoint-md e menores que $breakpoint-lg
+    @media (min-width: ($breakpoint-md + 1)) and (max-width: $breakpoint-lg) {
+      margin-left: 26vw;
+      top: 1rem;
+      right: 1vw;
+    }
+
+    // Para telas maiores que $breakpoint-lg e menores que $breakpoint-xl
+    @media (min-width: ($breakpoint-lg + 1)) and (max-width: $breakpoint-xl) {
+      top: 1rem;
+      right: 1vw;
+      margin-left: 21vw;
+    }
+
+    // Para telas maiores que $breakpoint-xl e menores que $breakpoint-xxl
+    @media (min-width: ($breakpoint-xl + 1)) and (max-width: $breakpoint-xxl) {
+      top: 1rem;
+      right: 1vw;
+      margin-left: 19vw;
+    }
+
+    // Para telas maiores que $breakpoint-xxl e menores que $breakpoint-xxxl
+    @media (min-width: ($breakpoint-xxl + 1)) and (max-width: $breakpoint-xxxl) {
+      top: 1rem;
+      right: 1vw;
+      margin-left: 15vw;
+    }
+
+    // Para telas maiores que $breakpoint-xxxl
+    @media (min-width: ($breakpoint-xxxl + 1)) {
+      top: 1rem;
+      right: 1vw;
+      margin-left: 12.5vw;
+    }
+}
+
+.search-bar{
+  padding: 4px;
+}

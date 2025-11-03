@@ -167,46 +167,69 @@ body {
   background: $bg-app;
 }
 
-// HEADER
+/* Estilos para o cabeçalho com flexbox */
 .header-tecnico {
+  display: flex; /* Usamos flexbox para alinhar os itens */
+  align-items: center; /* Alinha verticalmente os itens */
+  justify-content: space-between; /* Coloca o título à esquerda e o botão à direita */
+  color: #2E3DA3;
+  font-size: $text-xl;
+  font-weight: bold;
   padding-top: 2vh;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
 
-  @media (min-width: $breakpoint-lg) {
-    margin-left: 15vw;
+  .menu-toggle{
+    margin-right: 1.5vw;
   }
 
-  @media (max-width: $breakpoint-lg) {
-    margin-left: 15vw;
+    // Para telas menores que $breakpoint-xs
+  @media (max-width: $breakpoint-xs) {
+    padding-top: 4vh;
+    padding-left: 2vw;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgb(207, 207, 207);
   }
 
-  @media (max-width: $breakpoint-md) {
-    margin-left: 0;
+  // Para telas maiores que $breakpoint-xs e menores que $breakpoint-sm
+  @media (min-width: ($breakpoint-xs + 1)) and (max-width: $breakpoint-sm) {
+    padding-left: 2vw;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgb(207, 207, 207);
   }
 
-  h1 {
-    font-size: $text-3xl;
-    font-weight: $font-semibold;
-    color: #2e3da3;
-    margin-bottom: 2vh;
-    letter-spacing: -0.025em;
-    margin-left: 1vw;
+  // Para telas maiores que $breakpoint-sm e menores que $breakpoint-md
+  @media (min-width: ($breakpoint-sm + 1)) and (max-width: $breakpoint-md) {
+    padding-left: 2vw;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgb(207, 207, 207);
+  }
 
-    @media(min-width: $breakpoint-xxl) {
-      font-size: 2.5rem;
-      font-weight: $font-bold;
-    }
+  // Para telas maiores que $breakpoint-md e menores que $breakpoint-lg
+  @media (min-width: ($breakpoint-md + 1)) and (max-width: $breakpoint-lg) {
+    margin-left: 28vw;
+  }
 
-    @media(min-width: $breakpoint-xxxl) {
-      font-size: 3rem;
-      font-weight: $font-bold;
-    }
+  // Para telas maiores que $breakpoint-lg e menores que $breakpoint-xl
+  @media (min-width: ($breakpoint-lg + 1)) and (max-width: $breakpoint-xl) {
+    margin-left: 23vw;
+  }
+
+  // Para telas maiores que $breakpoint-xl e menores que $breakpoint-xxl
+  @media (min-width: ($breakpoint-xl + 1)) and (max-width: $breakpoint-xxl) {
+    margin-left: 21vw;
+  }
+
+  // Para telas maiores que $breakpoint-xxl e menores que $breakpoint-xxxl
+  @media (min-width: ($breakpoint-xxl + 1)) and (max-width: $breakpoint-xxxl) {
+    margin-left: 16vw;
+    padding-left: 0.5vw;
+  }
+
+  // Para telas maiores que $breakpoint-xxxl
+  @media (min-width: ($breakpoint-xxxl + 1)) {
+    padding-left: 20px;
+    margin-left: 14vw;
   }
 }
-
 // SEÇÕES (Em atendimento / Encerrados)
 .section-tecnico {
   margin-bottom: 3vh;
@@ -217,9 +240,44 @@ body {
   transition: margin-left 0.3s ease;
   margin-left: 15vw; // margem padrão para telas grandes
 
-  // Remover margem em telas menores que 768px
-  @include responsive($breakpoint-md) {
+  // Para telas menores que $breakpoint-xs
+  @media (max-width: $breakpoint-xs) {
     margin-left: 0;
+  }
+
+  // Para telas maiores que $breakpoint-xs e menores que $breakpoint-sm
+  @media (min-width: ($breakpoint-xs + 1)) and (max-width: $breakpoint-sm) {
+    margin-left: 0;
+  }
+
+  // Para telas maiores que $breakpoint-sm e menores que $breakpoint-md
+  @media (min-width: ($breakpoint-sm + 1)) and (max-width: $breakpoint-md) {
+    margin-left: 0;
+  }
+
+  // Para telas maiores que $breakpoint-md e menores que $breakpoint-lg
+  @media (min-width: ($breakpoint-md + 1)) and (max-width: $breakpoint-lg) {
+    margin-left: 26.5vw;
+  }
+
+  // Para telas maiores que $breakpoint-lg e menores que $breakpoint-xl
+  @media (min-width: ($breakpoint-lg + 1)) and (max-width: $breakpoint-xl) {
+    margin-left: 22vw;
+  }
+
+  // Para telas maiores que $breakpoint-xl e menores que $breakpoint-xxl
+  @media (min-width: ($breakpoint-xl + 1)) and (max-width: $breakpoint-xxl) {
+    margin-left: 20vw;
+  }
+
+  // Para telas maiores que $breakpoint-xxl e menores que $breakpoint-xxxl
+  @media (min-width: ($breakpoint-xxl + 1)) and (max-width: $breakpoint-xxxl) {
+    margin-left: 16vw;
+  }
+
+  // Para telas maiores que $breakpoint-xxxl
+  @media (min-width: ($breakpoint-xxxl + 1)) {
+    margin-left: 14vw;
   }
 }
 
@@ -228,12 +286,21 @@ body {
   font-weight: $font-normal;
   display: inline-flex;
   align-items: center;
+  align-self: flex-start;      // impede de esticar no container flex
+  width: auto;                 // garante que o tamanho siga o conteúdo
   gap: 8px;
   align-self: flex-start;
   margin-bottom: 3vh;
   padding: 6px 14px;
   border-radius: 24px;
+  font-size: $text-base;
+  font-weight: $font-normal;
   color: $text-white;
+
+  &.espera {
+    background: #fee2e2;
+    color: #b91c1c;
+  }
 
   &.andamento {
     background: $color-warning;
@@ -301,7 +368,7 @@ body {
     padding: $spacing-lg;
     border-radius: $radius-sm;
   }
-}
+  }
 
 @media (max-width: $breakpoint-xs) {
   .chamado-tecnico-card {
@@ -314,7 +381,7 @@ body {
   .chamado-tecnico-card {
     flex: 1;
     min-width: 32rem !important;
-    max-width: 46rem !important;
+    max-width: 48rem !important;
   }
 }
 
@@ -358,7 +425,7 @@ body {
   margin-bottom: $spacing-md;
 
   @include responsive($breakpoint-md) {
-    flex-direction: column;
+    flex-direction: row;
     gap: 16px;
   }
 }
