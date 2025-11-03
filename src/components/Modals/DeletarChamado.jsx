@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import {
   Box,
   Modal,
@@ -9,9 +10,10 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
-import { Widgets } from "@mui/icons-material";
 
 export default function DeletarChamado({ isOpen, onClose, onDelete, chamado }) {
+  const [loading, setLoading] = useState(false);
+
   const style = {
     position: "absolute",
     display: "flex",
@@ -32,6 +34,12 @@ export default function DeletarChamado({ isOpen, onClose, onDelete, chamado }) {
     if (!name) return "??";
     const words = name.split(" ");
     return words.map((w) => w[0]).join("").toUpperCase().slice(0, 2);
+  };
+
+  const handleDelete = async () => {
+    setLoading(true); 
+    await onDelete(); 
+    setLoading(false);
   };
 
   return (
@@ -72,10 +80,11 @@ export default function DeletarChamado({ isOpen, onClose, onDelete, chamado }) {
           <Button
             variant="text"
             color="error"
-            onClick={onDelete}
+            onClick={handleDelete}
             sx={{ margin: "-15px", textTransform: "none" }}
+            disabled={loading} 
           >
-            Deletar Chamado
+            {loading ? "Deletando..." : "Deletar Chamado"}
           </Button>
         </Box>
       </Box>

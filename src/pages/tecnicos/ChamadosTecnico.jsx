@@ -12,7 +12,7 @@ import Spinner from "../../components/LoadingSpinner";
 
 function ChamadosTecnicoInner() {
   const { token } = useAuth();
-  const { search } = useSearch(); // ✅ pega texto digitado na barra de busca
+  const { search } = useSearch(); 
 
   const [chamados, setChamados] = useState([]);
   const [tecnicos, setTecnicos] = useState([]);
@@ -70,7 +70,6 @@ function ChamadosTecnicoInner() {
     fetchUsuarioAtual();
   }, [token]);
 
-  // ✅ Filtro aplicado com base no search
   const termo = search?.toLowerCase() || "";
 
   const chamadosFiltrados = chamados.filter((c) => {
@@ -127,11 +126,11 @@ function ChamadosTecnicoInner() {
         borderRadius: "50%",
         width: "18px",
         height: "18px",
-        animation: "spin 1s linear infinite",
+        animation: "spin 1s linear infinite", 
         margin: "0 auto",
       }}
     />
-  );
+);
 
   if (loading) {
     return (
@@ -169,7 +168,7 @@ function ChamadosTecnicoInner() {
                     <div className="chamado-tecnico-descricao">{chamado.descricao}</div>
                     <div className="chamado-tecnico-data">{chamado.data_criacao || chamado.data}</div>
                   </div>
-                  <Botao
+                  <Botao className="botao-encerrar"
                     onClick={(e) => handleEncerrar(e, chamado.id)}
                     text={encerrandoId === chamado.id ? "" : "Encerrar"}
                     icon={encerrandoId === chamado.id ? null : CircleCheckBig}

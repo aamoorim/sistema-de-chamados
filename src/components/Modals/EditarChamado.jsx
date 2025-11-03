@@ -13,13 +13,14 @@ import {
 import CloseIcon from '@mui/icons-material/Close';
 import EditIcon from '@mui/icons-material/Edit';
 import StatusChip from '../StatusChip';
-import Botao from '../Button.jsx'; 
+import Botao from '../Button.jsx';
 
 const EditTicketModal = ({ open = false, onClose, ticket, onSave }) => {
   const [ticketData, setTicketData] = useState({
     titulo: '',
     descricao: '',
   });
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (ticket) {
@@ -34,9 +35,11 @@ const EditTicketModal = ({ open = false, onClose, ticket, onSave }) => {
     setTicketData((prev) => ({ ...prev, [field]: event.target.value }));
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (onSave) {
-      onSave(ticketData);
+      setLoading(true);
+      await onSave(ticketData);
+      setLoading(false);
     }
   };
 
@@ -135,9 +138,10 @@ const EditTicketModal = ({ open = false, onClose, ticket, onSave }) => {
         />
 
         <Botao
-          text="Salvar"
+          text={loading ? 'Salvando...' : 'Salvar'} 
           icon={EditIcon}
           onClick={handleSave}
+          disabled={loading} 
         />
       </DialogActions>
     </Dialog>
