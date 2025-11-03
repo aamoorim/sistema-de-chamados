@@ -1,0 +1,45 @@
+* {
+  font-family: 'Lato', sans-serif;
+}
+
+.logs-table-container {
+  max-width: 66rem;
+  margin-top: 45px;
+  margin-bottom: 30px;
+}
+
+.logs-wrapper {
+  margin-left: 21vw;
+
+}
+
+.log-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #2E3DA3;
+  color: #fff;
+  font-weight: 600;
+  font-size: 14px;
+  margin-right: 8px;
+  font-family: 'Lato', sans-serif;
+  padding: 1rem;
+  margin-top: 6rem;
+  margin-bottom: 6rem;
+}
+
+.logs-info {
+  margin-top: 5px;
+
+}
+
+.titulo {
+  font-size: 30px;
+  font-weight: bold;
+  color: #2E3DA3;
+  padding-top: 2vh;
+  margin-bottom: 24px;
+}
