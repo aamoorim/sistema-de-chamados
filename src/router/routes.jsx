@@ -13,6 +13,7 @@ import ClientesAdmin from "../pages/admins/ClientesAdmin";
 import TecnicosAdmin from "../pages/admins/TecnicosAdmin";
 import AdminLayout  from "../layouts/AdminLayout";
 import TecnicoLayout from "../layouts/TecnicoLayout";
+import Logs from "../pages/admins/LogAuditoria";
 
 export default function AppRoutes() {
   return (
@@ -26,6 +27,7 @@ export default function AppRoutes() {
           <Route index element={<CallAdmin />} />
           <Route path="clientes" element={<ClientesAdmin />} />
           <Route path="tecnicos" element={<TecnicosAdmin />} />
+          <Route path="logs" element={<Logs />} />
         </Route>
       </Route>
 

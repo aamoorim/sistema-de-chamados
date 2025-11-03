@@ -7,6 +7,7 @@ import {
   MessageSquare,
   BriefcaseBusiness,
   User,
+  NotepadText,
 } from 'lucide-react';
 
 import { useAuth } from '../context/auth-context';
@@ -47,6 +48,7 @@ const SideBar = ({ sidebarOpen, closeSidebar }) => {
           { path: '/admin', icon: <MessageSquare size={20} />, label: 'Chamados', end: true },
           { path: '/admin/tecnicos', icon: <BriefcaseBusiness size={20} />, label: 'Técnicos' },
           { path: '/admin/clientes', icon: <Users size={20} />, label: 'Clientes' },
+          { path: '/admin/logs', icon: <NotepadText size={20} />, label: 'Registros' }
         ];
       case 'cliente':
         return [

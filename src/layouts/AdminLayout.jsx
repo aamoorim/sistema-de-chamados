@@ -57,6 +57,8 @@ export default function AdminLayout() {
         return "Clientes"; // Página de Clientes
       case "/admin/tecnicos":
         return "Técnicos"; // Página de Técnicos
+      case "/admin/logs": 
+        return "Logs de Auditoria";
       default:
         return "Administração"; // Página padrão
     }
