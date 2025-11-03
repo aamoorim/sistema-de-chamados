@@ -47,7 +47,7 @@ function AvatarInitials({ name }) {
 
 export default function LogsAuditoria() {
   const theme = useTheme();
-  const isMobile = useIsMobile(1000);
+  const isMobile = useIsMobile(1200);
 
   const [logs, setLogs] = useState([]);
   const [previousLogs, setPreviousLogs] = useState([]);
@@ -163,8 +163,10 @@ export default function LogsAuditoria() {
                 </div>
                 <div
                   style={{
+                    paddingTop: "1vw",
                     color: "#888",
-                    fontSize: 13,
+                    fontSize: 15,
+                    fontWeight: 500,
                     overflow: "hidden",
                     textOverflow: "ellipsis",
                     whiteSpace: "nowrap",
