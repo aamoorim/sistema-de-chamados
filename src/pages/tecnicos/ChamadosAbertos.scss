@@ -196,16 +196,18 @@ body {
   // Para telas maiores que $breakpoint-xl e menores que $breakpoint-xxl
   @media (min-width: ($breakpoint-xl + 1)) and (max-width: $breakpoint-xxl) {
     margin-left: 20vw;
-    margin-top: 2vw;
+    margin-top: 1vw;
   }
 
   // Para telas maiores que $breakpoint-xxl e menores que $breakpoint-xxxl
   @media (min-width: ($breakpoint-xxl + 1)) and (max-width: $breakpoint-xxxl) {
+    margin-top: 1vw;
     margin-left: 16vw;
   }
 
   // Para telas maiores que $breakpoint-xxxl
   @media (min-width: ($breakpoint-xxxl + 1)) {
+    margin-top: 1vw;
     margin-left: 14vw;
   }
 }
@@ -382,7 +384,7 @@ body {
   font-family: Lato;
   font-weight: 600;
   font-size: medium;
-  margin-left: 5vw;
+  margin-left: 2vw;
   margin-right: 5vw;
   margin-top: 5vw;
   color: #1e293b;

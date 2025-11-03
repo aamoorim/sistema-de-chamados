@@ -1,21 +1,22 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Outlet } from "react-router-dom";
 import StatusChip from "../../components/StatusChip";
-import { Clock2, ClipboardList} from "lucide-react";
+import { Clock2, ClipboardList } from "lucide-react";
 import { Tooltip, IconButton } from "@mui/material";
-import ListTableTec from "../../components/tableTec"; // Importando o ListTableTec
+import ListTableTec from "../../components/tableTec"; 
 import chamadosService from "../../services/chamadosService";
 import Spinner from "../../components/LoadingSpinner";
-import useIsMobile from "../../hooks/useIsMobile"; // Hook de responsividade
+import useIsMobile from "../../hooks/useIsMobile"; 
 import ModalAtenderChamado from "../../components/Modals/AtenderChamado";
 import "./ChamadosAbertos.scss";
 
 export default function ChamadosAbertos() {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false); 
   const [chamados, setChamados] = useState([]);
   const [open, setOpen] = useState(false);
   const [selectedChamado, setSelectedChamado] = useState(null);
-  
+  const [previousChamados, setPreviousChamados] = useState([]); // Armazena os chamados anteriores para comparação
+
   // Modal
   const handleOpenModal = (chamado) => {
     const chamadoFormatado = {
@@ -38,33 +39,62 @@ export default function ChamadosAbertos() {
   // Usando o hook useIsMobile para detectar se a tela é mobile
   const isMobile = useIsMobile(1200);
 
-  useEffect(() => {
-    const fetchChamados = async () => {
-      setLoading(true);
-      try {
-        // Busca chamados abertos
-        const data = await chamadosService.getChamadosAbertosDisponiveis();
-        setChamados(data);
-      } catch (error) {
-        console.error("Erro ao buscar chamados", error);
-        setChamados([]);
-      } finally {
-        setLoading(false);
+  // Função para buscar os chamados
+  const fetchChamados = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await chamadosService.getChamadosAbertosDisponiveis();
+      
+      // Só atualiza se os dados forem diferentes dos anteriores
+      if (JSON.stringify(data) !== JSON.stringify(previousChamados)) {
+        setChamados(data); // Atualiza os chamados
+        setPreviousChamados(data); // Atualiza a lista anterior
       }
-    };
+    } catch (error) {
+      console.error("Erro ao buscar chamados", error);
+      setChamados([]); // Caso haja erro, zera os chamados
+    } finally {
+      setLoading(false); // Para o spinner após a atualização ou erro
+    }
+  }, [previousChamados]); // Agora depende dos chamados anteriores
 
-    fetchChamados();
-  }, []);
+  // Carrega a lista de chamados apenas na primeira vez que o componente for montado
+  useEffect(() => {
+    fetchChamados(); // Carrega inicialmente os chamados
+
+    // Polling ou atualização periódica
+    const interval = setInterval(async () => {
+      try {
+        const data = await chamadosService.getChamadosAbertosDisponiveis();
+        // Só atualiza se os dados forem diferentes dos anteriores
+        if (JSON.stringify(data) !== JSON.stringify(previousChamados)) {
+          setChamados(data); // Atualiza os chamados
+          setPreviousChamados(data); // Atualiza os dados anteriores
+        }
+      } catch (err) {
+        console.error("Erro ao atualizar chamados:", err);
+      }
+    }, 2000); // Atualiza a cada 10 segundos
+
+    return () => clearInterval(interval); // Limpa o intervalo ao desmontar o componente
+  }, [previousChamados, fetchChamados]); // O useEffect depende dos dados anteriores e da função fetchChamados
 
   if (loading) {
-    return <Spinner />;
+    return <Spinner />; // Exibe o spinner apenas quando os dados estão sendo carregados
   }
+
   return (
     <div className="chamadosAbertos" style={{ minHeight: "100vh" }}>
       <ModalAtenderChamado
         isOpen={open}
         onClose={handleCloseModal}
         chamado={selectedChamado}
+        onAtenderChamado={() => {
+          if (selectedChamado) {
+            atenderChamado(selectedChamado.id);
+            handleCloseModal();
+          }
+        }} // Passando a função de atender chamado para o modal
       />
 
       {/* StatusChip */}
@@ -97,7 +127,7 @@ export default function ChamadosAbertos() {
                     <div className="user-avatar">{chamado.avatar}</div>
                     <span className="user-name">{chamado.cliente_nome || chamado.usuario}</span>
                     <span className="botao-atender">
-                     <Tooltip title="Atender chamado" arrow placement="top">
+                      <Tooltip title="Atender chamado" arrow placement="top">
                         <IconButton
                           size="small"
                           sx={{
@@ -111,7 +141,7 @@ export default function ChamadosAbertos() {
                             },
                             transition: "all 0.2s ease-in-out",
                           }}
-                          onClick={() => handleOpenModal(row)}
+                          onClick={() => handleOpenModal(chamado)}
                         >
                           <ClipboardList size={16} />
                         </IconButton>
