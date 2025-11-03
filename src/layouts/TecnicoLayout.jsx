@@ -1,7 +1,6 @@
-
-import { Outlet } from "react-router-dom";
-import { useState } from "react";
-import SideBar from "../components/SideBar"
+import { Outlet, useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
+import SideBar from "../components/SideBar";
 import useIsMobile from "../hooks/useIsMobile";
 import { useClientes } from "../context/ClientesContext"; 
 import { SearchProvider } from "../context/search-context";
@@ -46,7 +45,7 @@ export default function TecnicoLayout() {
   const isMobile = useIsMobile();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { loading } = useClientes();
-
+  const location = useLocation(); // Hook para acessar a localização atual
 
   // Função para definir o título com base na rota atual
   const getPageTitle = () => {
@@ -55,8 +54,15 @@ export default function TecnicoLayout() {
         return "Meus Chamados"; // Página de Chamados do técnico
       case "/tecnico/espera":
         return "Chamados Abertos"; // Página de chamados abertos
-      }
+      default:
+        return "Página Não Encontrada"; // Caso a rota não seja reconhecida
+    }
   };
+
+  // Atualizando o título da página sempre que a rota mudar
+  useEffect(() => {
+    document.title = getPageTitle(); // Atualiza o título da aba do navegador
+  }, [location]); // O efeito é executado sempre que a localização (rota) mudar
 
   // Função para alternar o estado da sidebar
   const toggleSidebar = () => {
