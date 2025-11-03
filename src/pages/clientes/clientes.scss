@@ -180,78 +180,47 @@ body {
 }
 
 // HEADER
-.header {
-  margin-top: 40px;
+.header-cliente {
   display: flex;
+  flex-direction: row;
   justify-content: space-between;
   align-items: center;
 
+  .menu-toggle{
+    margin-right: 4vw;
+  }
+
+  // Para telas menores que $breakpoint-xs
+  @media (max-width: $breakpoint-xs) {
+    padding-top: 1vh;
+    padding-left: 2vw;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid rgb(207, 207, 207);
+  }
+
+  // Para telas maiores que $breakpoint-xs e menores que $breakpoint-sm
+  @media (min-width: ($breakpoint-xs + 1)) and (max-width: $breakpoint-sm) {
+    padding-left: 2vw;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid rgb(207, 207, 207);
+  }
+
+  // Para telas maiores que $breakpoint-sm e menores que $breakpoint-md
+  @media (min-width: ($breakpoint-sm + 1)) and (max-width: $breakpoint-md) {
+    padding-left: 2vw;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid rgb(207, 207, 207);
+  }
+
   h1 {
-    display: inline-block;
     font-size: $text-3xl;
     font-weight: $font-semibold;
     color: #2e3da3;
     margin-bottom: $spacing-2xl;
     letter-spacing: -0.025em;
     margin-left: 2px;
-  }
-
-  @include responsive($breakpoint-md) {
-    gap: 12px;
-
-    h1 {
-      font-size: 1.5rem;
-    }
-  }
-
-  .botao-novo{
-    padding-bottom: 2rem;
-    display: inline-block;
-
-    // Para telas menores que $breakpoint-xs
-    @media (max-width: $breakpoint-xs) {
-      width: auto;
-      min-width: 2vw;
-      max-width: 10rem !important;
-    }
-
-    // Para telas maiores que $breakpoint-xs e menores que $breakpoint-sm
-    @media (min-width: ($breakpoint-xs + 1)) and (max-width: $breakpoint-sm) {
-      // margin-right: 2vw;
-      width: auto;
-      min-width: 2vw;
-      max-width: 20rem;
-    }
-
-    // Para telas maiores que $breakpoint-sm e menores que $breakpoint-md
-    @media (min-width: ($breakpoint-sm + 1)) and (max-width: $breakpoint-md) {
-      // margin-right: 2vw;
-    }
-
-    // Para telas maiores que $breakpoint-md e menores que $breakpoint-lg
-    @media (min-width: ($breakpoint-md + 1)) and (max-width: $breakpoint-lg) {
-      // margin-right: 2vw;
-    }
-
-    // Para telas maiores que $breakpoint-lg e menores que $breakpoint-xl
-    @media (min-width: ($breakpoint-lg + 1)) and (max-width: $breakpoint-xl) {
-      // margin-right: 2vw;
-    }
-
-    // Para telas maiores que $breakpoint-xl e menores que $breakpoint-xxl
-    @media (min-width: ($breakpoint-xl + 1)) and (max-width: $breakpoint-xxl) {
-      margin-right: 2vw;
-    }
-
-    // Para telas maiores que $breakpoint-xxl e menores que $breakpoint-xxxl
-    @media (min-width: ($breakpoint-xxl + 1)) and (max-width: $breakpoint-xxxl) {
-      margin-right: 2vw;
-    }
-
-    // Para telas maiores que $breakpoint-xxxl
-    @media (min-width: ($breakpoint-xxxl + 1)) {
-      margin-right: 2vw;
-    }
+    max-width: fit-content;
+    margin-top: 1vh;
   }
 }
 
@@ -262,26 +231,28 @@ body {
   flex-direction: column;
   padding: 10px;
   transition: margin-left 0.3s ease;
-  margin-left: 15vw; // margem padrão para telas grandes
 
   // Para telas menores que $breakpoint-xs
   @media (max-width: $breakpoint-xs) {
-    margin-left: 2vw;
+    margin-left: 0;
+    padding: 0;
   }
 
   // Para telas maiores que $breakpoint-xs e menores que $breakpoint-sm
   @media (min-width: ($breakpoint-xs + 1)) and (max-width: $breakpoint-sm) {
-    margin-left: 2vw;
+    margin-left: 0;
+    padding: 0;
   }
 
   // Para telas maiores que $breakpoint-sm e menores que $breakpoint-md
   @media (min-width: ($breakpoint-sm + 1)) and (max-width: $breakpoint-md) {
-    margin-left: 2vw;
+    margin-left: 0;
+    padding: 0;
   }
 
   // Para telas maiores que $breakpoint-md e menores que $breakpoint-lg
   @media (min-width: ($breakpoint-md + 1)) and (max-width: $breakpoint-lg) {
-    margin-left: 28vw;
+    margin-left: 26vw;
   }
 
   // Para telas maiores que $breakpoint-lg e menores que $breakpoint-xl
@@ -307,6 +278,7 @@ body {
 
 // SEÇÕES
 .section {
+  padding: 10px;
   margin-bottom: $spacing-4xl;
 }
 
@@ -561,4 +533,59 @@ body {
     flex-direction: column;
   }
 }
-  
+
+.botao-novo{
+  position: absolute;
+  margin-bottom: 2vh;
+
+  @media(max-width: $breakpoint-md){
+    position: static;
+    margin-bottom: 0;
+    padding: 4px;
+    .botao-novo-chamado{
+      width: 100%;
+      min-width: 12rem;
+      max-width: 48rem;
+      margin-right: 1vw;
+    }
+  }
+
+    // Para telas maiores que $breakpoint-md e menores que $breakpoint-lg
+    @media (min-width: ($breakpoint-md + 1)) and (max-width: $breakpoint-lg) {
+      margin-left: 26vw;
+      top: 1rem;
+      right: 1vw;
+    }
+
+    // Para telas maiores que $breakpoint-lg e menores que $breakpoint-xl
+    @media (min-width: ($breakpoint-lg + 1)) and (max-width: $breakpoint-xl) {
+      top: 1rem;
+      right: 1vw;
+      margin-left: 21vw;
+    }
+
+    // Para telas maiores que $breakpoint-xl e menores que $breakpoint-xxl
+    @media (min-width: ($breakpoint-xl + 1)) and (max-width: $breakpoint-xxl) {
+      top: 1rem;
+      right: 1vw;
+      margin-left: 19vw;
+    }
+
+    // Para telas maiores que $breakpoint-xxl e menores que $breakpoint-xxxl
+    @media (min-width: ($breakpoint-xxl + 1)) and (max-width: $breakpoint-xxxl) {
+      top: 1rem;
+      right: 1vw;
+      margin-left: 15vw;
+    }
+
+    // Para telas maiores que $breakpoint-xxxl
+    @media (min-width: ($breakpoint-xxxl + 1)) {
+      top: 1rem;
+      right: 1vw;
+      margin-left: 12.5vw;
+    }
+}
+
+.search-bar{
+  padding: 4px;
+}

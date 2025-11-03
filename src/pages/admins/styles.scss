@@ -175,28 +175,40 @@ body {
   min-width: 0;
 }
 
-.header-chamados-admin,
-.header-clientes-admin,
-.header-tecnicos-admin {
-  font-size: 30px;
-  font-weight: bold;
+/* Estilos para o cabeçalho com flexbox */
+.header-admin {
+  display: flex; /* Usamos flexbox para alinhar os itens */
+  align-items: center; /* Alinha verticalmente os itens */
+  justify-content: space-between; /* Coloca o título à esquerda e o botão à direita */
   color: #2E3DA3;
+  font-size: $text-xl;
+  font-weight: bold;
   padding-top: 2vh;
-  margin-bottom: 24px;
 
-  // Para telas menores que $breakpoint-xs
+  .menu-toggle{
+    margin-right: 4vw;
+  }
+
+    // Para telas menores que $breakpoint-xs
   @media (max-width: $breakpoint-xs) {
-    margin-left: 2vw;
+    padding-top: 4vh;
+    padding-left: 2vw;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgb(207, 207, 207);
   }
 
   // Para telas maiores que $breakpoint-xs e menores que $breakpoint-sm
   @media (min-width: ($breakpoint-xs + 1)) and (max-width: $breakpoint-sm) {
-    margin-left: 2vw;
+    padding-left: 2vw;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgb(207, 207, 207);
   }
 
   // Para telas maiores que $breakpoint-sm e menores que $breakpoint-md
   @media (min-width: ($breakpoint-sm + 1)) and (max-width: $breakpoint-md) {
-    margin-left: 2vw;
+    padding-left: 2vw;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgb(207, 207, 207);
   }
 
   // Para telas maiores que $breakpoint-md e menores que $breakpoint-lg
@@ -284,7 +296,7 @@ body {
 }
 }
 
-.header-admin {
+.header {
   display: flex;
   align-items: center; /* Garante alinhamento vertical */
   width: 100%;
@@ -318,90 +330,81 @@ body {
 
 .header-container {
   display: flex;
-  justify-content: space-between; // coloca header à esquerda e botão à direita
-  align-items: center; // alinha verticalmente
-}
+  position: absolute;
 
-.header-container .botao-novo-tecnico{
-    // Para telas menores que $breakpoint-xs
-  @media (max-width: $breakpoint-xs) {
-    margin-right: 1vw;
+  @media(max-width: $breakpoint-xs){
+    position: static;
+    .botao-novo-cliente, .botao-novo-tecnico {
+      width: 100%;
+      min-width: 12rem;
+      max-width: 30rem;
+      margin-right: 1vw;
+    }
   }
 
-  // Para telas maiores que $breakpoint-xs e menores que $breakpoint-sm
   @media (min-width: ($breakpoint-xs + 1)) and (max-width: $breakpoint-sm) {
-    margin-right: 1vw;
+    position: static;
+    .botao-novo-cliente, .botao-novo-tecnico {
+      width: 100%;
+      min-width: 12rem;
+      max-width: 36rem;
+      margin-right: 1vw;
+    }
   }
 
-  // Para telas maiores que $breakpoint-sm e menores que $breakpoint-md
-  @media (min-width: ($breakpoint-sm + 1)) and (max-width: $breakpoint-md) {
-    margin-right: 1vw;
-  }
+    // Para telas maiores que $breakpoint-sm e menores que $breakpoint-md
+    @media (min-width: ($breakpoint-sm + 1)) and (max-width: $breakpoint-md) {
+      position: static;
+      margin-right: 1vw;
 
-  // Para telas maiores que $breakpoint-md e menores que $breakpoint-lg
-  @media (min-width: ($breakpoint-md + 1)) and (max-width: $breakpoint-lg) {
-    margin-right: 1vw;
-  }
+      .botao-novo-cliente, .botao-novo-tecnico {
+        width: 100%;
+        min-width: 12rem;
+        max-width: 45.8rem;
+      }
+    }
 
-  // Para telas maiores que $breakpoint-lg e menores que $breakpoint-xl
-  @media (min-width: ($breakpoint-lg + 1)) and (max-width: $breakpoint-xl) {
-    margin-right: 1vw;
-  }
+    // Para telas maiores que $breakpoint-md e menores que $breakpoint-lg
+    @media (min-width: ($breakpoint-md + 1)) and (max-width: $breakpoint-lg) {
+      margin-left: 26vw;
+      top: 1rem;
+      right: 1vw;
+    }
 
-  // Para telas maiores que $breakpoint-xl e menores que $breakpoint-xxl
-  @media (min-width: ($breakpoint-xl + 1)) and (max-width: $breakpoint-xxl) {
-    margin-right: 1vw;
-  }
+    // Para telas maiores que $breakpoint-lg e menores que $breakpoint-xl
+    @media (min-width: ($breakpoint-lg + 1)) and (max-width: $breakpoint-xl) {
+      top: 1rem;
+      right: 1vw;
+      margin-left: 21vw;
+    }
 
-  // Para telas maiores que $breakpoint-xxl e menores que $breakpoint-xxxl
-  @media (min-width: ($breakpoint-xxl + 1)) and (max-width: $breakpoint-xxxl) {
-    margin-right: 1vw;
-  }
+    // Para telas maiores que $breakpoint-xl e menores que $breakpoint-xxl
+    @media (min-width: ($breakpoint-xl + 1)) and (max-width: $breakpoint-xxl) {
+      top: 1rem;
+      right: 1vw;
+      margin-left: 19vw;
+    }
 
-  // Para telas maiores que $breakpoint-xxxl
-  @media (min-width: ($breakpoint-xxxl + 1)) {
-    margin-right: 1vw;
-  }
-}
+    // Para telas maiores que $breakpoint-xxl e menores que $breakpoint-xxxl
+    @media (min-width: ($breakpoint-xxl + 1)) and (max-width: $breakpoint-xxxl) {
+      top: 1rem;
+      right: 1vw;
+      margin-left: 15vw;
+    }
 
-.header-container .botao-novo-cliente{
-    // Para telas menores que $breakpoint-xs
-  @media (max-width: $breakpoint-xs) {
-    margin-right: 1vw;
-  }
+    // Para telas maiores que $breakpoint-xxxl
+    @media (min-width: ($breakpoint-xxxl + 1)) {
+      top: 1rem;
+      right: 1vw;
+      margin-left: 12.5vw;
+    }
 
-  // Para telas maiores que $breakpoint-xs e menores que $breakpoint-sm
-  @media (min-width: ($breakpoint-xs + 1)) and (max-width: $breakpoint-sm) {
-    margin-right: 1vw;
-  }
-
-  // Para telas maiores que $breakpoint-sm e menores que $breakpoint-md
-  @media (min-width: ($breakpoint-sm + 1)) and (max-width: $breakpoint-md) {
-    margin-right: 1vw;
-  }
-
-  // Para telas maiores que $breakpoint-md e menores que $breakpoint-lg
-  @media (min-width: ($breakpoint-md + 1)) and (max-width: $breakpoint-lg) {
-    margin-right: 1vw;
-  }
-
-  // Para telas maiores que $breakpoint-lg e menores que $breakpoint-xl
-  @media (min-width: ($breakpoint-lg + 1)) and (max-width: $breakpoint-xl) {
-    margin-right: 1vw;
-  }
-
-  // Para telas maiores que $breakpoint-xl e menores que $breakpoint-xxl
-  @media (min-width: ($breakpoint-xl + 1)) and (max-width: $breakpoint-xxl) {
-    margin-right: 1vw;
-  }
-
-  // Para telas maiores que $breakpoint-xxl e menores que $breakpoint-xxxl
-  @media (min-width: ($breakpoint-xxl + 1)) and (max-width: $breakpoint-xxxl) {
-    margin-right: 1vw;
-  }
-
-  // Para telas maiores que $breakpoint-xxxl
-  @media (min-width: ($breakpoint-xxxl + 1)) {
-    margin-right: 1vw;
-  }
+    h1{
+      margin-top: 2vh;
+      margin-bottom: 2vh;
+    }
+    .botao-novo-cliente, .botao-novo-tecnico{
+      margin-left: 2vw;
+      margin-bottom: 1rem !important;
+    }
 }

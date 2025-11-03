@@ -13,13 +13,13 @@ export default function ClientesAdmin() {
   return (
     <>
       <div className="header-container">
-        <h1 className="header-clientes-admin">Clientes</h1>
+        {/* Título dinâmico da página vem do AdminLayout*/}        
         <Botao
-          className="botao-novo-cliente"
-          icon={Plus}
-          text="Novo Cliente"
-          onClick={() => setOpen(true)}
-        />
+            className="botao-novo-cliente"
+            icon={Plus}
+            text="Novo Cliente"
+            onClick={() => setOpen(true)}
+          />
       </div>
       <SearchBar/>
 

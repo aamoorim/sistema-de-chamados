@@ -131,6 +131,7 @@ html, body {
   background: $bg-sidebar;
 }
 
+/* Sidebar */
 .aside {
   background: #181920;
   color: #fff;
@@ -143,7 +144,9 @@ html, body {
   box-shadow: 2px 0 8px rgba(0, 0, 0, 0.04);
   transition: transform 0.3s ease-in-out;
   z-index: 1000;
+  top: 0;
 
+  /* Logo e Nome do Usuário */
   .logo {
     display: flex;
     align-items: center;
@@ -174,7 +177,6 @@ html, body {
 
   nav {
     width: 100%;
-
     ul {
       list-style: none;
       margin: 32px 0 0;
@@ -258,6 +260,7 @@ html, body {
     background: #27272e;
   }
 
+  /* Menu Dropdown */
   .user_dropdown_menu {
     position: absolute;
     bottom: 100%;
@@ -267,8 +270,7 @@ html, body {
     background: #374151;
     border: 1px solid #4b5563;
     border-radius: 8px;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
-    0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
     z-index: 50;
     overflow: hidden;
     animation: dropdownFadeIn 0.2s ease-out;
@@ -314,41 +316,42 @@ html, body {
   }
 }
 
+/* Overlay para fechar a sidebar */
 .sidebar-overlay {
   position: fixed;
-  top: 65;
+  top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
   background: rgba(0, 0, 0, 0.5);
   z-index: 999;
+  display: none; /* Inicia invisível */
 }
 
-/* MOBILE - Até XS (até 480px) */
-@include breakpoint-max($breakpoint-xs) {
-  
-  .app-container {
-    flex-direction: column-reverse;
-    overflow-x: hidden;
-  }
+/* Mostrar o overlay quando a sidebar estiver aberta */
+.aside.active + .sidebar-overlay {
+  display: block;
+}
 
+/* MOBILE - Até MD (até 768px) */
+@include breakpoint-max($breakpoint-md) {
   .menu-toggle {
+    width: 3rem;
     display: block;
-    position: fixed;
-    top: 16px;
-    left: 16px;
-    background-color: #7c3aed;
-    color: white;
+    background-color: #604FEB;
+    color: rgba(255, 255, 255, 0.793);
     padding: 10px 14px;
     border: none;
-    border-radius: 8px;
+    border-radius: 4px;
     font-size: 20px;
     z-index: 1100;
     cursor: pointer;
   }
 
   .aside {
-    transform: translateX(100%);
+    background: #181920f5;
+    transform: translateX(100%); /* Começa fora da tela */
+    padding-top: 6rem;
     position: fixed;
     min-width: 60vw;
     max-width: 80vw;
@@ -358,75 +361,37 @@ html, body {
     z-index: 1000;
 
     &.active {
-      transform: translateX(0);
+      transform: translateX(0); /* Move para dentro da tela quando ativa */
     }
   }
 }
 
 /* MOBILE - Entre XS e SM (481px até 576px) */
 @include breakpoint-range($breakpoint-xs + 1, $breakpoint-sm) {
-  
-  .app-container {
-    flex-direction: column-reverse;
-    overflow-x: hidden;
-  }
-
-  .menu-toggle {
-    display: block;
-    position: fixed;
-    top: 16px;
-    left: 16px;
-    background-color: #7c3aed;
-    color: white;
-    padding: 10px 14px;
-    border: none;
-    border-radius: 8px;
-    font-size: 20px;
-    z-index: 1100;
-    cursor: pointer;
-  }
-
   .aside {
-    transform: translateX(100%);
+    transform: translateX(100%); /* Começa fora da tela */
     position: fixed;
     min-width: 50vw;
     max-width: 56vw;
     right: 0;
     top: 0;
     height: 100vh;
+    transition: transform .3s ease-in-out !important; /* A transição agora vai suavizar a entrada e saída */
     z-index: 1000;
+    /* Quando a sidebar está inativa, ela deve começar fora da tela */
+    transform: translateX(100%);  // A sidebar começa fora da tela por padrão
 
-    &.active {
-      transform: translateX(0);
+      /* Quando a sidebar está ativa, ela deve deslizar de volta para a tela */
+      &.active {
+        transform: translateX(0);  // A sidebar entra na tela
+      }
     }
-  }
 }
 
 /* MOBILE - Entre SM e MD (577px até 768px) */
 @include breakpoint-range($breakpoint-sm + 1, $breakpoint-md) {
-  
-  .app-container {
-    flex-direction: column-reverse;
-    overflow-x: hidden;
-  }
-
-  .menu-toggle {
-    display: block;
-    position: fixed;
-    top: 16px;
-    left: 16px;
-    background-color: #7c3aed;
-    color: white;
-    padding: 10px 14px;
-    border: none;
-    border-radius: 8px;
-    font-size: 20px;
-    z-index: 1100;
-    cursor: pointer;
-  }
-
   .aside {
-    transform: translateX(100%);
+    transform: translateX(100%); /* Começa fora da tela */
     position: fixed;
     min-width: 50vw;
     max-width: 54vw;
@@ -436,7 +401,7 @@ html, body {
     z-index: 1000;
 
     &.active {
-      transform: translateX(0);
+      transform: translateX(0); /* Move para dentro da tela quando ativa */
     }
   }
 }

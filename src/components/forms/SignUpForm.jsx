@@ -34,12 +34,13 @@ const SignUpForm = () => {
           className="form-title"
           gutterBottom
           sx={{
+            mt: "4rem",
             fontSize: {
               xs: "1.5rem",  // até 480px
               sm: "1.8rem",  // até 768px
               md: "2.2rem",  // até 1024px
               lg: "3rem"   // acima de 1024px
-            }
+            },
           }}
         >
           Acesso Restrito
