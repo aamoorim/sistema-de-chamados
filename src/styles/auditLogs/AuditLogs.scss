@@ -184,28 +184,24 @@ body {
   @media (min-width: ($breakpoint-lg + 1)) and (max-width: $breakpoint-xl) {
     min-width: 30vw;
     max-width: 76vw;
-    padding-left: 20px;
   }
 
   // Para telas maiores que $breakpoint-xl e menores que $breakpoint-xxl
   @media (min-width: ($breakpoint-xl + 1)) and (max-width: $breakpoint-xxl) {
     min-width: 78vw;
     max-width: 72vw;
-    padding-left: 20px;
   }
 
   // Para telas maiores que $breakpoint-xxl e menores que $breakpoint-xxxl
   @media (min-width: ($breakpoint-xxl + 1)) and (max-width: $breakpoint-xxxl) {
     min-width: 40vw;
     max-width: 82vw;
-    padding-left: 20px;
   }
 
   // Para telas maiores que $breakpoint-xxxl
   @media (min-width: ($breakpoint-xxxl + 1)) {
     min-width: 56vw;
     max-width: 84vw;
-    padding-left: 20px;
   }
 }
 
