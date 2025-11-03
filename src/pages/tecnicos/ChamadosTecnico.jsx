@@ -99,7 +99,7 @@ function ChamadosTecnicoInner() {
     setEncerrandoId(chamadoId);
 
     try {
-      await chamadoService.atualizarChamado(chamadoId, { status: "encerrado" });
+      await chamadoService.encerrarChamado(chamadoId); // só passa o ID do chamado
 
       setChamados((prev) =>
         prev.map((chamado) =>
@@ -108,7 +108,7 @@ function ChamadosTecnicoInner() {
       );
     } catch (error) {
       console.error("Erro ao encerrar chamado:", error);
-      alert("Erro ao encerrar chamado. Tente novamente.");
+      alert("Não foi possível encerrar o chamado.");
     } finally {
       setEncerrandoId(null);
     }
@@ -226,7 +226,6 @@ function ChamadosTecnicoInner() {
   );
 }
 
-// ✅ Agora o componente final envolve tudo com SearchProvider
 export default function ChamadosTecnico() {
   return (
     <SearchProvider>

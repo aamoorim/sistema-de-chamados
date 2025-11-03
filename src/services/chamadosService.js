@@ -43,6 +43,12 @@ const enviarMensagemNoChamado = async (id, mensagem) => {
   return res.data;
 }
 
+const encerrarChamado = async (chamadoId) => {
+  const res = await api.put(`/chamados/${chamadoId}/encerrar`);
+  return res.data;
+};
+
+
 export default {
   getChamadosDoCliente,
   criarChamado,
@@ -52,4 +58,5 @@ export default {
   getChamadosAbertosDisponiveis,
   getMensagensDoChamado,
   enviarMensagemNoChamado,
+  encerrarChamado,
 };
