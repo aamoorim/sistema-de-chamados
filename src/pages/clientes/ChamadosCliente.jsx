@@ -164,8 +164,8 @@ const ChamadosClienteContent = () => {
         if (["em_andamento", "encerrado"].includes(atualizado.status?.toLowerCase())) {
           const mensagem =
             atualizado.status.toLowerCase() === "em_andamento"
-              ? "Chamado atendido!"
-              : "Chamado finalizado!";
+              ? "Chamado atualizado!"
+              : "Chamado atualizado";
           showToast(mensagem);
         }
       } catch {
